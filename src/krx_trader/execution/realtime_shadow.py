@@ -417,8 +417,25 @@ class RealtimeShadowRunner:
         return self._last_scan is None or (now - self._last_scan).total_seconds() >= 1800
 
     def _scan(self, now: datetime) -> None:
+        now = now.astimezone(KST)
+        if now >= self.stop_at:
+            return
         try:
             candidates, excluded = self.scanner(self.client, self.settings, top_n=20)
+            observed_at = self.clock().astimezone(KST)
+            if observed_at >= self.stop_at:
+                self._monitor_symbols = []
+                self._candidate_rank = {}
+                self._last_scan = observed_at
+                self._event("SCANNER_SKIPPED_AFTER_STOP", observed_at.isoformat(), {
+                    "candidate_count": 0,
+                    "reason": "SCANNER_RESPONSE_OBSERVED_AT_OR_AFTER_SHADOW_STOP",
+                }, observed_at)
+                self._manifest["scanner_cycles_skipped_after_stop"] = int(
+                    self._manifest.get("scanner_cycles_skipped_after_stop", 0)
+                ) + 1
+                self._write_manifest()
+                return
             self._monitor_symbols = [row.stock.symbol for row in candidates[: self.monitor_top]]
             self._candidate_rank = {row.stock.symbol: index for index, row in enumerate(candidates, start=1)}
             serialized = [
@@ -438,19 +455,20 @@ class RealtimeShadowRunner:
                 "excluded_for_eligibility": excluded,
                 "monitored_symbols": self._monitor_symbols,
                 "candidates": serialized,
-            }, now)
-            self._last_scan = now
+            }, observed_at)
+            self._last_scan = observed_at
             self._manifest["scanner_cycles"] = int(self._manifest.get("scanner_cycles", 0)) + 1
             self._write_manifest()
         except (KisApiError, OSError, ValueError) as exc:
+            observed_at = self.clock().astimezone(KST)
             # A failed refresh must not keep yesterday's/currently stale symbols
             # eligible for new decisions.
             self._monitor_symbols = []
             self._candidate_rank = {}
-            self._last_scan = now
-            self._event("SCANNER_FAILURE", f"{now.isoformat()}|{type(exc).__name__}", {
+            self._last_scan = observed_at
+            self._event("SCANNER_FAILURE", f"{observed_at.isoformat()}|{type(exc).__name__}", {
                 "error_type": type(exc).__name__, "candidate_count": 0,
-            }, now)
+            }, observed_at)
             self._manifest["scanner_failures"] = int(self._manifest.get("scanner_failures", 0)) + 1
             self._write_manifest()
 
@@ -535,12 +553,24 @@ class RealtimeShadowRunner:
         regime: Regime | None,
         observed_at: datetime,
     ) -> None:
+        bar = bars[-1]
+        key = f"{symbol}|{interval}|{strategy}|{bar.time.isoformat()}"
+        if observed_at.astimezone(KST) >= self.stop_at:
+            self._event("DECISION_SKIPPED_AFTER_STOP", key, {
+                "symbol": symbol,
+                "strategy": strategy,
+                "interval_minutes": interval,
+                "market_timestamp": bar.time.astimezone(KST).isoformat(),
+                "scheduled_stop": self.stop_at.isoformat(),
+                "reason": "OBSERVED_AT_OR_AFTER_SHADOW_STOP",
+                "order_api_calls": 0,
+            }, observed_at)
+            return
         signal = (
             evaluate_breakout(bars, symbol, regime=regime)
             if strategy == "breakout"
             else evaluate_pullback(bars, symbol, regime=regime)
         )
-        bar = bars[-1]
         cursor_key = f"{symbol}|{interval}|{strategy}"
         previous = self._state["bar_cursor"].get(cursor_key)
         if previous is not None and bar.time.isoformat() <= previous:
@@ -591,7 +621,6 @@ class RealtimeShadowRunner:
                     "risk_budget_krw": initial.risk_budget_krw,
                     "reason": reason,
                 }
-        key = f"{symbol}|{interval}|{strategy}|{bar.time.isoformat()}"
         self._event("DECISION", key, {
             "market_timestamp": bar.time.astimezone(KST).isoformat(),
             "data_timestamp": bar.time.astimezone(KST).isoformat(),
@@ -706,6 +735,8 @@ class RealtimeShadowRunner:
     def _manage_strategy_bar(
         self, symbol: str, interval: int, strategy: str, bar: Bar, observed_at: datetime
     ) -> None:
+        if observed_at.astimezone(KST) >= self.stop_at:
+            return
         for profile, portfolio in self._state["profiles"].items():
             for position in list(portfolio["positions"]):
                 if position["symbol"] != symbol or position["interval"] != interval or position["strategy"] != strategy:
@@ -748,7 +779,10 @@ class RealtimeShadowRunner:
             symbol = str(intent["symbol"])
             signal_time = datetime.fromisoformat(str(intent["signal_time"]))
             earliest = datetime.fromisoformat(str(intent["earliest_fill_time"]))
-            executable = next((bar for bar in bars_by_symbol.get(symbol, []) if bar.time >= max(signal_time, earliest)), None)
+            executable = next((
+                bar for bar in bars_by_symbol.get(symbol, [])
+                if max(signal_time, earliest) <= bar.time < self.stop_at
+            ), None)
             if executable is None:
                 still_pending.append(intent)
                 continue
@@ -887,7 +921,12 @@ class RealtimeShadowRunner:
         self._refresh_indexes(session)
         anchor: list[Bar] = []
         try:
-            anchor = [bar for bar in self.client.get_minute_bars("005930", session) if bar.time + timedelta(minutes=1) <= now]
+            anchor_observed_at = self.clock().astimezone(KST)
+            anchor_cutoff = min(anchor_observed_at, self.stop_at)
+            anchor = [
+                bar for bar in self.client.get_minute_bars("005930", session)
+                if bar.time + timedelta(minutes=1) <= anchor_cutoff
+            ]
         except (KisApiError, OSError, ValueError) as exc:
             self._event("MARKET_STATUS_CHECK", f"{now.isoformat()}|{type(exc).__name__}", {
                 "status": "NOT_CONFIRMED",
@@ -923,10 +962,11 @@ class RealtimeShadowRunner:
             self._ensure_warmup(symbol, session)
         bars_by_symbol: dict[str, list[Bar]] = {}
         fetched_at = self.clock().astimezone(KST)
+        data_cutoff = min(fetched_at, self.stop_at)
         for symbol in dict.fromkeys(["005930", *self._monitor_symbols]):
             try:
                 current = self.client.get_minute_bars(symbol, session)
-                current = [bar for bar in current if bar.time + timedelta(minutes=1) <= fetched_at]
+                current = [bar for bar in current if bar.time + timedelta(minutes=1) <= data_cutoff]
                 if inspect_bars(current):
                     raise ValueError("CURRENT_SESSION_DATA_QUALITY_FAILURE")
                 cursor = self._state["minute_cursor"].get(symbol)

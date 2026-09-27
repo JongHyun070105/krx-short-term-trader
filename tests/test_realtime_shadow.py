@@ -92,6 +92,75 @@ def test_pending_entry_waits_for_minute_after_decision_observation(tmp_path) -> 
     assert event["order_api_calls"] == 0
 
 
+def test_pending_entry_after_shadow_cutoff_is_not_filled(tmp_path) -> None:
+    runner = make_runner(tmp_path)
+    runner._state["pending"].append({
+        "signal_id": "after-cutoff",
+        "symbol": "005930",
+        "strategy": "breakout",
+        "interval": 15,
+        "signal_time": "2026-09-28T12:45:00+09:00",
+        "earliest_fill_time": "2026-09-28T13:00:00+09:00",
+        "signal_high": 1_005,
+        "stop_price": 999,
+        "max_holding_bars": 10,
+        "scanner_rank": 1,
+        "regime": "UP",
+        "snapshot_id": "after-cutoff",
+    })
+
+    runner._resolve_pending(
+        {"005930": [
+            Bar(datetime(2026, 9, 28, 13, 0, tzinfo=KST), 1_000, 1_005, 999, 1_002, 100),
+        ]},
+        observed_at=datetime(2026, 9, 28, 13, 1, tzinfo=KST),
+    )
+
+    assert runner._state["pending"]
+    assert not runner._state["profiles"]["CURRENT_LIVE_LIKE"]["positions"]
+    runner._finish("STOP_TIME_REACHED")
+    event = next(
+        json.loads(line) for line in runner.events_path.read_text(encoding="utf-8").splitlines()
+        if json.loads(line)["event_type"] == "SIMULATED_ORDER_EXPIRED"
+    )
+    assert event["event_type"] == "SIMULATED_ORDER_EXPIRED"
+    assert event["reason"] == "SHADOW_WINDOW_STOP"
+
+
+def test_strategy_decisions_observed_after_cutoff_create_no_intent(tmp_path) -> None:
+    runner = make_runner(tmp_path)
+    start = datetime(2026, 9, 28, 14, 15, tzinfo=KST)
+    completed = [
+        Bar(start + timedelta(minutes=index * 15), 1_000, 1_005, 995, 1_000, 100)
+        for index in range(20)
+    ]
+    completed.append(Bar(datetime(2026, 9, 28, 14, 15, tzinfo=KST), 1_000, 1_012, 1_008, 1_010, 1_000))
+
+    runner._decision(
+        "005930", 15, "breakout", completed, Regime.UP,
+        datetime(2026, 9, 28, 13, 1, tzinfo=KST),
+    )
+
+    events = [json.loads(line) for line in runner.events_path.read_text(encoding="utf-8").splitlines()]
+    assert [event["event_type"] for event in events] == ["DECISION_SKIPPED_AFTER_STOP"]
+
+
+def test_delayed_market_poll_never_collects_bars_after_cutoff(tmp_path) -> None:
+    runner = make_runner(tmp_path)
+    runner.client.bars = [
+        Bar(datetime(2026, 9, 28, 9, tzinfo=KST) + timedelta(minutes=index), 1_000, 1_001, 999, 1_000, 100)
+        for index in range(245)
+    ]  # type: ignore[attr-defined]
+    runner.clock = lambda: datetime(2026, 9, 28, 13, 5, tzinfo=KST)
+
+    runner.cycle(datetime(2026, 9, 28, 12, 59, tzinfo=KST))
+
+    stored = [json.loads(line) for line in runner.bars_path.read_text(encoding="utf-8").splitlines()]
+    assert len(stored) == 240
+    assert stored[-1]["timestamp"] == "2026-09-28T12:59:00+09:00"
+    assert all(datetime.fromisoformat(row["timestamp"]) < datetime(2026, 9, 28, 13, tzinfo=KST) for row in stored)
+
+
 def test_max_holding_exit_uses_next_observed_minute_open(tmp_path) -> None:
     runner = make_runner(tmp_path)
     runner._state["pending"].append({
@@ -290,6 +359,27 @@ def test_scanner_failure_clears_previous_candidate_membership(tmp_path) -> None:
     assert event["event_type"] == "SCANNER_FAILURE"
 
 
+def test_scanner_response_after_cutoff_is_not_accepted(tmp_path) -> None:
+    runner = make_runner(tmp_path)
+    clock = [datetime(2026, 9, 28, 12, 59, tzinfo=KST)]
+    runner.clock = lambda: clock[0]
+    runner._monitor_symbols = ["001440"]
+    runner._candidate_rank = {"001440": 1}
+
+    def late_scan(*_args, **_kwargs):
+        clock[0] = datetime(2026, 9, 28, 13, 1, tzinfo=KST)
+        return ([object()], 0)
+
+    runner.scanner = late_scan
+    runner._scan(datetime(2026, 9, 28, 12, 59, tzinfo=KST))
+
+    assert runner._monitor_symbols == []
+    assert runner._candidate_rank == {}
+    event = json.loads(runner.events_path.read_text(encoding="utf-8").splitlines()[-1])
+    assert event["event_type"] == "SCANNER_SKIPPED_AFTER_STOP"
+    assert event["observed_at"] == "2026-09-28T13:01:00+09:00"
+
+
 def test_index_refresh_retries_transient_failure_after_cooldown(tmp_path) -> None:
     runner = make_runner(tmp_path)
     runner.index_bars = {}
@@ -357,6 +447,7 @@ def test_missing_regular_minutes_prevent_full_pass(tmp_path) -> None:
 
 def test_shared_breakout_evaluator_creates_only_a_simulated_pending_entry(tmp_path) -> None:
     runner = make_runner(tmp_path)
+    runner.stop_at = datetime(2026, 9, 28, 16, tzinfo=KST)
     runner._candidate_rank["005930"] = 1
     start = datetime(2026, 9, 28, 9, 15, tzinfo=KST)
     completed = [

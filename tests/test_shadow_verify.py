@@ -20,8 +20,8 @@ def test_shadow_verifier_replays_signal_from_saved_warmup_and_index_inputs(tmp_p
         Settings(),
         object(),  # type: ignore[arg-type]
         run_id="verify-shadow",
-        scheduled_start=start,
-        stop_at=datetime(2026, 9, 28, 13, tzinfo=KST),
+        scheduled_start=datetime(2026, 9, 28, 12, tzinfo=KST),
+        stop_at=datetime(2026, 9, 28, 16, tzinfo=KST),
         root=tmp_path,
         index_bars={"kospi": [], "kosdaq": []},
         clock=lambda: observed,
