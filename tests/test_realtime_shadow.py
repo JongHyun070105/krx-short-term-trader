@@ -437,6 +437,25 @@ def test_empty_scanner_does_not_fallback_into_strategy_monitoring(tmp_path) -> N
     assert not [event for event in events if event["event_type"] == "DECISION"]
 
 
+def test_shadow_resume_records_restart_gap_and_unknown_exit_cause(tmp_path) -> None:
+    original = make_runner(tmp_path)
+    original._manifest["status"] = "RUNNING"
+    original._manifest["started_at"] = "2026-09-28T09:00:00+09:00"
+    original._manifest["last_market_event_at"] = "2026-09-28T09:04:00+09:00"
+    original._write_manifest()
+
+    resumed = make_runner(tmp_path)
+
+    assert resumed._manifest["started_at"] == "2026-09-28T09:00:00+09:00"
+    assert resumed._manifest["process_start_count"] == 2
+    assert resumed._manifest["process_restart_count"] == 1
+    recovery = resumed._manifest["restart_history"][-1]
+    assert recovery["previous_status"] == "RUNNING"
+    assert recovery["last_checkpoint_at"] == "2026-09-28T09:04:00+09:00"
+    assert recovery["gap_since_last_checkpoint_seconds"] == 60
+    assert recovery["cause"] == "PROCESS_EXIT_CAUSE_NOT_AVAILABLE"
+
+
 def test_missing_regular_minutes_prevent_full_pass(tmp_path) -> None:
     runner = make_runner(tmp_path)
     runner.client.bars = [minute(0), minute(2), minute(4)]  # type: ignore[attr-defined]

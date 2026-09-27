@@ -215,8 +215,36 @@ class RealtimeShadowRunner:
             existing = json.loads(self.manifest_path.read_text(encoding="utf-8"))
             if existing.get("run_id") != self.run_id or existing.get("config_sha256") != config_hash:
                 raise ValueError("run ID already exists with a different frozen configuration")
-            if existing.get("status") == "RUNNING":
+            previous_status = existing.get("status")
+            if previous_status in {"SCHEDULED", "RUNNING"}:
+                detected_at = self.clock().astimezone(KST)
+                checkpoint_text = (
+                    existing.get("last_market_event_at")
+                    or existing.get("last_cycle_started_at")
+                    or existing.get("started_at")
+                    or existing.get("created_at")
+                )
+                try:
+                    checkpoint = datetime.fromisoformat(str(checkpoint_text)).astimezone(KST)
+                    gap_seconds = max(0.0, (detected_at - checkpoint).total_seconds())
+                except (TypeError, ValueError):
+                    checkpoint_text = None
+                    gap_seconds = None
+                process_start_count = int(existing.get("process_start_count", 1)) + 1
+                existing["process_start_count"] = process_start_count
                 existing["process_restart_count"] = int(existing.get("process_restart_count", 0)) + 1
+                restart_history = existing.setdefault("restart_history", [])
+                if not isinstance(restart_history, list):
+                    raise ValueError("Shadow restart history is malformed; resume is fail-closed")
+                restart_history.append({
+                    "process_start_count": process_start_count,
+                    "detected_at": detected_at.isoformat(),
+                    "previous_status": previous_status,
+                    "last_checkpoint_at": checkpoint_text,
+                    "gap_since_last_checkpoint_seconds": gap_seconds,
+                    "cause": "PROCESS_EXIT_CAUSE_NOT_AVAILABLE",
+                })
+                _atomic_json(self.manifest_path, existing)
             self._hydrate_dedup_sets()
             return existing
         git = self._git_evidence()
@@ -227,6 +255,9 @@ class RealtimeShadowRunner:
             "scheduled_start": self.scheduled_start.isoformat(),
             "stop_at": self.stop_at.isoformat(),
             "status": "SCHEDULED",
+            "process_start_count": 1,
+            "process_restart_count": 0,
+            "restart_history": [],
             "source": "KIS read-only REST market-rank, minute, and daily-index endpoints",
             "order_api_calls": 0,
             "account_data_collected": False,
@@ -1073,9 +1104,19 @@ class RealtimeShadowRunner:
             while self.clock().astimezone(KST) < self.scheduled_start:
                 self.sleeper(min(5.0, max(0.0, (self.scheduled_start - self.clock().astimezone(KST)).total_seconds())))
             self._manifest["status"] = "RUNNING"
-            self._manifest["started_at"] = self.clock().astimezone(KST).isoformat()
+            started_at = self.clock().astimezone(KST).isoformat()
+            if not isinstance(self._manifest.get("started_at"), str):
+                self._manifest["started_at"] = started_at
+            self._manifest["last_process_started_at"] = started_at
             self._write_manifest()
-            self._event("RUN_STARTED", self.run_id, {"status": "RUNNING", "order_api_calls": 0})
+            process_start_count = int(self._manifest.get("process_start_count", 1))
+            self._event("RUN_STARTED", f"{self.run_id}|process-{process_start_count}", {
+                "status": "RUNNING",
+                "process_start_count": process_start_count,
+                "process_restart_count": int(self._manifest.get("process_restart_count", 0)),
+                "recovery": (self._manifest.get("restart_history") or [None])[-1] if process_start_count > 1 else None,
+                "order_api_calls": 0,
+            })
             while self.clock().astimezone(KST) < self.stop_at:
                 cycle_started = self.clock().astimezone(KST)
                 self.cycle(cycle_started)
