@@ -24,6 +24,7 @@ from krx_trader.data.cache import ParquetBarCache
 from krx_trader.data.resample import resample_session_minutes
 from krx_trader.market.regime import Regime, classify_regime
 from krx_trader.models import Bar, Decision, Signal
+from krx_trader.research.scenario import ResearchScenario
 from krx_trader.strategies.breakout import BreakoutConfig, evaluate_breakout
 from krx_trader.strategies.pullback import PullbackConfig, evaluate_pullback
 from krx_trader.universe.master import load_stock_master
@@ -146,6 +147,8 @@ def _portfolio_metrics(
         capital_cap_krw=100_000,
         order_cap_krw=settings.max_order_notional_krw,
         risk_per_trade_pct=settings.risk_per_trade_pct,
+        min_price_krw=settings.min_price_krw,
+        max_price_krw=settings.max_price_krw,
         max_concurrent_positions=settings.max_concurrent_positions,
         cost_model=CostModel(settings.broker_fee_rate, settings.sell_tax_rate, settings.slippage_bps),
         stress_multiplier=cost_multiplier,
@@ -233,13 +236,33 @@ def _trade_concentration(
     }
 
 
-def _load_research_bars(cache_root: Path, symbol_filter: list[str] | None = None):
+def _load_research_bars(
+    cache_root: Path,
+    symbol_filter: list[str] | None = None,
+    dataset_manifest: Path = Path("runtime/research/latest_dataset.json"),
+):
     minute_root = cache_root / "minute"
-    dataset_report = Path("runtime/research/latest_dataset.json")
-    report = json.loads(dataset_report.read_text(encoding="utf-8")) if dataset_report.is_file() else {}
+    report = json.loads(dataset_manifest.read_text(encoding="utf-8")) if dataset_manifest.is_file() else {}
     if symbol_filter is None:
         succeeded = report.get("succeeded_symbols", [])
         symbol_filter = succeeded if succeeded else None
+    frozen_sessions = report.get("sessions")
+    session_filter = (
+        {date.fromisoformat(value) for value in frozen_sessions if isinstance(value, str)}
+        if isinstance(frozen_sessions, list)
+        else None
+    )
+    frozen_partitions = report.get("partition_hashes")
+    expected_partition_hashes: dict[tuple[str, str], str] | None = None
+    if isinstance(frozen_partitions, list):
+        expected_partition_hashes = {}
+        for partition in frozen_partitions:
+            if not isinstance(partition, str):
+                raise TypeError("frozen dataset manifest contains an invalid partition hash record")
+            parts = partition.split(":", 2)
+            if len(parts) != 3:
+                raise ValueError("frozen dataset manifest contains an invalid partition hash record")
+            expected_partition_hashes[(parts[0], parts[1])] = parts[2]
     symbols = symbol_filter or sorted(path.name for path in minute_root.iterdir() if path.is_dir())
     range_start = date.fromisoformat(report["date_range"]["start"]) if report.get("date_range") else None
     range_end = date.fromisoformat(report["date_range"]["end"]) if report.get("date_range") else None
@@ -247,9 +270,15 @@ def _load_research_bars(cache_root: Path, symbol_filter: list[str] | None = None
     bars_by_symbol: dict[str, list[Bar]] = {}
     hashes: list[str] = []
     cache = ParquetBarCache(cache_root)
+    actual_partition_hashes: dict[tuple[str, str], str] = {}
     for symbol in symbols:
         symbol_path = minute_root / symbol
         dates = sorted(path.stem for path in symbol_path.glob("*.parquet")) if symbol_path.is_dir() else []
+        if session_filter is not None:
+            dates = [
+                date_text for date_text in dates
+                if date.fromisoformat(date_text) in session_filter
+            ]
         if range_start is not None and range_end is not None:
             dates = [
                 date_text for date_text in dates
@@ -263,18 +292,84 @@ def _load_research_bars(cache_root: Path, symbol_filter: list[str] | None = None
             bars.extend(cache.load("minute", symbol, "1m", session))
             metadata = json.loads((symbol_path / f"{date_text}.metadata.json").read_text(encoding="utf-8"))
             hashes.append(f"{symbol}:{date_text}:{metadata['sha256']}")
+            actual_partition_hashes[(symbol, date_text)] = metadata["sha256"]
         bars.sort(key=lambda bar: bar.time)
         if bars:
             bars_by_symbol[symbol] = bars
+    if expected_partition_hashes is not None:
+        expected_selected = {
+            key: value for key, value in expected_partition_hashes.items()
+            if key[0] in symbols
+            and (session_filter is None or date.fromisoformat(key[1]) in session_filter)
+            and (range_start is None or date.fromisoformat(key[1]) >= range_start)
+            and (range_end is None or date.fromisoformat(key[1]) <= range_end)
+        }
+        if actual_partition_hashes != expected_selected:
+            raise ValueError("cached minute partitions differ from the frozen dataset manifest")
     return bars_by_symbol, hashlib.sha256("\n".join(sorted(hashes)).encode()).hexdigest(), hashes
 
 
-def _with_reference_dataset_hashes(cache_root: Path, hashes: list[str]) -> tuple[str, list[str]]:
+def _verify_frozen_dataset_digest(manifest_report: dict[str, Any], actual_digest: str) -> None:
+    if manifest_report.get("evidence_class") not in {
+        "FRESH_CLEAN_RESEARCH_COHORT",
+        "FRESH_RESEARCH_DIAGNOSTIC_WITH_GAPS",
+    }:
+        return
+    expected_digest = manifest_report.get("dataset_sha256")
+    if not isinstance(expected_digest, str) or actual_digest != expected_digest:
+        raise ValueError("computed dataset hash differs from the frozen cohort manifest")
+
+
+def _segment_dates(common_dates: list[date], manifest_report: dict[str, Any], segment: str) -> list[date]:
+    split_metadata = manifest_report.get("splits")
+    if isinstance(split_metadata, dict) and segment in split_metadata:
+        segment_metadata = split_metadata[segment]
+        start_text = segment_metadata.get("start")
+        end_text = segment_metadata.get("end")
+        if not isinstance(start_text, str) or not isinstance(end_text, str):
+            raise ValueError("frozen split manifest lacks date boundaries")
+        start_day, end_day = date.fromisoformat(start_text), date.fromisoformat(end_text)
+        segment_dates = [day for day in common_dates if start_day <= day <= end_day]
+        expected = segment_metadata.get("sessions")
+        if isinstance(expected, list) and [day.isoformat() for day in segment_dates] != expected:
+            raise ValueError(f"frozen {segment} sessions are incomplete; boundary shifts are prohibited")
+        return segment_dates
+    split = chronological_split([
+        Bar(datetime.combine(day, datetime.min.time(), KST), 1, 1, 1, 1, 0) for day in common_dates
+    ]) if len(common_dates) >= 2 else None
+    if split is None:
+        return common_dates[:1] if segment == "development" else []
+    if segment == "development":
+        return [bar.time.date() for bar in split.development]
+    if segment == "validation":
+        return [bar.time.date() for bar in split.validation]
+    raise ValueError("segment must be development or validation")
+
+
+def _with_reference_dataset_hashes(
+    cache_root: Path,
+    hashes: list[str],
+    *,
+    through_date: date | None = None,
+) -> tuple[str, list[str]]:
     records = list(hashes)
+    cache = ParquetBarCache(cache_root)
     for symbol in ("kospi", "kosdaq"):
         path = cache_root / "indexes" / f"{symbol}-1d.metadata.json"
         metadata = json.loads(path.read_text(encoding="utf-8"))
-        records.append(f"index:{symbol}:{metadata['sha256']}")
+        if through_date is None:
+            digest = metadata["sha256"]
+            bound = "all"
+        else:
+            bars = cache.load("indexes", symbol, "1d")
+            payload = [
+                [bar.time.isoformat(), bar.open, bar.high, bar.low, bar.close, bar.volume]
+                for bar in bars
+                if bar.time.astimezone(KST).date() <= through_date
+            ]
+            digest = hashlib.sha256(json.dumps(payload, separators=(",", ":"), allow_nan=False).encode()).hexdigest()
+            bound = through_date.isoformat()
+        records.append(f"index:{symbol}:through:{bound}:{digest}")
     master_metadata = json.loads(
         (cache_root / "universe" / "stocks.metadata.json").read_text(encoding="utf-8")
     )
@@ -476,6 +571,8 @@ def run_validation(
                     interval_series, evaluate, starting_cash_krw=100_000, capital_cap_krw=100_000,
                     order_cap_krw=settings.max_order_notional_krw,
                     risk_per_trade_pct=settings.risk_per_trade_pct,
+                    min_price_krw=settings.min_price_krw,
+                    max_price_krw=settings.max_price_krw,
                     max_concurrent_positions=settings.max_concurrent_positions,
                     cost_model=CostModel(settings.broker_fee_rate, settings.sell_tax_rate, settings.slippage_bps),
                 )
@@ -520,10 +617,14 @@ def run_baseline(
     interval: str,
     cache_root: Path = Path("data"),
     report_root: Path = Path("runtime/research"),
+    dataset_manifest: Path = Path("runtime/research/latest_dataset.json"),
+    segment: str = "development",
 ) -> dict[str, Any]:
     if strategy not in {"breakout", "pullback"} or interval not in {"15m", "30m"}:
         raise ValueError("strategy must be breakout/pullback and interval must be 15m/30m")
-    one_minute, dataset_hash, hashes = _load_research_bars(cache_root)
+    if segment not in {"development", "validation"}:
+        raise ValueError("baseline segment must be development or validation")
+    one_minute, dataset_hash, hashes = _load_research_bars(cache_root, dataset_manifest=dataset_manifest)
     if not one_minute:
         raise ValueError("no cached real minute dataset; run data build-research-set first")
     common_dates = sorted(set.intersection(*[
@@ -531,17 +632,16 @@ def run_baseline(
     ]))
     if not common_dates:
         raise ValueError("no common KRX sessions across the cached symbols")
-    split = chronological_split([
-        Bar(datetime.combine(day, datetime.min.time(), KST), 1, 1, 1, 1, 0) for day in common_dates
-    ]) if len(common_dates) >= 2 else None
-    development_dates = [bar.time.date() for bar in split.development] if split else common_dates[:1]
-    if not development_dates:
-        raise ValueError("not enough sessions for a development-only baseline")
+    manifest_report = json.loads(dataset_manifest.read_text(encoding="utf-8")) if dataset_manifest.is_file() else {}
+    segment_dates = _segment_dates(common_dates, manifest_report, segment)
+    if not segment_dates:
+        raise ValueError(f"not enough sessions for a {segment}-only baseline")
     size = int(interval[:-1])
+    warmup_dates = [day for day in common_dates if day <= segment_dates[-1]]
     series = {
         symbol: [
             resampled
-            for session in development_dates
+            for session in warmup_dates
             for resampled in resample_session_minutes(
                 [bar for bar in bars if bar.time.astimezone(KST).date() == session], size
             )
@@ -551,15 +651,17 @@ def run_baseline(
     cache = ParquetBarCache(cache_root)
     kospi = cache.load("indexes", "kospi", "1d")
     kosdaq = cache.load("indexes", "kosdaq", "1d")
-    dataset_hash, hashes = _with_reference_dataset_hashes(cache_root, hashes)
+    dataset_end = date.fromisoformat(manifest_report["date_range"]["end"]) if manifest_report.get("date_range") else None
+    dataset_hash, hashes = _with_reference_dataset_hashes(cache_root, hashes, through_date=dataset_end)
+    _verify_frozen_dataset_digest(manifest_report, dataset_hash)
     config = BreakoutConfig() if strategy == "breakout" else PullbackConfig()
-    end_exclusive = date.fromordinal(development_dates[-1].toordinal() + 1)
+    end_exclusive = date.fromordinal(segment_dates[-1].toordinal() + 1)
     results = {}
     for multiplier in (1.0, 1.5, 2.0):
         metrics, portfolio, _ = _portfolio_metrics(
             series, strategy, settings, kospi, kosdaq, config=config,
-            start_date=development_dates[0], end_date=end_exclusive,
-            scanner="top10", cost_multiplier=multiplier, warmup_date=development_dates[0],
+            start_date=segment_dates[0], end_date=end_exclusive,
+            scanner="top10", cost_multiplier=multiplier, warmup_date=warmup_dates[0],
         )
         results[f"{multiplier:.1f}x"] = {
             "metrics": _metrics_dict(metrics), "trades": len(portfolio.trades),
@@ -567,19 +669,209 @@ def run_baseline(
             "closed_trade_net_pnl_krw": round(sum(trade.net_pnl_krw for trade in portfolio.trades), 2),
         }
     report = {
-        "run_id": datetime.now(KST).strftime("baseline-%Y%m%dT%H%M%S%z"),
-        "scope": "DEVELOPMENT_BASELINE_ONLY; FINAL_NOT_TOUCHED",
+        "run_id": datetime.now(KST).strftime("baseline-%Y%m%dT%H%M%S%z") + f"-{strategy}-{interval}-{segment}",
+        "scope": f"{segment.upper()}_BASELINE_ONLY; FRESH_HOLDOUT_NOT_TOUCHED",
         "git_sha": subprocess.run(["git", "rev-parse", "HEAD"], check=True, capture_output=True, text=True).stdout.strip(),
         "dataset_sha256": dataset_hash,
+        "dataset_manifest": str(dataset_manifest),
         "dataset_partitions": hashes,
+        "evidence_class": manifest_report.get("evidence_class", "UNCLASSIFIED_CACHE"),
+        "dataset_quality_status": manifest_report.get("quality", {}).get("status", "NOT_REPORTED"),
+        "promotion_eligible": (
+            manifest_report.get("evidence_class") == "FRESH_CLEAN_RESEARCH_COHORT"
+            and manifest_report.get("quality", {}).get("status") == "PASS"
+        ),
         "strategy": strategy,
         "interval": interval,
         "symbols": sorted(series),
-        "period": [development_dates[0].isoformat(), development_dates[-1].isoformat()],
+        "period": [segment_dates[0].isoformat(), segment_dates[-1].isoformat()],
+        "segment": segment,
         "parameters": asdict(config),
         "capital_krw": 100_000,
         "cost_status": "ASSUMED",
         "results": results,
+    }
+    report_root.mkdir(parents=True, exist_ok=True, mode=0o700)
+    target = report_root / f"{report['run_id']}.json"
+    target.write_text(json.dumps(report, indent=2, ensure_ascii=False, allow_nan=False) + "\n", encoding="utf-8")
+    report["report_path"] = str(target)
+    return report
+
+
+def run_feasibility_matrix(
+    settings: Settings,
+    *,
+    cache_root: Path = Path("data"),
+    report_root: Path = Path("runtime/research"),
+    top_n: int = 10,
+    start_date: date | None = None,
+    end_date: date | None = None,
+    dataset_manifest: Path = Path("runtime/research/latest_dataset.json"),
+) -> dict[str, Any]:
+    """Measure execution feasibility over explicit research scenarios, never live settings."""
+    if (start_date is None) != (end_date is None) or (start_date and end_date and start_date >= end_date):
+        raise ValueError("matrix date bounds must be omitted together or form a non-empty range")
+    manifest_report = json.loads(dataset_manifest.read_text(encoding="utf-8")) if dataset_manifest.is_file() else {}
+    frozen_splits = manifest_report.get("splits")
+    holdout = frozen_splits.get("fresh_holdout") if isinstance(frozen_splits, dict) else None
+    if isinstance(holdout, dict) and (start_date is None or end_date is None):
+        raise ValueError("an explicit date range is required when a fresh holdout is locked")
+    if isinstance(holdout, dict):
+        holdout_start = date.fromisoformat(holdout["start"])
+        if end_date > holdout_start or start_date >= holdout_start:
+            raise ValueError("feasibility matrix cannot evaluate the locked fresh holdout")
+    minute, _, partition_hashes = _load_research_bars(cache_root, dataset_manifest=dataset_manifest)
+    if not minute:
+        raise ValueError("no cached real minute dataset; run data build-research-set first")
+    common_dates = sorted(set.intersection(*[
+        {bar.time.astimezone(KST).date() for bar in bars} for bars in minute.values()
+    ]))
+    if not common_dates:
+        raise ValueError("no common KRX sessions across the cached symbols")
+    range_start = start_date or common_dates[0]
+    range_end = end_date or date.fromordinal(common_dates[-1].toordinal() + 1)
+    available = [day for day in common_dates if range_start <= day < range_end]
+    if not available:
+        raise ValueError("matrix date range contains no common KRX sessions")
+
+    resampled: dict[str, dict[str, list[Bar]]] = {"15m": {}, "30m": {}}
+    for symbol, bars in minute.items():
+        grouped: dict[date, list[Bar]] = {}
+        for bar in bars:
+            grouped.setdefault(bar.time.astimezone(KST).date(), []).append(bar)
+        for interval, size in (("15m", 15), ("30m", 30)):
+            resampled[interval][symbol] = [
+                item for day in common_dates if day < range_end
+                for item in resample_session_minutes(grouped.get(day, []), size)
+            ]
+
+    cache = ParquetBarCache(cache_root)
+    kospi = cache.load("indexes", "kospi", "1d")
+    kosdaq = cache.load("indexes", "kosdaq", "1d")
+    dataset_end = date.fromisoformat(manifest_report["date_range"]["end"]) if manifest_report.get("date_range") else None
+    dataset_hash, partition_hashes = _with_reference_dataset_hashes(
+        cache_root, partition_hashes, through_date=dataset_end
+    )
+    _verify_frozen_dataset_digest(manifest_report, dataset_hash)
+    cost_model = CostModel(settings.broker_fee_rate, settings.sell_tax_rate, settings.slippage_bps)
+    matrix: dict[str, list[dict[str, Any]]] = {}
+    for interval, interval_series in resampled.items():
+        membership = _scanner_membership(interval_series, top_n)
+        by_symbol_time = {
+            symbol: {bar.time: (index, bar) for index, bar in enumerate(bars)}
+            for symbol, bars in interval_series.items()
+        }
+        rows: list[dict[str, Any]] = []
+        for order_cap in (20_000, 30_000, 40_000, 50_000):
+            for risk_pct in (0.25, 0.50, 0.75, 1.00):
+                scenario = ResearchScenario(
+                    name=f"cap{order_cap}_risk{risk_pct:g}",
+                    capital_krw=100_000,
+                    order_cap_krw=order_cap,
+                    risk_per_trade_pct=risk_pct,
+                    regime_mode="off",
+                    max_positions=2,
+                )
+                evaluate = _signal_function(
+                    "breakout", settings, scenario.regime_mode, kospi, kosdaq,
+                    config=BreakoutConfig(), start_date=range_start, end_date=range_end,
+                    warmup_date=common_dates[0], scanner_membership=membership,
+                )
+                run_series = {
+                    symbol: [bar for bar in bars if bar.time.astimezone(KST).date() < range_end]
+                    for symbol, bars in interval_series.items()
+                }
+                result = run_portfolio_backtest(
+                    run_series, evaluate,
+                    starting_cash_krw=scenario.capital_krw,
+                    capital_cap_krw=scenario.capital_krw,
+                    order_cap_krw=scenario.order_cap_krw,
+                    risk_per_trade_pct=scenario.risk_per_trade_pct,
+                    min_price_krw=settings.min_price_krw,
+                    max_price_krw=settings.max_price_krw,
+                    max_concurrent_positions=scenario.max_positions,
+                    cost_model=cost_model,
+                )
+                entries = [
+                    signal for signal in result.decisions
+                    if signal.decision == Decision.ENTER
+                    and range_start <= signal.timestamp.astimezone(KST).date() < range_end
+                ]
+                price_ok = order_ok = risk_ok = cash_ok = executable = 0
+                for signal in entries:
+                    location = by_symbol_time.get(signal.symbol, {}).get(signal.timestamp)
+                    if location is None or location[0] + 1 >= len(interval_series[signal.symbol]):
+                        continue
+                    next_bar = interval_series[signal.symbol][location[0] + 1]
+                    entry = cost_model.buy_fill_price(next_bar.open)
+                    if signal.stop_price is None or entry <= signal.stop_price or entry > next_bar.high:
+                        continue
+                    executable += 1
+                    in_price_range = settings.min_price_krw <= entry <= settings.max_price_krw
+                    price_ok += int(in_price_range)
+                    one_share_notional = entry * (1 + cost_model.broker_fee_rate)
+                    affordable = one_share_notional <= min(scenario.order_cap_krw, scenario.capital_krw)
+                    order_ok += int(in_price_range and affordable)
+                    cash_ok += int(one_share_notional <= scenario.capital_krw)
+                    stop_fill = cost_model.sell_fill_price(signal.stop_price)
+                    per_share_risk = (
+                        entry - stop_fill
+                        + entry * cost_model.broker_fee_rate
+                        + stop_fill * (cost_model.broker_fee_rate + cost_model.sell_tax_rate)
+                    )
+                    risk_ok += int(per_share_risk <= scenario.capital_krw * scenario.risk_per_trade_pct / 100)
+                metrics = calculate_metrics(result)
+                rows.append({
+                    "scenario": scenario.name,
+                    "capital_krw": scenario.capital_krw,
+                    "order_cap_krw": scenario.order_cap_krw,
+                    "risk_per_trade_pct": scenario.risk_per_trade_pct,
+                    "regime_mode": scenario.regime_mode,
+                    "max_positions": scenario.max_positions,
+                    "raw_enter": len(entries),
+                    "price_eligible_next_bar": price_ok,
+                    "one_share_affordable_order_and_cash": order_ok,
+                    "one_share_cash_eligible": cash_ok,
+                    "one_share_risk_eligible": risk_ok,
+                    "next_bar_executable": executable,
+                    "portfolio_fills": len(result.trades),
+                    "execution_rate_pct": len(result.trades) / len(entries) * 100 if entries else None,
+                    "net_pnl_krw": sum(trade.net_pnl_krw for trade in result.trades),
+                    "expectancy_krw": metrics.expectancy_krw if result.trades else None,
+                    "profit_factor": _finite(metrics.profit_factor) if result.trades else None,
+                    "max_drawdown_pct": metrics.max_drawdown_pct,
+                    "cost_drag_krw": metrics.cost_drag_krw,
+                    "segment_end_exits": sum(trade.exit_reason == "SEGMENT_END" for trade in result.trades),
+                })
+        matrix[interval] = rows
+
+    report: dict[str, Any] = {
+        "run_id": datetime.now(KST).strftime("phase25-feasibility-%Y%m%dT%H%M%S%z")
+        + f"-{range_start.isoformat()}_{range_end.isoformat()}",
+        "scope": "DIAGNOSTIC_ONLY; 100K CAPITAL; REGIME OFF; NO LIVE SETTINGS MUTATED",
+        "git_sha": subprocess.run(["git", "rev-parse", "HEAD"], check=True, capture_output=True, text=True).stdout.strip(),
+        "dataset_sha256": dataset_hash,
+        "dataset_manifest": str(dataset_manifest),
+        "dataset_partitions": partition_hashes,
+        "evidence_class": manifest_report.get("evidence_class", "UNCLASSIFIED_CACHE"),
+        "dataset_quality_status": manifest_report.get("quality", {}).get("status", "NOT_REPORTED"),
+        "promotion_eligible": (
+            manifest_report.get("evidence_class") == "FRESH_CLEAN_RESEARCH_COHORT"
+            and manifest_report.get("quality", {}).get("status") == "PASS"
+        ),
+        "symbols": sorted(minute),
+        "sessions_available": len(common_dates),
+        "sessions_evaluated": len(available),
+        "period": [available[0].isoformat(), available[-1].isoformat()],
+        "holdout_policy": "fresh holdout excluded by frozen manifest guard" if isinstance(holdout, dict) else "caller must keep any external holdout outside start_date/end_date",
+        "cost_assumptions": {
+            "broker_fee_rate": settings.broker_fee_rate,
+            "sell_tax_rate": settings.sell_tax_rate,
+            "slippage_bps": settings.slippage_bps,
+            "status": "ASSUMED",
+        },
+        "intervals": matrix,
+        "interpretation": "execution feasibility study, not a profit-parameter selection or live recommendation",
     }
     report_root.mkdir(parents=True, exist_ok=True, mode=0o700)
     target = report_root / f"{report['run_id']}.json"

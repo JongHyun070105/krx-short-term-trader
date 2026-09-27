@@ -28,6 +28,7 @@ def size_long_position(
     sell_tax_rate: float = 0.002,
     slippage_bps: float = 15,
 ) -> SizingResult:
+    """Size whole shares; ``entry_price`` is the assumed buy fill price including slippage."""
     budget = max(0.0, capital_cap_krw * risk_per_trade_pct / 100)
     if entry_price < min_price_krw or entry_price > max_price_krw:
         return SizingResult(0, budget, 0.0, 0.0, "PRICE_OUT_OF_RANGE")
@@ -37,13 +38,16 @@ def size_long_position(
         return SizingResult(0, budget, 0.0, 0.0, "INVALID_CAPITAL_STATE")
     remaining_cap = capital_cap_krw - current_exposure_krw
     max_notional = min(bot_cash_krw, remaining_cap, order_cap_krw)
-    per_share_cost = (entry_price * fee_rate) + (entry_price * slippage_bps / 10_000)
-    per_share_cost += (stop_price * fee_rate) + (stop_price * sell_tax_rate)
-    per_share_risk = entry_price - stop_price + per_share_cost
-    if max_notional < entry_price or per_share_risk <= 0:
+    one_share_purchase_cost = entry_price * (1 + fee_rate)
+    if max_notional < one_share_purchase_cost:
+        return SizingResult(0, budget, 0.0, 0.0, "UNAFFORDABLE_ONE_SHARE")
+    stop_fill = stop_price * (1 - slippage_bps / 10_000)
+    per_share_risk = entry_price - stop_fill
+    per_share_risk += (entry_price * fee_rate) + (stop_fill * (fee_rate + sell_tax_rate))
+    if per_share_risk <= 0:
         return SizingResult(0, budget, 0.0, 0.0, "INSUFFICIENT_CASH_OR_CAP")
     by_risk = floor(budget / per_share_risk)
-    by_notional = floor(max_notional / (entry_price * (1 + fee_rate + slippage_bps / 10_000)))
+    by_notional = floor(max_notional / (entry_price * (1 + fee_rate)))
     quantity = max(0, min(by_risk, by_notional))
     notional = quantity * entry_price
     expected_risk = quantity * per_share_risk

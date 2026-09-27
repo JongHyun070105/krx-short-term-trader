@@ -11,6 +11,12 @@ def test_settings_defaults_are_shadow_and_capital_bounded():
     assert settings.credential_status()["KIS_APP_SECRET"] is False
 
 
+def test_effective_price_respects_order_cap_and_buy_cost_reserve():
+    settings = Settings.from_env({}, env_file=None)
+    assert settings.max_price_krw == 50_000
+    assert settings.effective_max_price_krw == 19_967
+
+
 def test_paper_mode_is_rejected_as_out_of_scope():
     with pytest.raises(ValueError, match="paper is out of scope"):
         Settings.from_env({"TRADING_MODE": "paper"}, env_file=None)

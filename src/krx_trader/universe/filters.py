@@ -28,6 +28,8 @@ def check_eligibility(
         reasons.append("PRICE_TOO_LOW")
     elif activity.price > settings.max_price_krw:
         reasons.append("PRICE_TOO_HIGH")
+    elif activity.price > settings.effective_max_price_krw:
+        reasons.append("UNAFFORDABLE_ONE_SHARE")
     if activity.turnover_krw < min_turnover_krw:
         reasons.append("LIQUIDITY_LOW")
     return Eligibility(stock, activity, not reasons, tuple(reasons or ["ELIGIBLE"]))

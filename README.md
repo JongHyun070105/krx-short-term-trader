@@ -34,7 +34,7 @@ Fill `.env` locally. The doctor prints only whether each credential is present; 
 
 Required local KIS fields are `KIS_APP_KEY`, `KIS_APP_SECRET`, `KIS_ACCOUNT_NO` (first eight digits), `KIS_ACCOUNT_PRODUCT_CODE` (two digits, normally `01`), and `KIS_HTS_ID`. Paper trading is out of scope and has no configuration path.
 
-Defaults are `TRADING_MODE=shadow`, `LIVE_TRADING_ENABLED=false`, `MAX_LIVE_CAPITAL_KRW=100000`, and `MAX_ORDER_NOTIONAL_KRW=20000`. The live capital cap cannot be configured above 100,000 KRW. Fee, tax, and slippage defaults in `.env.example` are assumptions, not verified KIS terms; replace them with the account's current schedule before interpreting backtests.
+Defaults are `TRADING_MODE=shadow`, `LIVE_TRADING_ENABLED=false`, `MAX_LIVE_CAPITAL_KRW=100000`, and `MAX_ORDER_NOTIONAL_KRW=20000`. The live capital cap cannot be configured above 100,000 KRW. Scanner eligibility and sizing both enforce the effective one-share ceiling: the lower of `MAX_PRICE_KRW` and the per-order notional remaining after buy slippage and fee. With the example fee and slippage assumptions, the 20,000 KRW order cap gives an effective scanner ceiling of 19,967 KRW. Sizing takes the assumed buy fill price as its entry input and includes the modeled stop fill, fees, and sell tax in per-share risk. A candidate beyond the order cap reports `UNAFFORDABLE_ONE_SHARE`. Fee, tax, and slippage defaults in `.env.example` are assumptions, not verified KIS terms; replace them with the account's current schedule before interpreting backtests.
 
 ## KIS API
 
@@ -77,7 +77,7 @@ Implemented shared rules:
 - `breakout`: prior completed range high plus volume confirmation.
 - `pullback`: impulse, structure-preserving lower-volume pullback, then local rebreak.
 
-Both return explicit `HOLD` reasons and suppress new long entries in `DOWN` and `HIGH_VOL` regimes. Missing or insufficient regime history also blocks entry. Backtest and replay default to requiring both KOSPI and KOSDAQ daily index CSVs; only prior index sessions are considered for each stock bar. Use `--regime-filter off` only for the explicit OFF-vs-ON comparison. Regime thresholds and strategy defaults are initial research parameters, not calibrated recommendations.
+Both return explicit `HOLD` reasons and suppress new long entries in `DOWN` and `HIGH_VOL` regimes. Missing or insufficient regime history also blocks entry. Backtest and replay default to requiring both KOSPI and KOSDAQ daily index CSVs; only prior index sessions are considered for each stock bar. Use `--regime-filter off` only for the explicit OFF-vs-ON comparison. The volatility measure is the sample standard deviation of daily log returns scaled by `sqrt(N)`, so `REGIME_HIGH_VOL_THRESHOLD=0.025` means 2.5% aggregate volatility across the configured N-session window, not annualized volatility. The threshold and strategy defaults are initial research parameters, not calibrated recommendations.
 
 ## Backtest and replay
 
@@ -100,6 +100,17 @@ The fixed candidate gate requires at least 30 OOS trades, positive expectancy, P
 
 `shadow-replay` only replays a supplied data file; it is not a realtime shadow collector. It does not call KIS or submit broker orders. Live-market Shadow remains `NOT_STARTED` until data-source provenance, stream parsing, operational monitoring, and session evidence are validated.
 
+`shadow-live` polls KIS read-only market-rank, minute-data, and daily-index endpoints during a scheduled KST window (default 09:00–13:00). It confirms the session from KIS minute data, refreshes the eligible Top 20 every 30 minutes, deep-monitors up to five candidates, uses only complete session-anchored 15m/30m bars, and logs all Breakout/Pullback decisions. Simulated entries use the next one-minute bar after the decision was observed and apply the configured assumed costs; no broker order endpoint is available to this runner. Current-session bars, historical warmup bars, the exact index inputs, scanner events, resumable state, and the run manifest are written under `runtime/shadow/<run-id>/` so the signal path can be replayed from its captured inputs. At the stop time, open simulated positions receive an `OBSERVATIONAL_MARK` and are not force-closed. Costs remain `ASSUMED`; this evidence validates collection and pipeline behavior, not strategy profitability or live readiness.
+
+Start the command before the scheduled opening if it should wait without querying KIS until 09:00:
+
+```bash
+uv run krx-trader shadow-live --run-id shadow-20260928 --start 09:00 --stop 13:00
+uv run krx-trader shadow-verify --run-dir runtime/shadow/shadow-20260928
+```
+
+An optional frozen `ResearchScenario` JSON file can add a second independent simulated sizing ledger. The command still requires `TRADING_MODE=shadow` and `LIVE_TRADING_ENABLED=false`.
+
 ## Risk and live safety
 
 Sizing starts from the configured cash risk budget divided by stop distance, then applies one-share granularity, available bot cash, exposure, per-order cap, price band, fees, tax reserve, and slippage. Zero shares means skip. Daily risk state survives restarts in ignored `runtime/`; corrupt risk state fails closed.
@@ -108,7 +119,7 @@ Sizing starts from the configured cash risk budget divided by stop distance, the
 
 ## Known limitations
 
-- The realtime WebSocket callback receives raw provider messages; completed-bar parsing and end-to-end Shadow collection are not yet connected.
+- The realtime collector currently uses bounded REST minute polling; WebSocket trade-message parsing is not connected to completed bars.
 - No account/buying-power/open-order reconciliation, KIS order/cancel adapter, or complete live preflight exists.
 - Historical universe membership comes from the current stock master, so delisting/survivorship bias remains.
 - One short recent dataset cannot establish robust alpha; inspect `RESULTS.md` before using any strategy conclusion.

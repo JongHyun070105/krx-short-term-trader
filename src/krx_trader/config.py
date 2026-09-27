@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from collections.abc import Mapping
 from dataclasses import dataclass
+from math import floor
 from pathlib import Path
 
 
@@ -61,6 +62,13 @@ class Settings:
     regime_trend_lookback: int = 20
     regime_volatility_lookback: int = 20
     regime_high_vol_threshold: float = 0.025
+
+    @property
+    def effective_max_price_krw(self) -> int:
+        """Highest scanner price that fits one share under the order cap and buy-cost reserve."""
+        slippage = self.slippage_bps / 10_000
+        scanner_price_reserve = (1 + slippage) * (1 + self.broker_fee_rate)
+        return min(self.max_price_krw, floor(self.max_order_notional_krw / scanner_price_reserve))
 
     @classmethod
     def from_env(

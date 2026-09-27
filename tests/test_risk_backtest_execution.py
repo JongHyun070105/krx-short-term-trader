@@ -28,12 +28,37 @@ def test_sizing_skips_expensive_one_share_risk_and_enforces_order_cap():
         capital_cap_krw=100_000, order_cap_krw=20_000, risk_per_trade_pct=0.25,
     )
     assert result.quantity == 0
-    assert result.reason == "RISK_BUDGET_BELOW_ONE_SHARE"
+    assert result.reason == "UNAFFORDABLE_ONE_SHARE"
+    risk_limited = size_long_position(
+        entry_price=10_000, stop_price=9_700, bot_cash_krw=100_000, current_exposure_krw=0,
+        capital_cap_krw=100_000, order_cap_krw=20_000, risk_per_trade_pct=0.25,
+    )
+    assert risk_limited.quantity == 0
+    assert risk_limited.reason == "RISK_BUDGET_BELOW_ONE_SHARE"
     bounded = size_long_position(
         entry_price=10_000, stop_price=9_990, bot_cash_krw=100_000, current_exposure_krw=90_000,
         capital_cap_krw=100_000, order_cap_krw=20_000, risk_per_trade_pct=1,
     )
     assert bounded.notional_krw <= 10_000
+
+
+def test_sizing_risk_uses_buy_fill_and_slipped_stop_exit_once():
+    result = size_long_position(
+        entry_price=1_000,
+        stop_price=990,
+        bot_cash_krw=100_000,
+        current_exposure_krw=0,
+        capital_cap_krw=100_000,
+        order_cap_krw=100_000,
+        risk_per_trade_pct=1.0,
+        fee_rate=0.005,
+        sell_tax_rate=0.005,
+        slippage_bps=100,
+    )
+    stop_fill = 990 * 0.99
+    expected_per_share_risk = 1_000 - stop_fill + 1_000 * 0.005 + stop_fill * 0.01
+    assert result.quantity > 0
+    assert result.expected_risk_krw / result.quantity == pytest.approx(expected_per_share_risk)
 
 
 def test_entry_gates_fail_closed_for_data_loss_and_duplicates():

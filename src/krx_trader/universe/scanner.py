@@ -24,12 +24,16 @@ def scan_market(
 ) -> tuple[list[CandidateContext], int]:
     if not 1 <= top_n <= 100:
         raise ValueError("top_n must be between 1 and 100")
+    if settings.effective_max_price_krw < settings.min_price_krw:
+        return [], 0
     stocks = {row.symbol: row for row in load_stock_master(master_path)}
     volume = client.get_market_activity_rank(
-        sort_by="volume", limit=top_n, min_price=settings.min_price_krw, max_price=settings.max_price_krw
+        sort_by="volume", limit=top_n, min_price=settings.min_price_krw,
+        max_price=settings.effective_max_price_krw,
     )
     turnover = client.get_market_activity_rank(
-        sort_by="turnover", limit=top_n, min_price=settings.min_price_krw, max_price=settings.max_price_krw
+        sort_by="turnover", limit=top_n, min_price=settings.min_price_krw,
+        max_price=settings.effective_max_price_krw,
     )
     activities = deduplicate_activities(volume, turnover)
     included, excluded = eligible_activities(

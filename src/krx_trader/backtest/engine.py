@@ -71,6 +71,8 @@ def run_backtest(
     capital_cap_krw: float = 100_000,
     order_cap_krw: float = 20_000,
     risk_per_trade_pct: float = 0.25,
+    min_price_krw: float = 1_000,
+    max_price_krw: float = 50_000,
     cost_model: CostModel,
     stress_multiplier: float = 1.0,
 ) -> BacktestResult:
@@ -139,6 +141,8 @@ def run_backtest(
                     capital_cap_krw=min(capital_cap_krw, starting_cash_krw),
                     order_cap_krw=order_cap_krw,
                     risk_per_trade_pct=risk_per_trade_pct,
+                    min_price_krw=min_price_krw,
+                    max_price_krw=max_price_krw,
                     fee_rate=cost_model.broker_fee_rate * stress_multiplier,
                     sell_tax_rate=cost_model.sell_tax_rate * stress_multiplier,
                     slippage_bps=cost_model.slippage_bps * stress_multiplier,

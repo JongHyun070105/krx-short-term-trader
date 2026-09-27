@@ -87,6 +87,35 @@ def test_quote_parses_only_market_fields_and_marks_local_observation_time(tmp_pa
     assert (quote.volume, quote.turnover_krw) == (9876, 120000000)
 
 
+def test_index_history_is_fetched_in_bounded_date_chunks(tmp_path):
+    def row(session: str, close: str) -> dict[str, str]:
+        return {
+            "stck_bsop_date": session,
+            "bstp_nmix_oprc": close,
+            "bstp_nmix_hgpr": close,
+            "bstp_nmix_lwpr": close,
+            "bstp_nmix_prpr": close,
+            "acml_vol": "0",
+        }
+
+    transport = FakeTransport([
+        response({"access_token": "tok", "expires_in": 3600}),
+        response({"rt_cd": "0", "output2": [row("20260402", "100"), row("20260506", "101")]}),
+        response({"rt_cd": "0", "output2": [row("20260506", "101")]}),
+    ])
+    manager = TokenManager("app", "secret", transport, tmp_path / "token.json")
+    client = KisRestClient("app", "secret", manager, transport, min_request_interval=0,
+                           rate_limit_path=tmp_path / "rate.json")
+
+    bars = client.get_index_bars("0001", date(2026, 4, 1), date(2026, 5, 10))
+
+    index_calls = [call for call in transport.calls if call[1].endswith("inquire-daily-indexchartprice")]
+    assert len(index_calls) == 2
+    assert [call[2]["params"]["FID_INPUT_DATE_1"] for call in index_calls] == ["20260401", "20260506"]
+    assert [call[2]["params"]["FID_INPUT_DATE_2"] for call in index_calls] == ["20260505", "20260510"]
+    assert [bar.time.date().isoformat() for bar in bars] == ["2026-04-02", "2026-05-06"]
+
+
 def test_invalid_symbol_fails_before_network(tmp_path):
     transport = FakeTransport([])
     manager = TokenManager("app", "secret", transport, tmp_path / "token.json")

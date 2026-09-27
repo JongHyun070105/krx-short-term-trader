@@ -356,30 +356,32 @@ class KisRestClient:
             raise ValueError("index_code must be 0001 (KOSPI) or 1001 (KOSDAQ)")
         if start > end:
             raise ValueError("start date must not be after end date")
+        if (end - start).days > 365:
+            raise ValueError("index history is limited to a one-year range")
         all_rows: dict[str, dict[str, Any]] = {}
-        current_end = end
-        for _ in range(10):
+        chunk_start = start
+        while chunk_start <= end:
+            chunk_end = min(end, chunk_start + timedelta(days=34))
             payload = self._get(
                 INDEX_DAILY_PATH,
                 "FHKUP03500100",
                 {
                     "FID_COND_MRKT_DIV_CODE": "U",
                     "FID_INPUT_ISCD": index_code,
-                    "FID_INPUT_DATE_1": start.strftime("%Y%m%d"),
-                    "FID_INPUT_DATE_2": current_end.strftime("%Y%m%d"),
+                    "FID_INPUT_DATE_1": chunk_start.strftime("%Y%m%d"),
+                    "FID_INPUT_DATE_2": chunk_end.strftime("%Y%m%d"),
                     "FID_PERIOD_DIV_CODE": "D",
                 },
             )
             rows = payload.get("output2", [])
-            if not isinstance(rows, list) or not rows:
-                break
+            if not isinstance(rows, list):
+                raise KisApiError("KIS index-bar response was invalid")
             valid_rows = [row for row in rows if isinstance(row, dict) and row.get("stck_bsop_date")]
             for row in valid_rows:
-                all_rows[row["stck_bsop_date"]] = row
-            oldest = min(row["stck_bsop_date"] for row in valid_rows) if valid_rows else ""
-            if not oldest or oldest <= start.strftime("%Y%m%d") or len(valid_rows) < 100:
-                break
-            current_end = date.fromisoformat(f"{oldest[:4]}-{oldest[4:6]}-{oldest[6:8]}") - timedelta(days=1)
+                session_text = row["stck_bsop_date"]
+                if chunk_start.strftime("%Y%m%d") <= session_text <= chunk_end.strftime("%Y%m%d"):
+                    all_rows[session_text] = row
+            chunk_start = chunk_end + timedelta(days=1)
         bars = []
         for key, row in all_rows.items():
             if start.strftime("%Y%m%d") <= key <= end.strftime("%Y%m%d"):

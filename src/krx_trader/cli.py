@@ -18,13 +18,16 @@ from krx_trader.config import Settings
 from krx_trader.data.cache import ParquetBarCache
 from krx_trader.data.historical import load_bars_csv
 from krx_trader.data.research_set import build_research_set
+from krx_trader.execution.realtime_shadow import RealtimeShadowRunner, scheduled_market_window
 from krx_trader.execution.shadow import run_shadow_replay
+from krx_trader.execution.shadow_verify import verify_shadow_run
 from krx_trader.kis.auth import KisAuthError, TokenManager
 from krx_trader.kis.rest import KisApiError, KisRestClient
 from krx_trader.kis.transport import UrllibTransport
 from krx_trader.market.regime import Regime, classify_regime
 from krx_trader.models import Bar
-from krx_trader.research.runner import run_baseline, run_validation
+from krx_trader.research.runner import run_baseline, run_feasibility_matrix, run_validation
+from krx_trader.research.scenario import ResearchScenario
 from krx_trader.status import write_project_status
 from krx_trader.storage.sqlite_store import SQLiteStore
 from krx_trader.strategies.breakout import evaluate_breakout
@@ -213,6 +216,59 @@ def _scan_command(args, settings: Settings) -> int:
     return 0
 
 
+def _shadow_live(args, settings: Settings) -> int:
+    if settings.trading_mode != "shadow" or settings.live_trading_enabled:
+        print("Blocked: realtime Shadow requires shadow mode and LIVE_TRADING_ENABLED=false", file=sys.stderr)
+        return 2
+    scenario = None
+    if args.research_scenario is not None:
+        try:
+            payload = json.loads(args.research_scenario.read_text(encoding="utf-8"))
+            scenario = ResearchScenario(
+                name=str(payload["name"]),
+                capital_krw=int(payload["capital_krw"]),
+                order_cap_krw=int(payload["order_cap_krw"]),
+                risk_per_trade_pct=float(payload["risk_per_trade_pct"]),
+                regime_mode=str(payload.get("regime_mode", "on")),
+                max_positions=int(payload.get("max_positions", settings.max_concurrent_positions)),
+            )
+        except (OSError, ValueError, KeyError, TypeError, json.JSONDecodeError) as exc:
+            print(f"Invalid frozen research scenario: {type(exc).__name__}", file=sys.stderr)
+            return 2
+    start, stop = scheduled_market_window(datetime.now(ZoneInfo("Asia/Seoul")).date(), args.start, args.stop)
+    run_id = args.run_id or datetime.now(ZoneInfo("Asia/Seoul")).strftime("shadow-%Y%m%dT%H%M%S%z")
+    try:
+        runner = RealtimeShadowRunner(
+            settings,
+            _kis_client(settings),
+            run_id=run_id,
+            scheduled_start=start,
+            stop_at=stop,
+            research_scenario=scenario,
+            poll_seconds=args.poll_seconds,
+            monitor_top=args.monitor_top,
+        )
+        report = runner.run()
+    except (KisApiError, OSError, RuntimeError, ValueError) as exc:
+        print(f"Realtime Shadow failed: {type(exc).__name__}; details redacted", file=sys.stderr)
+        return 1
+    _emit_json({
+        "run_id": report["run_id"],
+        "status": report["status"],
+        "started_at": report.get("started_at"),
+        "stopped_at": report.get("stopped_at"),
+        "market_status": report.get("market_status", "NOT_CONFIRMED"),
+        "poll_cycles": report.get("poll_cycles", 0),
+        "scanner_cycles": report.get("scanner_cycles", 0),
+        "completed_minute_bars": report.get("completed_minute_bars", 0),
+        "strategy_decisions": report.get("strategy_decisions", 0),
+        "api_errors": report.get("api_errors", 0),
+        "order_api_calls": 0,
+        "manifest": str(runner.manifest_path),
+    })
+    return 0 if report["status"] == "PASS" else 1
+
+
 def _doctor(settings: Settings) -> int:
     checks: list[tuple[str, bool]] = [("Python >= 3.11", sys.version_info >= (3, 11))]
     checks.extend((name, present) for name, present in settings.credential_status().items())
@@ -316,8 +372,15 @@ def build_parser() -> argparse.ArgumentParser:
     for strategy in ("breakout", "pullback"):
         strategy_research = research_sub.add_parser(strategy)
         strategy_research.add_argument("--interval", choices=("15m", "30m"), required=True)
+        strategy_research.add_argument("--manifest", type=Path, default=Path("runtime/research/latest_dataset.json"))
+        strategy_research.add_argument("--segment", choices=("development", "validation"), default="development")
     research_validate = research_sub.add_parser("validate", help="run four baselines, OOS, stress, scanner and regime comparisons")
     research_validate.add_argument("--top", type=int, default=10)
+    feasibility = research_sub.add_parser("feasibility-matrix", help="compare fixed 100K execution constraints offline")
+    feasibility.add_argument("--top", type=int, default=10)
+    feasibility.add_argument("--start", type=_parse_iso_date)
+    feasibility.add_argument("--end", type=_parse_iso_date)
+    feasibility.add_argument("--manifest", type=Path, default=Path("runtime/research/latest_dataset.json"))
     validate = sub.add_parser("validate", help="alias for research validate")
     validate.add_argument("--top", type=int, default=10)
     backtest = sub.add_parser("backtest")
@@ -336,6 +399,17 @@ def build_parser() -> argparse.ArgumentParser:
     shadow.add_argument("--regime-filter", choices=("on", "off"), default="on")
     shadow.add_argument("--kospi-index-input", type=Path)
     shadow.add_argument("--kosdaq-index-input", type=Path)
+    realtime_shadow = sub.add_parser(
+        "shadow-live", help="collect live KIS market data and emit only simulated Shadow orders"
+    )
+    realtime_shadow.add_argument("--run-id")
+    realtime_shadow.add_argument("--start", default="09:00")
+    realtime_shadow.add_argument("--stop", default="13:00")
+    realtime_shadow.add_argument("--poll-seconds", type=int, default=60)
+    realtime_shadow.add_argument("--monitor-top", type=int, default=5)
+    realtime_shadow.add_argument("--research-scenario", type=Path)
+    shadow_verify = sub.add_parser("shadow-verify", help="replay captured Shadow decisions without network access")
+    shadow_verify.add_argument("--run-dir", type=Path, required=True)
     live = sub.add_parser("live-preflight")
     live.add_argument("--confirm-live", action="store_true")
     return parser
@@ -343,6 +417,17 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
+    if args.command == "shadow-verify":
+        try:
+            report = verify_shadow_run(args.run_dir)
+        except (OSError, ValueError, RuntimeError, KeyError) as exc:
+            print(f"Shadow replay verification failed: {type(exc).__name__}; details redacted", file=sys.stderr)
+            raise SystemExit(1) from None
+        report_path = args.run_dir / "parity.json"
+        report_path.write_text(json.dumps(report, indent=2, ensure_ascii=False, allow_nan=False) + "\n", encoding="utf-8")
+        report["report_path"] = str(report_path)
+        _emit_json(report)
+        return
     try:
         settings = Settings.from_env()
     except ValueError as exc:
@@ -380,12 +465,26 @@ def main() -> None:
         except (KisAuthError, KisApiError, OSError, ValueError) as exc:
             print(f"KIS scan failed: {type(exc).__name__}; details redacted", file=sys.stderr)
             raise SystemExit(1) from None
+    if args.command == "shadow-live":
+        raise SystemExit(_shadow_live(args, settings))
     if args.command == "research":
         try:
             if args.research_command == "validate":
                 _emit_json(run_validation(settings, top_n=args.top))
+            elif args.research_command == "feasibility-matrix":
+                _emit_json(run_feasibility_matrix(
+                    settings, top_n=args.top,
+                    start_date=args.start, end_date=args.end,
+                    dataset_manifest=args.manifest,
+                ))
             else:
-                _emit_json(run_baseline(settings, strategy=args.research_command, interval=args.interval))
+                _emit_json(run_baseline(
+                    settings,
+                    strategy=args.research_command,
+                    interval=args.interval,
+                    dataset_manifest=args.manifest,
+                    segment=args.segment,
+                ))
         except (OSError, ValueError, RuntimeError, KeyError) as exc:
             print(f"Offline research failed: {type(exc).__name__}; details redacted", file=sys.stderr)
             raise SystemExit(1) from None
@@ -422,6 +521,8 @@ def main() -> None:
                 capital_cap_krw=settings.max_live_capital_krw,
                 order_cap_krw=settings.max_order_notional_krw,
                 risk_per_trade_pct=settings.risk_per_trade_pct,
+                min_price_krw=settings.min_price_krw,
+                max_price_krw=settings.max_price_krw,
                 cost_model=_cost_model(settings),
                 stress_multiplier=multiplier,
             )

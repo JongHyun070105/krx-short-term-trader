@@ -7,7 +7,7 @@ from conftest import make_bar
 
 from krx_trader.data.quality import DataQualityError, inspect_bars, is_stale, require_healthy_bars
 from krx_trader.data.resample import resample_session_minutes
-from krx_trader.market.regime import Regime, classify_regime
+from krx_trader.market.regime import Regime, aggregate_window_volatility, classify_regime
 from krx_trader.models import Decision
 from krx_trader.strategies.breakout import BreakoutConfig, evaluate_breakout
 from krx_trader.strategies.pullback import PullbackConfig, evaluate_pullback
@@ -104,6 +104,12 @@ def test_regime_is_unavailable_without_enough_completed_index_history():
     signal = evaluate_breakout(bars, "005930")
     assert signal.decision == Decision.HOLD
     assert signal.reason_codes == ("REGIME_UNAVAILABLE",)
+
+
+def test_regime_window_volatility_matches_hand_calculation():
+    # Two alternating 1% log returns have sample std sqrt(2) * 1%; scaling by sqrt(N=2) gives 2%.
+    assert aggregate_window_volatility([0.01, -0.01]) == pytest.approx(0.02)
+    assert aggregate_window_volatility([0.01, 0.01]) == pytest.approx(0.0)
 
 
 def test_regime_classification_uses_only_previous_index_sessions():

@@ -13,6 +13,7 @@ from krx_trader.universe.filters import check_eligibility, deduplicate_activitie
 from krx_trader.universe.master import parse_master_archive
 from krx_trader.universe.models import CandidateContext, MarketActivity, StockMaster
 from krx_trader.universe.rankers import rank_breakout, rank_pullback
+from krx_trader.universe.scanner import scan_market
 
 KST = ZoneInfo("Asia/Seoul")
 
@@ -54,6 +55,25 @@ def test_universe_eligibility_uses_price_security_status_and_turnover():
         "SECURITY_TYPE_EXCLUDED", "TRADING_HALTED", "MANAGEMENT_SECURITY", "MARKET_WARNING",
         "PRICE_TOO_LOW", "LIQUIDITY_LOW",
     )
+
+
+def test_universe_excludes_price_above_one_share_order_cap():
+    settings = Settings.from_env({}, env_file=None)
+    result = check_eligibility(
+        stock(), activity(price=20_000), settings, min_turnover_krw=50_000_000
+    )
+    assert not result.eligible
+    assert result.reason_codes == ("UNAFFORDABLE_ONE_SHARE",)
+
+
+def test_scanner_returns_empty_when_order_cap_cannot_afford_minimum_price(tmp_path):
+    settings = Settings.from_env({"MAX_ORDER_NOTIONAL_KRW": "500"}, env_file=None)
+
+    class UnusedClient:
+        def get_market_activity_rank(self, **_kwargs):
+            raise AssertionError("scanner must stop before an invalid provider price range")
+
+    assert scan_market(UnusedClient(), settings, master_path=tmp_path / "missing.parquet") == ([], 0)
 
 
 def test_market_rank_source_union_deduplicates_by_symbol_deterministically():
