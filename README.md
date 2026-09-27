@@ -4,7 +4,7 @@ Research-first tooling for KRX common stocks. The current release provides local
 
 ## Current status
 
-See [STATUS.md](STATUS.md), [RESULTS.md](RESULTS.md), and [LIVE_READINESS.md](LIVE_READINESS.md). Initial state is `ALPHA=UNPROVEN`, `BACKTEST=NOT_RUN`, `OOS=NOT_RUN`, `SHADOW=NOT_STARTED`, `PAPER=OUT_OF_SCOPE`, and `LIVE=DISABLED`.
+See [STATUS.md](STATUS.md), [RESULTS.md](RESULTS.md), and [LIVE_READINESS.md](LIVE_READINESS.md). Phase 2 recorded `ALPHA=UNPROVEN`, `BACKTEST=PASS` (research run completed with no fills), `OOS=INSUFFICIENT_SAMPLE`, `SHADOW=NOT_PROMOTED`, `PAPER=OUT_OF_SCOPE`, and `LIVE=DISABLED`.
 
 ## Architecture
 
