@@ -12,6 +12,7 @@ from krx_trader.models import Bar
 from krx_trader.research.runner import (
     _bars_for_segment,
     _load_research_bars,
+    _market_regime,
     _scanner_membership,
     _segment_dates,
     _trade_concentration,
@@ -44,6 +45,43 @@ def test_historical_scanner_rank_is_point_in_time_and_tie_breaks_by_symbol():
     membership = _scanner_membership(bars, 1)
     assert membership[times[0]] == {"000001"}
     assert membership[times[1]] == {"000001"}
+
+
+def test_future_scanner_bar_cannot_change_earlier_membership():
+    first = datetime(2026, 9, 21, 9, 0, tzinfo=KST)
+    future = first + timedelta(minutes=15)
+    bars = {
+        "000001": [Bar(first, 100, 101, 99, 100, 100), Bar(future, 100, 101, 99, 100, 100)],
+        "000002": [Bar(first, 100, 101, 99, 100, 90), Bar(future, 100, 1_000, 1, 900, 10_000_000)],
+    }
+    baseline = _scanner_membership(bars, 1)
+    changed_future = {
+        symbol: list(values)
+        for symbol, values in bars.items()
+    }
+    changed_future["000002"][1] = Bar(future, 100, 2_000, 1, 1_900, 20_000_000)
+
+    assert baseline[first] == _scanner_membership(changed_future, 1)[first] == {"000001"}
+
+
+def test_research_regime_ignores_current_session_index_close():
+    from krx_trader.config import Settings
+    from krx_trader.market.regime import Regime
+
+    prior = [
+        Bar(datetime(2026, 1, 1, tzinfo=KST) + timedelta(days=index),
+            100 + index * 0.1, 100.2 + index * 0.1, 99.9 + index * 0.1,
+            100 + index * 0.1, 0)
+        for index in range(22)
+    ]
+    current_session = Bar(datetime(2026, 1, 23, tzinfo=KST), 102.1, 2_000, 10, 1_500, 0)
+
+    baseline = _market_regime(date(2026, 1, 23), prior, prior, Settings())
+    changed_current_close = _market_regime(
+        date(2026, 1, 23), prior + [current_session], prior + [current_session], Settings()
+    )
+
+    assert baseline == changed_current_close == Regime.UP
 
 
 def test_research_segment_keeps_warmup_bars_and_excludes_adjacent_partitions():
