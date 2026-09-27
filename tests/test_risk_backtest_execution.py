@@ -1,4 +1,5 @@
-from datetime import datetime
+import random
+from datetime import datetime, timedelta
 
 import pytest
 from conftest import KST, make_bar
@@ -16,7 +17,7 @@ from krx_trader.execution.live import (
 )
 from krx_trader.execution.state_machine import OrderStatus, transition
 from krx_trader.market.regime import Regime
-from krx_trader.models import Decision, Signal
+from krx_trader.models import Bar, Decision, Signal
 from krx_trader.risk.gates import GateInput, evaluate_entry_gates
 from krx_trader.risk.kill_switch import DailyRiskState
 from krx_trader.risk.sizing import size_long_position
@@ -174,6 +175,86 @@ def test_strategy_signal_does_not_use_future_bars_in_backtest():
     original = run_backtest(bars, signal_fn, symbol="005930", cost_model=CostModel(0.0, 0.0, 0.0))
     modified = run_backtest(changed, signal_fn, symbol="005930", cost_model=CostModel(0.0, 0.0, 0.0))
     assert original.decisions[:4] == modified.decisions[:4]
+
+
+def test_randomized_portfolio_execution_invariants():
+    """Stress whole-share sizing and next-bar fills across varied valid OHLC paths."""
+    costs = CostModel(0.00015, 0.002, 15)
+    symbols = {"005930": 5_000.0, "000660": 10_000.0, "035420": 25_000.0, "051910": 45_000.0}
+
+    for seed in range(20):
+        rng = random.Random(seed)
+        bars_by_symbol = {}
+        for symbol, base in symbols.items():
+            previous_close = base
+            bars = []
+            for minute in range(40):
+                open_price = previous_close * (1 + rng.uniform(-0.01, 0.01))
+                close = open_price * (1 + rng.uniform(-0.015, 0.015))
+                high = max(open_price, close) * (1 + rng.uniform(0, 0.01))
+                low = min(open_price, close) * (1 - rng.uniform(0, 0.01))
+                bars.append(
+                    Bar(
+                        datetime(2026, 1, 5, 9, tzinfo=KST) + timedelta(minutes=minute),
+                        open_price,
+                        high,
+                        low,
+                        close,
+                        rng.randint(1_000, 100_000),
+                    )
+                )
+                previous_close = close
+            bars_by_symbol[symbol] = bars
+
+        def signal_fn(symbol, history):
+            last = history[-1]
+            if len(history) >= 2 and len(history) % 6 == 2:
+                return Signal(last.time, symbol, "randomized-invariant", Decision.ENTER,
+                              ("TEST",), last.close, last.low * 0.95, 2)
+            return Signal(last.time, symbol, "randomized-invariant", Decision.HOLD, ("TEST",))
+
+        result = run_portfolio_backtest(
+            bars_by_symbol,
+            signal_fn,
+            starting_cash_krw=100_000,
+            capital_cap_krw=100_000,
+            order_cap_krw=50_000,
+            risk_per_trade_pct=1.0,
+            max_price_krw=50_000,
+            max_concurrent_positions=2,
+            cost_model=costs,
+        )
+
+        assert result.ending_cash_krw >= 0
+        assert min(result.equity_curve) >= 0
+        for trade in result.trades:
+            assert type(trade.quantity) is int and trade.quantity > 0
+            assert trade.entry_signal_time < trade.entry_time
+            assert trade.entry_price * trade.quantity <= 50_000
+        fill_keys = [
+            (trade.symbol, trade.strategy_id, trade.entry_signal_time)
+            for trade in result.trades
+        ]
+        assert len(fill_keys) == len(set(fill_keys))
+        assert result.open_position is None
+
+        # Apply exits before same-timestamp fills, matching the portfolio event loop.
+        by_entry: dict[datetime, list] = {}
+        by_exit: dict[datetime, list] = {}
+        for trade in result.trades:
+            by_entry.setdefault(trade.entry_time, []).append(trade)
+            by_exit.setdefault(trade.exit_time, []).append(trade)
+        active = {}
+        for timestamp in sorted(set(by_entry) | set(by_exit)):
+            for trade in by_exit.get(timestamp, []):
+                if trade.entry_time < timestamp:
+                    active.pop(id(trade), None)
+            for trade in by_entry.get(timestamp, []):
+                active[id(trade)] = trade
+            assert len(active) <= 2
+            assert sum(item.entry_price * item.quantity for item in active.values()) <= 100_000
+            for trade in by_exit.get(timestamp, []):
+                active.pop(id(trade), None)
 
 
 def test_strategy_gate_requires_oos_stress_trade_count_and_neighborhood():
