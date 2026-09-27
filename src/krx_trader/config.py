@@ -54,6 +54,7 @@ class Settings:
     max_daily_trades: int = 4
     min_price_krw: int = 1_000
     max_price_krw: int = 50_000
+    min_turnover_krw: int = 50_000_000
     broker_fee_rate: float = 0.00015
     sell_tax_rate: float = 0.0020
     slippage_bps: float = 15.0
@@ -102,6 +103,7 @@ class Settings:
             max_daily_trades=integer("MAX_DAILY_TRADES", 4),
             min_price_krw=integer("MIN_PRICE_KRW", 1_000),
             max_price_krw=integer("MAX_PRICE_KRW", 50_000),
+            min_turnover_krw=integer("MIN_TURNOVER_KRW", 50_000_000),
             broker_fee_rate=number("BROKER_FEE_RATE", 0.00015),
             sell_tax_rate=number("SELL_TAX_RATE", 0.0020),
             slippage_bps=number("SLIPPAGE_BPS", 15.0),
@@ -127,6 +129,8 @@ class Settings:
             raise ValueError("risk percentages are outside safe configured ranges")
         if self.min_price_krw <= 0 or self.max_price_krw < self.min_price_krw:
             raise ValueError("invalid price range")
+        if self.min_turnover_krw < 0:
+            raise ValueError("MIN_TURNOVER_KRW cannot be negative")
         if self.broker_fee_rate < 0 or self.sell_tax_rate < 0 or self.slippage_bps < 0:
             raise ValueError("cost assumptions cannot be negative")
         if self.broker_fee_rate + self.sell_tax_rate >= 1 or self.slippage_bps >= 10_000:

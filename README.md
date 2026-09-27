@@ -38,9 +38,9 @@ Defaults are `TRADING_MODE=shadow`, `LIVE_TRADING_ENABLED=false`, `MAX_LIVE_CAPI
 
 ## KIS API
 
-The adapter follows Korea Investment's [official open-trading-api repository](https://github.com/koreainvestment/open-trading-api). Implemented REST methods are token reuse/cache, current quote, daily OHLCV, and paged intraday bars. Token cache is under ignored `runtime/` with owner-only permissions. GET retries are bounded; errors omit response bodies and credentials. The official minute-bar example describes a 120-row response limit and up to one year of retained history; actual account/API availability is unverified here ([official minute-bar example](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_time_dailychartprice/inquire_time_dailychartprice.py)).
+The adapter follows Korea Investment's [official open-trading-api repository](https://github.com/koreainvestment/open-trading-api). Read-only REST methods cover token reuse/cache, current quote, daily OHLCV, minute bars, index series, activity rankings, and the official KOSPI/KOSDAQ stock master. GET retries are bounded; a shared persistent limiter records provider cooldowns, and errors omit response bodies and credentials. Actual smoke results and the date limits of this collection are recorded in `LIVE_READINESS.md` and `RESULTS.md`.
 
-The WebSocket adapter supports approval-key acquisition, KRX trade subscription/unsubscription, heartbeat, stale-feed detection, bounded backoff, and shutdown. The REST minute-bar method requires the caller to explicitly confirm whether returned timestamps label the minute start or end; that mapping has not been verified against a live response. No WebSocket connection was opened in this work. No KIS account, balance, buying-power, order, fill-notice, or order-history endpoint is implemented or called.
+Minute timestamps are interpreted as bar starts (`MINUTE_TIMESTAMP_CONVENTION=bar_start`), verified against a live 005930 session: 09:00 through 15:19 KST, with the 15:20–15:30 closing auction excluded. Resampling is anchored at 09:00. The WebSocket adapter remains unverified in a live session. No KIS account, balance, buying-power, order, fill-notice, or order-history endpoint is implemented or called.
 
 To perform token-only connectivity locally, after reviewing the request scope:
 
@@ -50,7 +50,25 @@ uv run krx-trader auth-test --read-only
 
 This sends credentials to KIS for token issuance/reuse. It prints no token. It does not read an account or submit an order.
 
-## Data and strategies
+## Data, universe, and scanner
+
+`universe refresh` downloads the official KIS master and stores it in ignored `data/universe/`. Eligibility filters KOSPI/KOSDAQ common stock listings by active status, price (`MIN_PRICE_KRW` / `MAX_PRICE_KRW`, defaults 1,000–50,000 KRW), trading status where supplied, and configured turnover (default 50 million KRW). ETF/ETN, preferred, SPAC, halted, and unreliable/unrecognized instruments are excluded. A KIS activity shortlist unions volume and turnover ranks, deduplicates symbols, and applies those filters. Breakout and Pullback rankers are separate fixed-weight deep-scan priorities with reason codes; their scores are not entry signals. Shared strategy functions still decide ENTER/HOLD.
+
+```bash
+uv run krx-trader universe refresh
+uv run krx-trader scan market --top 50
+uv run krx-trader scan breakout --top 20
+uv run krx-trader scan pullback --top 20
+uv run krx-trader data quote 005930
+uv run krx-trader data daily 005930 --start 2026-09-01 --end 2026-09-23
+uv run krx-trader data minute 005930 --date 2026-09-23
+uv run krx-trader data index kospi --start 2026-07-01 --end 2026-09-23
+uv run krx-trader data index kosdaq --start 2026-07-01 --end 2026-09-23
+```
+
+Daily/index/minute bars use an ignored Parquet cache under `data/`, with per-partition provenance, requested range/session, row count, timestamps, and content hash. `data build-research-set` checkpoints each symbol/session partition and can resume after interruption. Collection is separate from offline backtesting; research commands never call KIS.
+
+## Bars and strategies
 
 Historical CSV input must contain `timestamp,open,high,low,close,volume`; timestamps must be ISO-8601 with timezone offset. Data is validated for ordering, duplicates, OHLC consistency, positive prices, volume, and timezone. Minute bars resample from the 09:00 KST session boundary; incomplete buckets are discarded.
 
@@ -70,7 +88,15 @@ uv run krx-trader shadow-replay breakout --input data/bars.csv --symbol 005930 -
 
 The fill model uses a completed-bar signal and the next bar's open, then applies explicit slippage, fees, and sell tax. Stops use an adverse gap-aware approximation. A position still open at the end is marked to market and reported separately; it is not silently treated as a completed trade. Synthetic fixtures are used only in tests.
 
-Chronological 55/20/25 splitting and a fixed candidate gate are available in the validation module. The fixed gate requires at least 30 OOS trades, positive expectancy, profit factor above 1, drawdown no greater than 3%, positive 1.5x and 2.0x cost-stress returns, and positive nearby-parameter expectancy/PF. These are initial governance thresholds and must not be changed after looking at a final holdout. No real-data validation has been run.
+Offline portfolio research runs Breakout and Pullback independently at 15m and 30m, uses a 100,000 KRW capital cap, 20,000 KRW order cap, share-level quantities, next-bar entries, a deterministic liquidity priority, and separately reports base, 1.5x, and 2.0x modeled costs. It compares eligible-universe vs scanner Top N and regime ON vs OFF, plus concentration and market/price/liquidity buckets. Dataset splits are chronological 55/20/25; one prior session is used only as signal warmup, and fills remain inside each partition. Run:
+
+```bash
+uv run krx-trader research breakout --interval 15m
+uv run krx-trader research pullback --interval 30m
+uv run krx-trader validate
+```
+
+The fixed candidate gate requires at least 30 OOS trades, positive expectancy, PF > 1, MDD <= 3%, positive 1.5x/2.0x cost-stress returns, and positive expectancy/PF across the configured parameter neighborhood. These thresholds are not tuned after viewing final results. The current final partition is marked touched in `RESULTS.md`; no Shadow promotion is allowed from it.
 
 `shadow-replay` only replays a supplied data file; it is not a realtime shadow collector. It does not call KIS or submit broker orders. Live-market Shadow remains `NOT_STARTED` until data-source provenance, stream parsing, operational monitoring, and session evidence are validated.
 
@@ -82,11 +108,10 @@ Sizing starts from the configured cash risk budget divided by stop distance, the
 
 ## Known limitations
 
-- No real KIS request, account smoke, realtime collection, or market-session run was performed.
-- No historical dataset was supplied in the checkout, so backtest/OOS/cost-stress results are `NOT_RUN`.
 - The realtime WebSocket callback receives raw provider messages; completed-bar parsing and end-to-end Shadow collection are not yet connected.
 - No account/buying-power/open-order reconciliation, KIS order/cancel adapter, or complete live preflight exists.
-- No full market-wide universe scanner or Parquet cache exists; CSV is the current manual research input.
+- Historical universe membership comes from the current stock master, so delisting/survivorship bias remains.
+- One short recent dataset cannot establish robust alpha; inspect `RESULTS.md` before using any strategy conclusion.
 - The cost defaults are assumptions and need account-specific verification.
 
-The attached `v7_rebalancing.zip` was reviewed only as an idea source; its hard-coded balance, fake-success order methods, random prices, TODO execution path, and partial accounting were not copied. The supplied education PDF informed the emphasis on regime/risk filters, HOLD logging, execution costs, kill switch, audit trail, and time-separated validation; its example indicator values were not adopted as truth.
+The supplied `v6_scanner.zip` was reviewed only for the shortlist pipeline concept. Its README claims exceed its code; the scanner mixes unrelated MA/RSI/MACD/Bollinger rules, leaves filters and volume surge incomplete, and its sample KIS order methods report fake success and hard-code a balance. None of its code was copied. Scanner output in this project is only a priority list and never an order signal.

@@ -24,6 +24,18 @@ class Bar:
 
 
 @dataclass(frozen=True, slots=True)
+class Quote:
+    symbol: str
+    observed_at: datetime
+    price: int
+    open: int | None = None
+    high: int | None = None
+    low: int | None = None
+    volume: int | None = None
+    turnover_krw: int | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class Signal:
     timestamp: datetime
     symbol: str

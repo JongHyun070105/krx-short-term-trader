@@ -7,7 +7,7 @@ import math
 import subprocess
 import sys
 import tempfile
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -15,16 +15,22 @@ from krx_trader.backtest.costs import CostModel
 from krx_trader.backtest.engine import run_backtest
 from krx_trader.backtest.metrics import calculate_metrics
 from krx_trader.config import Settings
+from krx_trader.data.cache import ParquetBarCache
 from krx_trader.data.historical import load_bars_csv
+from krx_trader.data.research_set import build_research_set
 from krx_trader.execution.shadow import run_shadow_replay
 from krx_trader.kis.auth import KisAuthError, TokenManager
+from krx_trader.kis.rest import KisApiError, KisRestClient
 from krx_trader.kis.transport import UrllibTransport
 from krx_trader.market.regime import Regime, classify_regime
 from krx_trader.models import Bar
+from krx_trader.research.runner import run_baseline, run_validation
 from krx_trader.status import write_project_status
 from krx_trader.storage.sqlite_store import SQLiteStore
 from krx_trader.strategies.breakout import evaluate_breakout
 from krx_trader.strategies.pullback import evaluate_pullback
+from krx_trader.universe.master import refresh_stock_master
+from krx_trader.universe.scanner import rank_market_candidates, scan_market
 
 
 def _resolve_regime(
@@ -83,6 +89,128 @@ def _strategy_fn(
 
 def _cost_model(settings: Settings) -> CostModel:
     return CostModel(settings.broker_fee_rate, settings.sell_tax_rate, settings.slippage_bps)
+
+
+def _kis_client(settings: Settings) -> KisRestClient:
+    if settings.trading_mode != "shadow" or settings.live_trading_enabled:
+        raise ValueError("read-only market commands require TRADING_MODE=shadow and LIVE_TRADING_ENABLED=false")
+    transport = UrllibTransport()
+    manager = TokenManager(settings.kis_app_key, settings.kis_app_secret, transport)
+    return KisRestClient(settings.kis_app_key, settings.kis_app_secret, manager, transport)
+
+
+def _parse_iso_date(value: str):
+    try:
+        parsed = date.fromisoformat(value)
+        if parsed.isoformat() != value:
+            raise ValueError
+        return parsed
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError("date must use YYYY-MM-DD") from exc
+
+
+def _emit_json(value: object) -> None:
+    print(json.dumps(value, indent=2, ensure_ascii=False, allow_nan=False))
+
+
+def _data_command(args, settings: Settings) -> int:
+    client = _kis_client(settings)
+    cache = ParquetBarCache()
+    if args.data_command == "build-research-set":
+        summary = build_research_set(
+            client,
+            symbols=args.symbols,
+            start=args.start,
+            end=args.end,
+            max_sessions=args.max_sessions,
+            cache=cache,
+            progress=lambda message: print(message, file=sys.stderr),
+        )
+        _emit_json(summary)
+        return 0 if summary["symbols_succeeded"] else 1
+    if args.data_command == "quote":
+        quote = client.get_quote(args.symbol)
+        _emit_json({
+            "symbol": quote.symbol, "timestamp": quote.observed_at.isoformat(), "price": quote.price,
+            "open": quote.open, "high": quote.high, "low": quote.low, "volume": quote.volume,
+            "turnover_krw": quote.turnover_krw,
+        })
+        return 0
+    if args.data_command == "daily":
+        bars = client.get_daily_bars(args.symbol, args.start, args.end)
+        if bars:
+            path, provenance = cache.save(
+                bars, kind="daily", symbol=args.symbol, interval="1d", market="KRX",
+                source="KIS daily OHLCV",
+            )
+        else:
+            path, provenance = None, None
+        _emit_json({"symbol": args.symbol, "rows": len(bars), "first": bars[0].time.isoformat() if bars else None,
+                    "last": bars[-1].time.isoformat() if bars else None, "cache_path": str(path) if path else None,
+                    "provenance": provenance})
+        return 0 if bars else 1
+    if args.data_command == "minute":
+        bars = client.get_minute_bars(args.symbol, args.date)
+        path, provenance = cache.save(
+            bars, kind="minute", symbol=args.symbol, interval="1m", market="KRX",
+            source="KIS regular-session minute OHLCV", session_date=args.date,
+        )
+        _emit_json({"symbol": args.symbol, "session_date": args.date.isoformat(),
+                    "timestamp_convention": "bar_start", "rows": len(bars),
+                    "first": bars[0].time.isoformat() if bars else None,
+                    "last": bars[-1].time.isoformat() if bars else None,
+                    "cache_path": str(path), "provenance": provenance})
+        return 0
+    if args.data_command == "index":
+        codes = {"kospi": "0001", "kosdaq": "1001"}
+        code = codes[args.market]
+        bars = client.get_index_bars(code, args.start, args.end)
+        if bars:
+            path, provenance = cache.save(
+                bars, kind="indexes", symbol=args.market, interval="1d", market=args.market.upper(),
+                source="KIS index daily OHLCV",
+            )
+        else:
+            path, provenance = None, None
+        _emit_json({"market": args.market, "index_code": code, "rows": len(bars),
+                    "first": bars[0].time.isoformat() if bars else None,
+                    "last": bars[-1].time.isoformat() if bars else None,
+                    "cache_path": str(path) if path else None, "provenance": provenance})
+        return 0 if bars else 1
+    return 2
+
+
+def _universe_command(args) -> int:
+    metadata = refresh_stock_master()
+    _emit_json(metadata)
+    return 0
+
+
+def _scan_command(args, settings: Settings) -> int:
+    client = _kis_client(settings)
+    if args.scan_type == "market":
+        contexts, excluded = scan_market(client, settings, top_n=args.top)
+        rows = [{
+            "rank": rank, "symbol": row.stock.symbol, "name": row.stock.name, "market": row.stock.market,
+            "price": row.activity.price, "turnover_krw": row.activity.turnover_krw,
+            "volume": row.activity.volume, "score": None, "reason_codes": ["RANKING_SHORTLIST"],
+        } for rank, row in enumerate(contexts, start=1)]
+    else:
+        rows, failures, excluded = rank_market_candidates(
+            client, settings, strategy=args.scan_type, top_n=min(args.top, 20), market_limit=50,
+            cache=ParquetBarCache(),
+        )
+        rows = [{
+            "rank": row.rank, "symbol": row.stock.symbol, "name": row.stock.name, "market": row.stock.market,
+            "price": row.activity.price, "turnover_krw": row.activity.turnover_krw,
+            "volume": row.activity.volume, "score": row.score, "reason_codes": list(row.reason_codes),
+        } for row in rows]
+        _emit_json({"strategy": args.scan_type, "status": "PASS" if rows else "NO_CANDIDATES",
+                    "candidates": rows, "excluded_for_eligibility": excluded, "data_failures": failures})
+        return 0
+    _emit_json({"scan": "market", "status": "PASS" if rows else "NO_CANDIDATES",
+                "candidates": rows, "excluded_for_eligibility": excluded})
+    return 0
 
 
 def _doctor(settings: Settings) -> int:
@@ -157,6 +285,41 @@ def build_parser() -> argparse.ArgumentParser:
     sub.add_parser("status")
     auth = sub.add_parser("auth-test", help="request/reuse a KIS REST token; no account/order API")
     auth.add_argument("--read-only", action="store_true", help="required acknowledgement for auth-only request")
+    universe = sub.add_parser("universe", help="refresh the official KIS KOSPI/KOSDAQ stock master")
+    universe_sub = universe.add_subparsers(dest="universe_command", required=True)
+    universe_sub.add_parser("refresh")
+    data = sub.add_parser("data", help="read-only KIS market data and Parquet cache")
+    data_sub = data.add_subparsers(dest="data_command", required=True)
+    quote = data_sub.add_parser("quote")
+    quote.add_argument("symbol")
+    daily = data_sub.add_parser("daily")
+    daily.add_argument("symbol")
+    daily.add_argument("--start", type=_parse_iso_date, required=True)
+    daily.add_argument("--end", type=_parse_iso_date, required=True)
+    minute = data_sub.add_parser("minute")
+    minute.add_argument("symbol")
+    minute.add_argument("--date", type=_parse_iso_date, required=True)
+    index = data_sub.add_parser("index")
+    index.add_argument("market", choices=("kospi", "kosdaq"))
+    index.add_argument("--start", type=_parse_iso_date, required=True)
+    index.add_argument("--end", type=_parse_iso_date, required=True)
+    research_set = data_sub.add_parser("build-research-set", help="resume KIS daily/minute Parquet collection")
+    research_set.add_argument("--symbols", nargs="+", required=True)
+    research_set.add_argument("--start", type=_parse_iso_date, required=True)
+    research_set.add_argument("--end", type=_parse_iso_date, required=True)
+    research_set.add_argument("--max-sessions", type=int, default=5)
+    scan = sub.add_parser("scan", help="cheap KIS shortlist and separate strategy rank")
+    scan.add_argument("scan_type", choices=("market", "breakout", "pullback"))
+    scan.add_argument("--top", type=int, default=50)
+    research = sub.add_parser("research", help="offline cached-data portfolio research")
+    research_sub = research.add_subparsers(dest="research_command", required=True)
+    for strategy in ("breakout", "pullback"):
+        strategy_research = research_sub.add_parser(strategy)
+        strategy_research.add_argument("--interval", choices=("15m", "30m"), required=True)
+    research_validate = research_sub.add_parser("validate", help="run four baselines, OOS, stress, scanner and regime comparisons")
+    research_validate.add_argument("--top", type=int, default=10)
+    validate = sub.add_parser("validate", help="alias for research validate")
+    validate.add_argument("--top", type=int, default=10)
     backtest = sub.add_parser("backtest")
     backtest.add_argument("strategy", choices=("breakout", "pullback"))
     backtest.add_argument("--input", type=Path, required=True)
@@ -202,6 +365,37 @@ def main() -> None:
             print(f"KIS auth failed: {type(exc).__name__}; details redacted", file=sys.stderr)
             raise SystemExit(1) from None
         print("KIS REST token available; token value redacted")
+        return
+    if args.command == "universe":
+        raise SystemExit(_universe_command(args))
+    if args.command == "data":
+        try:
+            raise SystemExit(_data_command(args, settings))
+        except (KisAuthError, KisApiError, OSError, ValueError) as exc:
+            print(f"KIS data request failed: {type(exc).__name__}; details redacted", file=sys.stderr)
+            raise SystemExit(1) from None
+    if args.command == "scan":
+        try:
+            raise SystemExit(_scan_command(args, settings))
+        except (KisAuthError, KisApiError, OSError, ValueError) as exc:
+            print(f"KIS scan failed: {type(exc).__name__}; details redacted", file=sys.stderr)
+            raise SystemExit(1) from None
+    if args.command == "research":
+        try:
+            if args.research_command == "validate":
+                _emit_json(run_validation(settings, top_n=args.top))
+            else:
+                _emit_json(run_baseline(settings, strategy=args.research_command, interval=args.interval))
+        except (OSError, ValueError, RuntimeError, KeyError) as exc:
+            print(f"Offline research failed: {type(exc).__name__}; details redacted", file=sys.stderr)
+            raise SystemExit(1) from None
+        return
+    if args.command == "validate":
+        try:
+            _emit_json(run_validation(settings, top_n=args.top))
+        except (OSError, ValueError, RuntimeError, KeyError) as exc:
+            print(f"Validation failed: {type(exc).__name__}; details redacted", file=sys.stderr)
+            raise SystemExit(1) from None
         return
     if args.command == "backtest":
         if args.regime_filter == "on" and (args.kospi_index_input is None or args.kosdaq_index_input is None):

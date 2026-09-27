@@ -1,10 +1,10 @@
 import json
 import stat
-from datetime import datetime
+from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 from krx_trader.kis.auth import TokenManager
-from krx_trader.kis.rest import KisRestClient
+from krx_trader.kis.rest import KisApiError, KisRestClient
 from krx_trader.kis.transport import HttpResponse
 
 KST = ZoneInfo("Asia/Seoul")
@@ -58,7 +58,8 @@ def test_current_price_uses_official_read_endpoint_and_redacts_errors(tmp_path):
         response({"rt_cd": "0", "output": {"stck_prpr": "12345"}}),
     ])
     manager = TokenManager("app", "secret", transport, tmp_path / "token.json")
-    client = KisRestClient("app", "secret", manager, transport, sleeper=lambda _: None, jitter=lambda a, b: 0)
+    client = KisRestClient("app", "secret", manager, transport, sleeper=lambda _: None, jitter=lambda a, b: 0,
+                           min_request_interval=0, rate_limit_path=tmp_path / "rate.json")
     assert client.get_current_price("005930") == 12345
     method, url, kwargs = transport.calls[1]
     assert method == "GET"
@@ -67,10 +68,29 @@ def test_current_price_uses_official_read_endpoint_and_redacts_errors(tmp_path):
     assert kwargs["headers"]["appsecret"] == "secret"
 
 
+def test_quote_parses_only_market_fields_and_marks_local_observation_time(tmp_path):
+    transport = FakeTransport([
+        response({"access_token": "tok", "expires_in": 3600}),
+        response({"rt_cd": "0", "output": {
+            "stck_prpr": "12345", "stck_oprc": "12000", "stck_hgpr": "12400",
+            "stck_lwpr": "11900", "acml_vol": "9876", "acml_tr_pbmn": "120000000",
+            "unused_private_field": "ignored",
+        }}),
+    ])
+    manager = TokenManager("app", "secret", transport, tmp_path / "token.json")
+    client = KisRestClient("app", "secret", manager, transport, min_request_interval=0,
+                           rate_limit_path=tmp_path / "rate.json")
+    quote = client.get_quote("005930")
+    assert quote.symbol == "005930"
+    assert quote.observed_at.tzinfo == KST
+    assert (quote.price, quote.open, quote.high, quote.low) == (12345, 12000, 12400, 11900)
+    assert (quote.volume, quote.turnover_krw) == (9876, 120000000)
+
+
 def test_invalid_symbol_fails_before_network(tmp_path):
     transport = FakeTransport([])
     manager = TokenManager("app", "secret", transport, tmp_path / "token.json")
-    client = KisRestClient("app", "secret", manager, transport)
+    client = KisRestClient("app", "secret", manager, transport, rate_limit_path=tmp_path / "rate.json")
     try:
         client.get_current_price("bad")
     except ValueError as error:
@@ -80,14 +100,109 @@ def test_invalid_symbol_fails_before_network(tmp_path):
     assert transport.calls == []
 
 
-def test_minute_bar_timestamp_convention_must_be_explicit_before_network(tmp_path):
-    transport = FakeTransport([])
+def test_minute_bars_reject_requested_day_without_daily_session(tmp_path):
+    transport = FakeTransport([
+        response({"access_token": "tok", "expires_in": 3600}),
+        response({"rt_cd": "0", "output2": []}),
+    ])
     manager = TokenManager("app", "secret", transport, tmp_path / "token.json")
-    client = KisRestClient("app", "secret", manager, transport)
+    client = KisRestClient("app", "secret", manager, transport, min_request_interval=0,
+                           rate_limit_path=tmp_path / "rate.json")
     try:
-        client.get_minute_bars("005930", datetime(2026, 1, 1, tzinfo=KST).date())
-    except ValueError as error:
-        assert "explicitly confirmed" in str(error)
+        client.get_minute_bars("005930", date(2026, 9, 25))
+    except KisApiError as error:
+        assert "no daily bar" in str(error)
     else:
-        raise AssertionError("unconfirmed minute timestamp convention accepted")
-    assert transport.calls == []
+        raise AssertionError("ambiguous minute data accepted for a non-session date")
+    assert len(transport.calls) == 2  # token plus exact-date daily confirmation
+
+
+def _minute_row(time_text: str) -> dict[str, str]:
+    return {
+        "stck_cntg_hour": time_text,
+        "stck_oprc": "100", "stck_hgpr": "101", "stck_lwpr": "99",
+        "stck_prpr": "100", "cntg_vol": "1",
+    }
+
+
+def _minutes(start: str, end: str) -> list[str]:
+    current = datetime.strptime(start, "%H%M%S").replace(tzinfo=KST)
+    finish = datetime.strptime(end, "%H%M%S").replace(tzinfo=KST)
+    values = []
+    while current <= finish:
+        values.append(current.strftime("%H%M%S"))
+        current += timedelta(minutes=1)
+    return values
+
+
+def test_minute_bars_use_start_labels_and_ignore_wrapped_pages(tmp_path):
+    day = "20260923"
+    daily = {"rt_cd": "0", "output2": [{
+        "stck_bsop_date": day, "stck_oprc": "100", "stck_hgpr": "101",
+        "stck_lwpr": "99", "stck_clpr": "100", "acml_vol": "390",
+    }]}
+    page_times = [
+        _minutes("133100", "153000"),
+        _minutes("113200", "133100"),
+        _minutes("093300", "113200"),
+        _minutes("090000", "093300") + _minutes("153100", "165600"),
+    ]
+    pages = [
+        response({"rt_cd": "0", "output2": [_minute_row(value) for value in reversed(times)]})
+        for times in page_times
+    ]
+    transport = FakeTransport([response({"access_token": "tok", "expires_in": 3600}), response(daily), *pages])
+    manager = TokenManager("app", "secret", transport, tmp_path / "token.json")
+    client = KisRestClient("app", "secret", manager, transport, min_request_interval=0,
+                           rate_limit_path=tmp_path / "rate.json")
+
+    bars = client.get_minute_bars("005930", date(2026, 9, 23))
+
+    assert len(bars) == 380
+    assert bars[0].time == datetime(2026, 9, 23, 9, 0, tzinfo=KST)
+    assert bars[-1].time == datetime(2026, 9, 23, 15, 19, tzinfo=KST)
+    assert all(bar.time.date() == date(2026, 9, 23) for bar in bars)
+    minute_calls = [call for call in transport.calls if call[1].endswith("inquire-time-dailychartprice")]
+    assert len(minute_calls) == 4
+    assert all(call[2]["params"]["FID_PW_DATA_INCU_YN"] == "N" for call in minute_calls)
+
+
+def test_request_limiter_spaces_successful_gets(tmp_path):
+    sleeps: list[float] = []
+    clock = [0.0]
+
+    def sleep(seconds: float) -> None:
+        sleeps.append(seconds)
+        clock[0] += seconds
+
+    transport = FakeTransport([
+        response({"access_token": "tok", "expires_in": 3600}),
+        response({"rt_cd": "0", "output": {"stck_prpr": "12345"}}),
+        response({"rt_cd": "0", "output": {"stck_prpr": "12345"}}),
+    ])
+    manager = TokenManager("app", "secret", transport, tmp_path / "token.json")
+    client = KisRestClient(
+        "app", "secret", manager, transport, sleeper=sleep, monotonic=lambda: clock[0],
+        min_request_interval=0.25, rate_limit_path=tmp_path / "rate.json", wall_clock=lambda: clock[0],
+    )
+    assert client.get_current_price("005930") == 12345
+    assert client.get_current_price("005930") == 12345
+    assert sleeps == [0.25]
+
+
+def test_per_second_rate_limit_error_gets_bounded_retry(tmp_path):
+    sleeps: list[float] = []
+    transport = FakeTransport([
+        response({"access_token": "tok", "expires_in": 3600}),
+        response({"rt_cd": "1", "msg_cd": "EGW00201"}),
+        response({"rt_cd": "0", "output": {"stck_prpr": "12345"}}),
+    ])
+    manager = TokenManager("app", "secret", transport, tmp_path / "token.json")
+    client = KisRestClient(
+        "app", "secret", manager, transport, sleeper=sleeps.append, jitter=lambda _a, _b: 0,
+        min_request_interval=0, max_retries=1, rate_limit_path=tmp_path / "rate.json",
+        wall_clock=lambda: 0.0,
+    )
+    assert client.get_current_price("005930") == 12345
+    assert sleeps == [61.0]
+    assert len(transport.calls) == 3

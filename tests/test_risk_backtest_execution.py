@@ -6,6 +6,7 @@ from conftest import KST, make_bar
 from krx_trader.backtest.costs import CostModel
 from krx_trader.backtest.engine import run_backtest
 from krx_trader.backtest.metrics import Metrics, calculate_metrics
+from krx_trader.backtest.portfolio import run_portfolio_backtest
 from krx_trader.backtest.validation import StrategyGateState, evaluate_strategy_gate
 from krx_trader.execution.live import (
     LiveBlocked,
@@ -158,3 +159,73 @@ def test_strategy_gate_requires_oos_stress_trade_count_and_neighborhood():
     rejected = evaluate_strategy_gate(good, fail_stress, good, [good])
     assert rejected.state == StrategyGateState.REJECTED
     assert "COST_STRESS_1_5X_FAILED" in rejected.reasons
+
+
+def test_portfolio_competition_uses_trailing_turnover_and_symbol_tiebreaker():
+    symbols = ("000001", "000002")
+    bars = {
+        symbol: [make_bar(index, open_=10_000, high=10_100, low=9_900, close=10_000,
+                          volume=(200 if symbol == "000002" else 100)) for index in range(4)]
+        for symbol in symbols
+    }
+
+    def signal_fn(symbol, history):
+        bar = history[-1]
+        if len(history) == 1:
+            return Signal(bar.time, symbol, "portfolio-test", Decision.ENTER, ("TEST",), 10_000, 9_000, 1)
+        return Signal(bar.time, symbol, "portfolio-test", Decision.HOLD, ("HOLD",))
+
+    result = run_portfolio_backtest(
+        bars, signal_fn, max_concurrent_positions=1, cost_model=CostModel(0, 0, 0),
+        order_cap_krw=20_000, risk_per_trade_pct=1,
+    )
+    assert [trade.symbol for trade in result.trades] == ["000002"]
+    tied = {symbol: [make_bar(index, open_=10_000, high=10_100, low=9_900, close=10_000,
+                              volume=100) for index in range(4)] for symbol in symbols}
+    tie_result = run_portfolio_backtest(
+        tied, signal_fn, max_concurrent_positions=1, cost_model=CostModel(0, 0, 0),
+        order_cap_krw=20_000, risk_per_trade_pct=1,
+    )
+    assert [trade.symbol for trade in tie_result.trades] == ["000001"]
+
+
+def test_portfolio_cash_constraint_blocks_second_simultaneous_order():
+    symbols = ("000001", "000002")
+    bars = {
+        symbol: [make_bar(index, open_=15_000, high=15_100, low=14_900, close=15_000,
+                          volume=200 if symbol == "000002" else 100) for index in range(4)]
+        for symbol in symbols
+    }
+
+    def signal_fn(symbol, history):
+        bar = history[-1]
+        if len(history) == 1:
+            return Signal(bar.time, symbol, "cash-test", Decision.ENTER, ("TEST",), 15_000, 14_000, 1)
+        return Signal(bar.time, symbol, "cash-test", Decision.HOLD, ("HOLD",))
+
+    result = run_portfolio_backtest(
+        bars, signal_fn, starting_cash_krw=25_000, max_concurrent_positions=2,
+        order_cap_krw=20_000, risk_per_trade_pct=4, cost_model=CostModel(0, 0, 0),
+    )
+    assert [trade.symbol for trade in result.trades] == ["000002"]
+
+
+def test_portfolio_marks_final_segment_bar_as_a_costed_exit():
+    early_end = [make_bar(index, open_=1_000, high=1_010, low=990, close=1_005) for index in range(2)]
+    normal_end = [make_bar(index, open_=1_000, high=1_010, low=990, close=1_005) for index in range(3)]
+
+    def signal_fn(symbol, history):
+        bar = history[-1]
+        decision = Decision.ENTER if len(history) == 1 else Decision.HOLD
+        return Signal(bar.time, symbol, "segment-test", decision, ("TEST",), 1_000, 900, 10)
+
+    result = run_portfolio_backtest(
+        {"000001": early_end, "000002": normal_end}, signal_fn,
+        max_concurrent_positions=2, cost_model=CostModel(0.001, 0, 25), risk_per_trade_pct=1,
+    )
+    assert len(result.trades) == 2
+    assert all(trade.exit_reason == "SEGMENT_END" for trade in result.trades)
+    assert {trade.symbol: trade.exit_time for trade in result.trades} == {
+        "000001": early_end[-1].time, "000002": normal_end[-1].time,
+    }
+    assert result.open_position is None
