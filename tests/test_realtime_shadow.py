@@ -19,9 +19,11 @@ class FakeClient:
     def __init__(self, bars: list[Bar] | None = None) -> None:
         self.bars = bars if bars is not None else [minute(value) for value in range(5)]
         self.index_calls = 0
+        self.minute_calls: list[str] = []
         self.fail_first_index_call = False
 
-    def get_minute_bars(self, _symbol, _session):
+    def get_minute_bars(self, symbol, _session):
+        self.minute_calls.append(symbol)
         return self.bars
 
     def get_index_bars(self, _index_code, _start, _end):
@@ -430,6 +432,7 @@ def test_empty_scanner_does_not_fallback_into_strategy_monitoring(tmp_path) -> N
 
     assert runner._monitor_symbols == []
     assert runner._candidate_rank == {}
+    assert runner.client.minute_calls.count("005930") == 1  # type: ignore[attr-defined]
     events = [json.loads(line) for line in runner.events_path.read_text(encoding="utf-8").splitlines()]
     assert not [event for event in events if event["event_type"] == "DECISION"]
 

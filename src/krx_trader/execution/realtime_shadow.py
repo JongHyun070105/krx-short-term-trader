@@ -965,7 +965,7 @@ class RealtimeShadowRunner:
         data_cutoff = min(fetched_at, self.stop_at)
         for symbol in dict.fromkeys(["005930", *self._monitor_symbols]):
             try:
-                current = self.client.get_minute_bars(symbol, session)
+                current = anchor if symbol == "005930" else self.client.get_minute_bars(symbol, session)
                 current = [bar for bar in current if bar.time + timedelta(minutes=1) <= data_cutoff]
                 if inspect_bars(current):
                     raise ValueError("CURRENT_SESSION_DATA_QUALITY_FAILURE")
