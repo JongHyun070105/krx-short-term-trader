@@ -1,3 +1,4 @@
+import random
 from dataclasses import replace
 from datetime import UTC, datetime, timedelta
 from zoneinfo import ZoneInfo
@@ -8,7 +9,7 @@ from conftest import make_bar
 from krx_trader.data.quality import DataQualityError, inspect_bars, is_stale, require_healthy_bars
 from krx_trader.data.resample import resample_session_minutes
 from krx_trader.market.regime import Regime, aggregate_window_volatility, classify_regime
-from krx_trader.models import Decision
+from krx_trader.models import Bar, Decision
 from krx_trader.strategies.breakout import BreakoutConfig, evaluate_breakout
 from krx_trader.strategies.pullback import PullbackConfig, evaluate_pullback
 
@@ -45,6 +46,48 @@ def test_resample_uses_session_open_and_drops_incomplete_bucket():
     assert result[0].volume == 1500
     utc_bars = [replace(bar, time=bar.time.astimezone(UTC)) for bar in bars[:15]]
     assert resample_session_minutes(utc_bars, 15) == result
+
+
+def test_randomized_resampling_keeps_only_complete_buckets_without_future_leakage():
+    kst = ZoneInfo("Asia/Seoul")
+    session_open = datetime(2026, 2, 2, 9, 0, tzinfo=kst)
+    for seed in range(12):
+        rng = random.Random(seed)
+        previous = 10_000.0
+        full_session = []
+        for minute in range(380):
+            open_price = previous * (1 + rng.uniform(-0.002, 0.002))
+            close = open_price * (1 + rng.uniform(-0.003, 0.003))
+            high = max(open_price, close) * (1 + rng.uniform(0, 0.002))
+            low = min(open_price, close) * (1 - rng.uniform(0, 0.002))
+            full_session.append(
+                Bar(session_open + timedelta(minutes=minute), open_price, high, low, close, rng.randrange(100_000))
+            )
+            previous = close
+        removed = set(rng.sample(range(380), 8))
+        bars = [bar for index, bar in enumerate(full_session) if index not in removed]
+
+        for interval in (15, 30):
+            actual = resample_session_minutes(bars, interval)
+            actual_by_time = {bar.time: bar for bar in actual}
+            expected_times = set()
+            for bucket_start in range(0, 380 - interval + 1, interval):
+                indices = range(bucket_start, bucket_start + interval)
+                if any(index in removed for index in indices):
+                    continue
+                expected_times.add(session_open + timedelta(minutes=bucket_start + interval))
+            assert set(actual_by_time) == expected_times
+
+            mutation_index = next(index for index in range(190, 220) if index not in removed)
+            mutation_bar = full_session[mutation_index]
+            changed = [
+                replace(bar, volume=bar.volume + 1_000_000) if bar.time == mutation_bar.time else bar
+                for bar in bars
+            ]
+            changed_by_time = {bar.time: bar for bar in resample_session_minutes(changed, interval)}
+            for timestamp, bar in actual_by_time.items():
+                if timestamp <= mutation_bar.time:
+                    assert changed_by_time[timestamp] == bar
 
 
 def test_breakout_uses_only_previous_completed_range_and_volume():
