@@ -98,3 +98,145 @@ For the 69 signals, only 2/43 15m and 1/26 30m expected one-share risks were wit
 - Post-session read-only smoke: token-only auth PASS; quote 005930 PASS at 13:02 KST; daily data and market scan commands exited successfully, scan status PASS. Two pre-market quote GETs (005930 and 047040) failed with redacted `KisApiError`; the after-session 005930 retry succeeded. No account/balance/open-order or order API was called.
 
 Machine-readable Phase 2.5 artifacts are ignored under `runtime/research/`, `runtime/shadow/shadow-20260928/`, `runtime/premarket/`, and `runtime/final-smoke/`. They retain the split, source hashes, diagnostics, health stream, parity report, and read-only smoke outputs.
+
+## Phase 3 — Breakout failure anatomy and v2 rejection
+
+### Scope, provenance, and integrity
+
+- Research implementation SHA: `623edb0abb22f9d3610cc1f05408882ab78774d1` (the code SHA recorded in every Phase 3 run artifact).
+- Source dataset SHA-256: `bb33c49aa0ce533a7a3f8a15360665f25dbba2d0f738ccabaceab560165e5304`; selected Development + Validation partition hash: `9c9e41ccb650b3b10b2a1818b2742f21dd63bf8ea241ecd7a593ba945b3f06c`.
+- 30 current KOSPI listings, fixed Top-10 turnover scanner proxy; 49 Development sessions (2026-04-17–06-30) and 18 Validation sessions (2026-07-01–07-27). This is a current-listing historical proxy with survivorship bias, not a full historical KRX universe replay.
+- Selected input: 2,010 symbol/session minute partitions, 758,919 minute rows, of which 272 selected partitions are incomplete; the broader 90-session source remains `PARTIAL` (412 partial partitions, 956 missing minute slots). No synthetic bars were added. Cost inputs (0.015% fee, 0.20% sell tax, 15 bps slippage) are assumptions.
+- `runtime/research/phase3/` holds ignored event Parquet and machine-readable JSON, including interval anatomy, comparison, hypothesis, and validation reports. Event files contain 477 15m and 235 30m ENTER events; the schema separates signal-time features from later trade outcomes. Features stop at the completed signal bar. Each run records code/data hashes, split, schema, source artifact hashes, and outputs.
+- Fresh Holdout `2026-07-28–08-28` remained `LOCKED_NOT_EVALUATED`; zero post-validation minute partitions were opened. The index parquet row group overlaps the later period, so index context was not read; index direction, regime, and `MARKET_AGAINST` labels are explicitly unavailable. No post-validation feature, MFE/MAE, signal, or parameter comparison was run.
+- Existing Phase 2/2.5 evidence and status are preserved. Phase 2.5 baseline numbers above are unchanged.
+
+### Breakout v1 event-level results
+
+The following are independent one-share signal diagnostics with next executable-bar entry, baseline stops/holding limit, and assumed costs. These are not portfolio equity curves; event-level MDD is therefore N/A. `MFE/MAE` below are signal-path median excursions. Closed counts exclude unfilled events; 30m Validation retains two open events.
+
+| Interval / split | Signals | Closed | Unfilled / open | Wins / losses | Stop / time exits | PF | Expectancy | Net PnL | Gross PnL / cost drag | Median MFE / MAE |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 15m Development | 353 | 293 | 60 / 0 | 86 / 207 | 122 / 171 | 0.406 | −₩383 | −₩112,137 | −₩50,091 / ₩62,046 | +1.989% / −2.432% |
+| 15m Validation | 124 | 103 | 21 / 0 | 13 / 90 | 58 / 45 | 0.151 | −₩495 | −₩51,007 | −₩34,840 / ₩16,167 | +1.152% / −2.545% |
+| 30m Development | 177 | 152 | 25 / 0 | 52 / 100 | 67 / 85 | 0.757 | −₩250 | −₩37,948 | −₩5,845 / ₩32,103 | +2.917% / −3.089% |
+| 30m Validation | 58 | 47 | 9 / 2 | 6 / 41 | 25 / 22 | 0.101 | −₩648 | −₩30,448 | −₩23,145 / ₩7,303 | +1.782% / −3.593% |
+
+All four gross-PnL results were already negative before modeled costs. Cost drag deepened each loss; the result is not explained by costs alone. 15m signal follow-through at +0.5% / +1% / +2% was 83.3% / 68.6% / 49.6% in Development and 74.2% / 54.0% / 28.2% in Validation. For 30m it was 84.7% / 73.4% / 59.9% and 82.8% / 70.7% / 44.8%. The gap between some favorable excursions and negative realized expectancy shows that favorable movement did not reliably become an exit win under the current entry/exit policy.
+
+False-breakout definition was frozen from Development per interval: signal-path MFE below the Development P25 and MAE at or below its Development median. This yields 15m 17.56% Development / 25.81% Validation and 30m 17.51% / 22.41%. This is a descriptive label, not a universal definition.
+
+### Failure anatomy and the largest loss sources
+
+Deterministic categories overlap, so percentages below are shares of losing closed events and must not be summed. Categories use only point-in-time context and observed outcome paths.
+
+| Interval / split | Largest categories among losses |
+|---|---|
+| 15m Development (207 losses) | Immediate rejection 83 (40.1%); late entry 63 (30.4%); no follow-through 53 (25.6%); volume-spike fade 53 (25.6%); repeated level 52 (25.1%) |
+| 15m Validation (90 losses) | Low-liquidity flag 57 (63.3%); no follow-through 32 (35.6%); immediate rejection 29 (32.2%); volume-spike fade 21 (23.3%) |
+| 30m Development (100 losses) | Volume-spike fade 42 (42.0%); late entry 31 (31.0%); immediate rejection 29 (29.0%); no follow-through 29 (29.0%) |
+| 30m Validation (41 losses) | Low-liquidity flag 29 (70.7%); immediate rejection 19 (46.3%); volume-spike fade 15 (36.6%) |
+
+The top three cross-split explanations are: (1) adverse/fast reversal or no continuation—15m stopped out 41.6% of Development and 56.3% of Validation closed events; 30m stopped out 44.1% and 53.2%; (2) chasing after prior extension—15m late-entry labels covered 30.4% of Dev and 17.8% of Validation losses, while winner median session extension was lower in both; (3) noisy volume/liquidity and execution drag—volume-spike fade marked 25.6%/23.3% of 15m losses and 42.0%/36.6% of 30m losses, while Validation low-turnover labels were frequent. These are overlapping diagnostics, not proven causal shares. The low-liquidity label uses a Development turnover quantile applied to the fixed cohort; it does not establish that raising the liquidity threshold would create alpha.
+
+### Winner / loser separation and feature stability
+
+The compact ranking below shows winner and loser medians; full P25/P50/P75 distributions and effect sizes are in the ignored anatomy JSON. 15m winners/losses numbered 86/207 in Dev and only 13/90 in Validation; 30m had 52/100 and 6/41. Validation winner medians are particularly noisy.
+
+| Feature (winner / loser median) | 15m Dev | 15m Validation | 30m Dev | 30m Validation |
+|---|---:|---:|---:|---:|
+| Return from session open | 2.68% / 4.31% | 3.07% / 3.99% | 3.72% / 4.52% | 4.40% / 4.42% |
+| Relative volume | 4.47 / 4.48 | 5.22 / 3.80 | 3.97 / 4.27 | 3.61 / 3.10 |
+| Upper-wick / bar-range ratio | 0.125 / 0.192 | 0.250 / 0.188 | 0.237 / 0.209 | 0.211 / 0.315 |
+| Body / total range | 0.608 / 0.588 | 0.556 / 0.616 | 0.530 / 0.519 | 0.609 / 0.547 |
+| Distance from intraday high | −0.560% / −0.726% | −0.564% / −0.498% | −1.020% / −0.951% | −0.918% / −0.956% |
+| Opening gap | 2.37% / 1.66% | 1.69% / 1.09% | 2.12% / 2.46% | 1.51% / 1.20% |
+| Close-location value | 0.805 / 0.778 | 0.625 / 0.813 | 0.741 / 0.756 | 0.789 / 0.685 |
+
+The only modest repeatable directional clue is lower session extension among 15m winners: median separation −1.63 percentage points in Dev and −0.92 points in Validation (Cliff's delta −0.256 and −0.171). It is not enough to distinguish profitable trades: the 30m difference shrinks from −0.80 points in Dev to −0.03 in Validation. Wick/body/close-location relationships reverse across splits, and RVOL does not separate 15m Dev winners from losers. Relative volume and relative turnover are nearly duplicate variables (Pearson r 0.998 in 15m Dev and 0.997 in 30m Dev); they should not be stacked as separate filters. No machine-learning classifier, magic score, or post-hoc p-value selection was used. Session-cluster bootstrap intervals were descriptive (2,000 resamples): 15m expectancy 95% intervals were −₩560 to −₩234 (Dev) and −₩693 to −₩254 (Validation); 30m were −₩847 to +₩371 and −₩1,017 to −₩420.
+
+### Time, volume, candle, gap, liquidity, and price context
+
+Time bucket entries are `signals / closed; PF; expectancy KRW`. The 30m interval has no 09:00–09:30 bucket; sparse buckets and Validation cells are not stable estimates.
+
+| Time bucket | 15m Dev | 15m Val | 30m Dev | 30m Val |
+|---|---:|---:|---:|---:|
+| 09:00–09:30 | 123/112; .472; −330 | 51/41; .092; −595 | — | — |
+| 09:30–10:00 | 74/65; .456; −282 | 16/14; .337; −370 | 79/69; .477; −393 | 26/21; .066; −614 |
+| 10:00–11:00 | 45/38; .167; −706 | 22/20; .017; −463 | 38/33; .570; −533 | 15/13; .000; −929 |
+| 11:00–12:00 | 30/21; .077; −538 | 5/5; .124; −252 | 22/19; 1.553; +746 | 3/3; .796; −66 |
+| 12:00–13:00 | 15/11; .032; −730 | 2/2; .000; −733 | 10/10; .000; −900 | 2/2; 2.194; +363 |
+| 13:00–14:00 | 14/11; 1.564; +372 | 8/7; .000; −538 | 10/7; .772; −237 | 0/0; N/A; N/A |
+| 14:00–15:00 | 27/22; .575; −318 | 15/12; .440; −386 | 13/11; .986; −22 | 9/7; .000; −911 |
+| 15:00+ | 25/13; .111; −596 | 5/2; .000; −521 | 5/3; 2.007; +1,164 | 3/1; N/A; +383 |
+
+15m opening (09:00–10:00) remained negative: Dev 197/177, PF .467, −₩313; Validation 67/55, PF .147, −₩538. Midday (11:30–13:30) was Dev 29/22, PF .317, −₩407 and Validation 7/7, PF 0, −₩547. Late (>14:30) had overnight exits for 23/27 closed Dev trades and 9/10 Validation trades; their expectancy was −₩351 and −₩275. 30m midday and late had small positive Dev cells (21/20, PF 1.308; 10/7, PF 1.276) that did not generalize (3/3, PF 1.183; 10/6, PF .132). No time-of-day strategy was promoted.
+
+| RVOL bucket | 15m Dev (signals; PF; exp) | 15m Val | 30m Dev | 30m Val |
+|---|---:|---:|---:|---:|
+| 1.5–2.0 | 49; .300; −422 | 21; .499; −226 | 23; .694; −411 | 5; .522; −212 |
+| 2.0–3.0 | 74; .648; −167 | 26; .109; −421 | 39; 1.071; +62 | 22; .018; −458 |
+| ≥3.0 | 230; .376; −435 | 77; .098; −593 | 115; .684; −323 | 31; .088; −848 |
+
+The existing v1 requires RVOL ≥1.5, so lower buckets had no eligible events. High RVOL was not reliably better; the isolated 30m Dev PF above 1 disappeared in Validation. Relative-volume and relative-turnover comparisons therefore do not support adding another volume gate.
+
+- **Breakout distance:** 15m's 0.5–1.0% bucket was the least negative common band (Dev 70 events, PF .437, −₩283; Validation 19, PF .468, −₩268); >1% stayed worse (188, .414, −₩411; 69, .097, −₩614). For 30m, 0.2–0.5% was positive in Dev (28, PF 1.427, +₩331) but reversed in Validation (11, .114, −₩550). No threshold generalized.
+- **Candle structure:** 15m HIGH close-location bucket had PF .552/−₩283 Dev and .120/−₩582 Validation; the apparently better Validation LOW bucket had only six signals/four closed. Dev winners' upper wick median was 0.125 vs 0.192, but Validation reversed to 0.250 vs 0.188. A strong-close/wick filter was rejected as unstable.
+- **Gap / extension:** 15m >5% gap had 55 Dev signals, PF .703, −₩163, but only four Validation signals/three closed (PF 0, −₩1,604). For 30m, 0–1% gap had Dev PF 2.007/+₩567 (21 closed) but Validation PF .051/−₩1,210 (12 closed). These cells do not justify gap filters. Lower pre-entry extension is the sole plausible but weak 15m separation noted above.
+- **Liquidity / price:** 15m LOW turnover quantile looked less negative in Dev (117 signals, PF .839, −₩54) than HIGH (117, .251, −₩636), but LOW still lost and Validation LOW was PF .162, −₩446. 30m liquidity buckets were all net negative in Validation. 15m 1k–10k KRW shares had only 27 Dev events (PF .463, −₩40) and none in that price bucket in Validation; no low-price or whole-share advantage is established. The wider stock cohort is still KOSPI-only.
+
+### MFE, MAE, data gaps, and holding behavior
+
+- Median executable-trade MFE/MAE was 15m Dev +1.689%/−2.028%, Val +0.966%/−2.031%; 30m Dev +2.488%/−2.816%, Val +1.414%/−2.309%. Signal-path excursion medians are in the baseline table. Session-cluster bootstrap results and P25/P50/P75 are retained in the per-interval JSON.
+- Median bars to MFE / to stop failure: 15m Dev 2 / 2, Validation 1 / 2.5; 30m Dev 2 / 4, Validation 3 / 1. Late 15m entries had 23/27 Dev and 9/10 Validation closed trades exit overnight because their holding window crossed session end; this is a timing diagnostic, not an exit optimization.
+- Near-gap sensitivity remains negative. Complete-window-only 15m Dev: 210 signals, 169 closed, PF .257, expectancy −₩424, net −₩71,723 (vs all PF .406/−₩383/−₩112,137); Validation: 94/77, PF .111, −₩491, −₩37,800 (vs .151/−₩495/−₩51,007). 30m complete-only Dev: 81/70, PF .648, −₩250; Validation: 29/23, PF .065, −₩565. Removing near-gap events does not change the rejection.
+
+### Hypotheses, v2 comparisons, and cost stress
+
+| Variant | Frozen rule / evidence | Development | Validation / disposition |
+|---|---|---|---|
+| V1 15m | Existing breakout + volume baseline | 353 signals, 293 closed; PF .406; expectancy −₩383; net −₩112,137 | 124 / 103; PF .151; −₩495; −₩51,007 |
+| V2-A 15m | Not overextended: session-open return ≤ Development P75, 7.0626% | 265 / 216; PF .483; −₩279; −₩60,235; 75.1% signal retention | 105 / 86; PF .193; −₩439; −₩37,760; 84.7% of Validation baseline signals retained; REJECTED |
+| V2-B 15m | Strong close / limited upper wick | Dev winner median upper wick .125 vs loser .192 | Validation direction reversed (.250 vs .188); screening only, REJECTED unstable; not sent to Validation backtest |
+| V2-C 15m | RVOL <3.0, predeclared bucket boundary | 123 / 89; PF .500; −₩262; −₩23,302; only 34.8% retention; false-breakout rate 19.51% vs V1 17.56% | Rejected on Development retention and false-break rate; Validation metrics deliberately not computed |
+| 30m candidates | No stable winner/loser structure | No candidate selected | No Validation candidate; v1 remains negative |
+
+V2-A removed 88/353 Development signals; the 77 removed closed trades had PF .282, expectancy −₩674 and net −₩51,902. This improves the retained subset's loss but does not make it positive. Validation removed 19 signals; the 17 closed removed trades had PF .003 and expectancy −₩779, while retained trades still had expectancy −₩439. Dev-derived nearby thresholds 6.0626%, 7.0626%, and 8.0626% yielded Validation expectancy −₩409, −₩439, and −₩452: direction vs baseline is nearby-stable, but no positive plateau exists. V2-A false-break rate moved 17.56%→16.60% in Dev and 25.81%→26.67% in Validation.
+
+| 15m strategy / split | Net PnL at 1.0x | 1.5x | 2.0x |
+|---|---:|---:|---:|
+| V1 Development | −₩112,137 | −₩143,160 | −₩174,183 |
+| V2-A Development | −₩60,235 | −₩82,418 | −₩104,602 |
+| V1 Validation | −₩51,007 | −₩59,091 | −₩67,175 |
+| V2-A Validation | −₩37,760 | −₩44,560 | −₩51,361 |
+
+Validation gates fail for V2-A: expectancy ≤0, PF ≤1 (.193), negative at 1.5x costs, false-break rate not reduced, despite 86 closed trades and improved Dev expectancy. Therefore `FAILED_GENERALIZATION_NO_EDGE_AFTER_COST`, not `VALIDATION_CANDIDATE`. Break-even slippage was not estimated because no Validation candidate had positive expectancy.
+
+### ₩100,000 whole-share feasibility
+
+This separate portfolio replay used fixed scanner settings, ₩100,000 starting capital, actual whole-share fills, and unchanged live settings. `20K/.25%` and `30K/.50%` are research scenarios, not recommendations.
+
+| 15m strategy / split | Scenario | Fills | Net PnL | PF | MDD | Avg invested / idle cash |
+|---|---|---:|---:|---:|---:|---:|
+| V1 Dev | 20K / .25% | 11 | −₩1,186 | .064 | 1.28% | ₩456 / 99.54% |
+| V2-A Dev | 20K / .25% | 7 | −₩544 | .129 | 0.76% | ₩379 / 99.62% |
+| V1 Validation | 20K / .25% | 2 | −₩415 | 0.000 | 0.63% | ₩313 / 99.69% |
+| V2-A Validation | 20K / .25% | 2 | −₩415 | 0.000 | 0.63% | ₩313 / 99.69% |
+| V1 Dev | 30K / .50% | 34 | −₩2,001 | .640 | 4.50% | ₩3,732 / 96.27% |
+| V2-A Dev | 30K / .50% | 28 | −₩1,086 | .750 | 3.75% | ₩3,395 / 96.61% |
+| V1 Validation | 30K / .50% | 14 | −₩3,473 | .134 | 3.47% | ₩3,663 / 96.34% |
+| V2-A Validation | 30K / .50% | 13 | −₩3,152 | .146 | 3.30% | ₩3,557 / 96.44% |
+
+For 30m V1, Dev had 3 / 9 fills and +₩210 / +₩616 in the two scenarios, but Validation had 1 / 4 fills and −₩153 / −₩1,583. That tiny Dev result does not qualify 30m; no 30m V2 candidate was selected. Typical idle cash was 96–99.95%, with only 1–14 Validation fills in the reported portfolios. Whole-share eligibility, risk sizing, and low utilization constrain execution; even the larger research scenario loses in Validation. Feasibility verdict: `CONSTRAINED`, with no capital-increase recommendation.
+
+### Phase 3 decision and verification
+
+- **Why did v1 lose?** Fast rejection / stop-outs and weak follow-through, late/extended entries, and volume/liquidity plus modeled execution drag are the three largest observed mechanisms. Every baseline interval/split was already gross-negative.
+- **Is a repeatable winner-vs-loser feature present in both splits?** `WEAK`: 15m lower prior session extension repeats directionally with small effect, but no candidate turns positive; 30m feature differences largely vanish or flip.
+- **Does a v2 candidate have positive cost-adjusted Validation expectancy?** `NO`. V2-A is rejected; V2-B and V2-C were screened out before Validation; no 30m candidate survived.
+- **Is it executable in a ₩100,000 whole-share portfolio?** `CONSTRAINED`; portfolio fills are sparse and all V2-A Validation scenarios lose.
+- Final: `BREAKOUT=REJECTED`; `PULLBACK=TOO_RARE / DEPRIORITIZED`; `ALPHA=UNPROVEN`; `LIVE=DISABLED`; `BREAKOUT_V2=NONE`; `SHADOW_FOR_V2=NOT_STARTED`.
+- Next phase: **D — improve clean evidence / cohort breadth first**, preferably accumulate future KRX sessions or freeze a genuinely untouched historical block. Do not open the locked Phase 2.5 Holdout. After that, the one evidence-linked strategy hypothesis worth considering is a breakout retest/acceptance entry: require price to hold the broken level after the first push, targeting the observed immediate-rejection and no-follow-through failures. It is only a research proposal; no new strategy was implemented or validated here. Current-listing survivorship and the fixed-cohort scanner proxy remain material limitations.
+- Research artifacts: ignored `runtime/research/phase3/breakout-signals-{15m,30m}.parquet`, `breakout-anatomy-{15m,30m}.json`, `breakout-v2-comparison-{15m,30m}.json`, `v2-hypotheses.json`, `v2-validation.json`, and `breakout-anatomy-summary.json`. `runtime/` remains untracked/ignored.
+- Regression: `uv run ruff check src tests` PASS; `uv run pytest -q` PASS (105 tests); `uv run python -m compileall -q src tests` PASS; `git diff --check` PASS. New tests cover lookahead isolation, holdout guard, feature calculations, outcome labeling, data-gap flags, deterministic buckets, filter attribution, retention, and validation isolation.
+- Phase 2/2.5 findings and the locked Holdout status were not changed. Source and research output are diagnostic only; no strategy promotion, V2 Shadow, account access, or live trading occurred.

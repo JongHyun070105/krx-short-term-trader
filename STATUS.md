@@ -2,15 +2,23 @@
 
 ```text
 ALPHA: UNPROVEN
-BACKTEST: PASS (real multi-symbol run completed; no trades)
-OOS: INSUFFICIENT_SAMPLE (0 / 30 minimum trades)
-SHADOW: NOT_PROMOTED
+BREAKOUT: REJECTED (Phase 3 Dev/Validation diagnostics negative)
+BREAKOUT_V2: NONE (no Validation candidate survived)
+PULLBACK: TOO_RARE / DEPRIORITIZED
+OOS: FAILED_GENERALIZATION_NO_EDGE_AFTER_COST (V2-A; locked Fresh Holdout untouched)
+SHADOW: NOT_STARTED_FOR_V2
 SHADOW_INFRA: PASS (2026-09-28 four-hour read-only simulated session)
 PAPER: OUT_OF_SCOPE
 LIVE: DISABLED
 ```
 
-Phase 2 and Phase 2.5 evidence is summarized in [RESULTS.md](RESULTS.md). The Phase 2 manifest and Phase 2.5 diagnostics are retained in ignored `runtime/research/`.
+Phase 2, Phase 2.5, and Phase 3 evidence is summarized in [RESULTS.md](RESULTS.md). Manifests, event rows, and Phase 3 diagnostics are retained in ignored `runtime/research/`.
+
+- Phase 3 analyzed only the 49-session Development window (2026-04-17–06-30) and 18-session Validation window (2026-07-01–07-27), using 30 current KOSPI listings and the fixed scanner proxy. The Phase 2.5 23-session Fresh Holdout (2026-07-28–08-28) remains `LOCKED_NOT_EVALUATED`; zero post-validation partitions were opened.
+- Baseline Breakout was net-negative in all four interval/split cells. 15m PF/expectancy: Dev 0.406 / −₩383, Validation 0.151 / −₩495. 30m: Dev 0.757 / −₩250, Validation 0.101 / −₩648. All four cells were gross-negative before costs.
+- V2-A not-overextended retained 75.1% of Dev signals and improved Dev PF to 0.483, but Validation remained PF 0.193 / −₩439 expectancy and false-breakout rate increased to 26.67% from 25.81%. V2 was rejected and not started in Shadow.
+- Research data quality remains partial (broader cohort: 412 incomplete partitions, 956 missing minute slots); cohort survivorship bias and fixed current-cohort scanner ranking remain. Phase 3 verdict is not full-market KRX alpha evidence.
+- Next phase: broaden clean prospective or genuinely untouched evidence before considering another strategy hypothesis. Do not use the locked Fresh Holdout to rescue v1/v2 results.
 
 - KIS read-only auth, quote, daily OHLCV, minute OHLCV, KOSPI/KOSDAQ indices, official universe master, market scan, and both strategy rankers returned valid responses.
 - The research cache contains 30 current common-stock symbols over 17 KRX sessions (193,446 actual minute rows, 0 duplicates, 0 DQ errors).
