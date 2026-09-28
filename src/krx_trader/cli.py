@@ -26,6 +26,11 @@ from krx_trader.kis.rest import KisApiError, KisRestClient
 from krx_trader.kis.transport import UrllibTransport
 from krx_trader.market.regime import Regime, classify_regime
 from krx_trader.models import Bar
+from krx_trader.research.anatomy import (
+    run_breakout_anatomy,
+    run_breakout_v2_comparison,
+    run_breakout_v2_validation,
+)
 from krx_trader.research.runner import run_baseline, run_feasibility_matrix, run_validation
 from krx_trader.research.scenario import ResearchScenario
 from krx_trader.status import write_project_status
@@ -381,6 +386,22 @@ def build_parser() -> argparse.ArgumentParser:
     feasibility.add_argument("--start", type=_parse_iso_date)
     feasibility.add_argument("--end", type=_parse_iso_date)
     feasibility.add_argument("--manifest", type=Path, default=Path("runtime/research/latest_dataset.json"))
+    anatomy = research_sub.add_parser("anatomy", help="build point-in-time Breakout signal anatomy")
+    anatomy_sub = anatomy.add_subparsers(dest="anatomy_strategy", required=True)
+    anatomy_breakout = anatomy_sub.add_parser("breakout")
+    anatomy_breakout.add_argument("--interval", choices=("15m", "30m"), required=True)
+    anatomy_breakout.add_argument("--manifest", type=Path, default=Path(
+        "runtime/research/phase25-diagnostic-dataset-manifest-v1.json"
+    ))
+    anatomy_breakout.add_argument("--cache-root", type=Path, default=Path("data"))
+    anatomy_breakout.add_argument("--output", type=Path, default=Path("runtime/research/phase3"))
+    breakout_v2 = research_sub.add_parser("breakout-v2", help="compare bounded evidence-based Breakout hypotheses")
+    breakout_v2_sub = breakout_v2.add_subparsers(dest="breakout_v2_command", required=True)
+    breakout_v2_compare = breakout_v2_sub.add_parser("compare")
+    breakout_v2_compare.add_argument("--interval", choices=("15m", "30m"), required=True)
+    breakout_v2_compare.add_argument("--output", type=Path, default=Path("runtime/research/phase3"))
+    breakout_v2_validate = breakout_v2_sub.add_parser("validate")
+    breakout_v2_validate.add_argument("--output", type=Path, default=Path("runtime/research/phase3"))
     validate = sub.add_parser("validate", help="alias for research validate")
     validate.add_argument("--top", type=int, default=10)
     backtest = sub.add_parser("backtest")
@@ -477,6 +498,27 @@ def main() -> None:
                     start_date=args.start, end_date=args.end,
                     dataset_manifest=args.manifest,
                 ))
+            elif args.research_command == "anatomy":
+                try:
+                    git_sha = subprocess.run(
+                        ["git", "rev-parse", "HEAD"], check=True, capture_output=True, text=True
+                    ).stdout.strip()
+                except (OSError, subprocess.CalledProcessError):
+                    git_sha = "UNAVAILABLE"
+                _emit_json(run_breakout_anatomy(
+                    interval=args.interval,
+                    manifest_path=args.manifest,
+                    cache_root=args.cache_root,
+                    report_root=args.output,
+                    git_sha=git_sha,
+                ))
+            elif args.research_command == "breakout-v2":
+                if args.breakout_v2_command == "compare":
+                    _emit_json(run_breakout_v2_comparison(
+                        interval=args.interval, report_root=args.output,
+                    ))
+                else:
+                    _emit_json(run_breakout_v2_validation(report_root=args.output))
             else:
                 _emit_json(run_baseline(
                     settings,
