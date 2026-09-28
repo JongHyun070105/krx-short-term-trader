@@ -1,6 +1,7 @@
 import json
 from datetime import date, datetime, timedelta
 from pathlib import Path
+from types import SimpleNamespace
 from zoneinfo import ZoneInfo
 
 import pyarrow as pa
@@ -19,6 +20,7 @@ from krx_trader.research.anatomy import (
     _one_share_order_cap_eligible,
     _one_share_risk_krw,
     _overextension_filter,
+    _peak_portfolio_positions,
     _thresholds_from_dev,
     _trade_metrics,
     _variant_metrics,
@@ -211,6 +213,17 @@ def test_one_share_feasibility_uses_the_project_cost_model():
     assert _one_share_order_cap_eligible(19_950, 20_000, cost)
     assert not _one_share_order_cap_eligible(19_990, 20_000, cost)
     assert _one_share_risk_krw(1_000, 1_010, cost) == float("inf")
+
+
+def test_peak_portfolio_count_applies_exits_before_same_bar_entries():
+    start = datetime(2026, 7, 1, 9, 0, tzinfo=KST)
+    next_bar = start + timedelta(minutes=15)
+    trades = [
+        SimpleNamespace(entry_time=start, exit_time=next_bar),
+        SimpleNamespace(entry_time=start, exit_time=next_bar),
+        SimpleNamespace(entry_time=next_bar, exit_time=next_bar),
+    ]
+    assert _peak_portfolio_positions(trades, [start, next_bar]) == 2
 
 
 def test_trade_metrics_reports_median_timing_and_overnight_exits():

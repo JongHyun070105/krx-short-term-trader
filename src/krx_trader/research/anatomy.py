@@ -1179,6 +1179,22 @@ def run_breakout_v2_validation(report_root: Path = DEFAULT_OUTPUT) -> dict:
     return hypotheses
 
 
+def _peak_portfolio_positions(trades: list, timeline: list[datetime]) -> int:
+    entries_by_time: dict[datetime, list[int]] = defaultdict(list)
+    for index, trade in enumerate(trades):
+        entries_by_time[trade.entry_time].append(index)
+    active: set[int] = set()
+    peak = 0
+    for timestamp in timeline:
+        active = {index for index in active if trades[index].exit_time > timestamp}
+        for index in entries_by_time.get(timestamp, []):
+            active.add(index)
+            peak = max(peak, len(active))
+            if trades[index].exit_time <= timestamp:
+                active.remove(index)
+    return peak
+
+
 def run_breakout_v2_portfolio(
     *,
     report_root: Path = DEFAULT_OUTPUT,
@@ -1256,9 +1272,7 @@ def run_breakout_v2_portfolio(
                         for trade in result.trades
                     )
                     average_invested = exposure_bar_sum / len(timeline) if timeline else 0.0
-                    peak_position_count = max((sum(
-                        trade.entry_time <= timestamp <= trade.exit_time for trade in result.trades
-                    ) for timestamp in timeline), default=0)
+                    peak_position_count = _peak_portfolio_positions(list(result.trades), timeline)
                     signals_sent = sum(signal.decision == Decision.ENTER for signal in result.decisions)
                     one_share_price_eligible = sum(
                         row.get("next_bar_open") is not None and
@@ -1305,6 +1319,6 @@ def run_breakout_v2_portfolio(
         "scenarios": {"20K_0.25pct": {"order_cap_krw": 20_000, "risk_per_trade_pct": .25},
                       "30K_0.50pct": {"order_cap_krw": 30_000, "risk_per_trade_pct": .50}},
         "split_results": portfolio_results,
-        "capital_utilization_method": "sum(entry_notional * held_interval_bars) / symbol_interval_bar_count",
+        "capital_utilization_method": "sum(entry_notional * active_interval_samples) / global_unique_interval_timestamps",
         "live_environment_changed": False,
     }
