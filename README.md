@@ -4,7 +4,7 @@ Research-first tooling for KRX common stocks. The current release provides local
 
 ## Current status
 
-See [STATUS.md](STATUS.md), [RESULTS.md](RESULTS.md), and [LIVE_READINESS.md](LIVE_READINESS.md). Phase 2 recorded `ALPHA=UNPROVEN`, `BACKTEST=PASS` (research run completed with no fills), `OOS=INSUFFICIENT_SAMPLE`, `SHADOW=NOT_PROMOTED`, `PAPER=OUT_OF_SCOPE`, and `LIVE=DISABLED`.
+See [STATUS.md](STATUS.md), [RESULTS.md](RESULTS.md), and [LIVE_READINESS.md](LIVE_READINESS.md). Phase 2.5 added 90 diagnostic sessions and a four-hour 2026-09-28 read-only prospective Shadow (`SHADOW_INFRA=PASS`, replay mismatches 0); every live decision was blocked by `HIGH_VOL`, so `SHADOW=NOT_PROMOTED` and `ALPHA=UNPROVEN`. Phase 2 OOS remains `INSUFFICIENT_SAMPLE`; `PAPER=OUT_OF_SCOPE` and `LIVE=DISABLED`.
 
 ## Architecture
 
@@ -98,7 +98,7 @@ uv run krx-trader validate
 
 The fixed candidate gate requires at least 30 OOS trades, positive expectancy, PF > 1, MDD <= 3%, positive 1.5x/2.0x cost-stress returns, and positive expectancy/PF across the configured parameter neighborhood. These thresholds are not tuned after viewing final results. The current final partition is marked touched in `RESULTS.md`; no Shadow promotion is allowed from it.
 
-`shadow-replay` only replays a supplied data file; it is not a realtime shadow collector. It does not call KIS or submit broker orders. Live-market Shadow remains `NOT_STARTED` until data-source provenance, stream parsing, operational monitoring, and session evidence are validated.
+`shadow-replay` only replays a supplied data file; it is not a realtime shadow collector. It does not call KIS or submit broker orders. The 2026-09-28 Phase 2.5 live-market run validated the REST polling, scanner, completed-bar decision, and replay-parity path; it did not qualify strategy profitability or promote a strategy. See `RESULTS.md` for exact session evidence and limitations.
 
 `shadow-live` polls KIS read-only market-rank, minute-data, and daily-index endpoints during a scheduled KST window (default 09:00–13:00). It confirms the session from KIS minute data, refreshes the eligible Top 20 every 30 minutes, deep-monitors up to five candidates, uses only complete session-anchored 15m/30m bars, and logs all Breakout/Pullback decisions. Simulated entries use the next one-minute bar after the decision was observed and apply the configured assumed costs; no broker order endpoint is available to this runner. Current-session bars, historical warmup bars, the exact index inputs, scanner events, resumable state, and the run manifest are written under `runtime/shadow/<run-id>/` so the signal path can be replayed from its captured inputs. At the stop time, open simulated positions receive an `OBSERVATIONAL_MARK` and are not force-closed. Costs remain `ASSUMED`; this evidence validates collection and pipeline behavior, not strategy profitability or live readiness.
 
