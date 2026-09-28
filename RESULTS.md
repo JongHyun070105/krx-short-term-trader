@@ -332,3 +332,118 @@ The frozen candidate block is 2026-01-05–2026-04-16 for the frozen 100-symbol 
 - Next step: do not run a Shadow for this family and do not open the locked Holdout. If a later research phase is authorized, consider only one newly preregistered family at a time; names for future consideration are relative-strength continuation, VWAP reclaim, or opening momentum with acceptance. None is implemented or evaluated in Phase 4.
 
 Phase 4 machine artifacts are intentionally ignored under `runtime/research/phase4/`: `data-quality-audit.json`, `cohort-manifest.json`, `retest-preregistration.json`, `retest-anatomy-{15m,30m}.json`, `retest-events-{retesta,retestb}-{15m,30m}.json`, `retest-neighborhood.json`, `external-cache-audit.json`, `external-validation.json`, `100k-feasibility.json`, and `phase4-artifact-index.json`. The index records SHA-256 for all 13 artifacts plus source dataset, selected partitions, cohort symbols/master, strategy config, costs, periods, freeze commit, and Holdout counters. Index SHA-256: `807ac406e088414c6b5826be036d70b611d72034f77d8d9cdd56976645516779`. Runtime data was not committed.
+
+---
+
+## Phase 5: Expanded Market Evidence and Relative-Strength Continuation
+
+### Research context and problem formulation
+
+Following the definitive rejection of the Breakout family in Phase 4 (`BREAKOUT_FAMILY = REJECTED`), Phase 5 investigates an entirely distinct, newly preregistered strategy family: **Relative-Strength Continuation**.
+
+The core hypothesis examines:
+> *"Does selecting intraday leaders that consistently outperform their peers across the market yield a statistically significant, cost-adjusted continuation edge after realistic KRX transaction costs and market frictions?"*
+
+- **Strategy freeze & non-contamination:** The Breakout family remained completely untouched with zero threshold or filter adjustments.
+- **Strict Holdout lock:** The 23-session Fresh Holdout period (`2026-07-28` to `2026-08-28`) remained strictly `LOCKED_NOT_EVALUATED`. Exactly 0 partitions, 0 features, and 0 signals from the holdout window were accessed.
+- **Cost modeling:** Baseline transaction costs mirror previous phases: 0.015% broker fee, 0.200% securities transaction tax (sell-side), and 15 bps slippage (combined round-trip friction ≈ 0.527%). Stress scenarios at 1.5x (≈ 0.79%) and 2.0x (≈ 1.05%) were evaluated.
+- **Primary & Secondary intervals:** 15m was designated as the primary decision interval; 30m was analyzed as secondary.
+
+### Data acquisition and expanded cohort breadth
+
+Phase 5 successfully expanded market coverage beyond the initial 30 KOSPI cohort toward a diversified 60-symbol universe (`cohort_60`: 30 KOSPI, 30 KOSDAQ across large, mid, and small market-cap strata):
+- **Downloaded data:** 33 symbols (30 KOSPI + 3 KOSDAQ) were fully loaded and partitioned across 67 safe trading sessions (`2026-04-17` to `2026-07-27`), producing **2,209 valid Parquet partitions**.
+- **Data quality semantics:** Missing minute slots were handled under Fail-Closed semantics without injecting synthetic bars.
+- **Cohort breadth status:** `EXPANDED_PARTIAL` (KOSDAQ representation initialized, multi-market cross-sectional evaluation unlocked).
+
+### Cross-sectional feature anatomy and persistence decay
+
+To test the foundational premise before strategy simulation, cross-sectional relative strength was evaluated across 50,271 bar observations (1,668 timestamps, 33 symbols) on the 15m timeframe:
+
+#### 15m Forward return by relative strength decile/quintile
+| RS Rank Bucket | Sample Size | Mean Fwd 1-bar Ret | Mean Fwd 2-bar Ret | Mean Fwd 4-bar Ret | 1-bar Win Rate | 10-bar MFE / MAE |
+|---|---:|---:|---:|---:|---:|
+| 0–20% (Lagging) | 9,073 | −0.0096% | −0.0084% | −0.0179% | 43.55% | +2.27% / −2.16% |
+| 20–40% | 9,913 | −0.0060% | −0.0243% | −0.0515% | 41.82% | +1.77% / −1.72% |
+| 40–60% (Median) | 9,989 | −0.0162% | −0.0228% | −0.0151% | 40.97% | +1.70% / −1.63% |
+| 60–80% | 9,913 | −0.0248% | −0.0301% | −0.0375% | 39.95% | +1.77% / −1.67% |
+| 80–90% | 4,957 | −0.0193% | −0.0282% | −0.0661% | 40.89% | +1.96% / −1.82% |
+| **90–100% (Leading)** | 6,426 | **−0.0694%** | **−0.0884%** | **−0.1397%** | **40.66%** | +2.48% / −2.42% |
+
+- **Monotonicity:** `FALSE`. Top-decile relative-strength leaders exhibit **worse** forward returns and lower win rates than bottom-quintile laggards.
+- **Mean-reversion drag:** In the KRX intraday market, short-term leadership over 45–90 minutes is followed by rapid profit-taking and mean-reversion rather than continuation.
+
+#### Persistence breakdown (3-bar consecutive leadership)
+| Persistence Condition | Sample Size | Mean Fwd 1-bar Ret | 1-bar Win Rate | Mean Fwd 4-bar Ret |
+|---|---:|---:|---:|---:|
+| 0 of 3 bars in top decile | 29,508 | −0.0108% | 41.39% | −0.0327% |
+| 1 of 3 bars in top decile | 11,135 | −0.0348% | 41.31% | −0.0467% |
+| 2 of 3 bars in top decile | 6,405 | −0.0264% | 41.61% | −0.0624% |
+| **3 of 3 bars in top decile** | 3,223 | **−0.0689%** | **40.71%** | **−0.1664%** |
+
+- **Persistence advantage over spike:** `FALSE`. Sustained leaders (3/3 bars) suffer even deeper forward decay (−0.0689% 1-bar, −0.1664% 4-bar) than transient spikes.
+
+### Preregistered strategy performance: RS-A vs RS-B
+
+Two distinct candidate formulations were preregistered before backtesting:
+1. **RS-A (Persistent Leader):** Cross-sectional relative strength rank ≥ 80th percentile, rank persistence ≥ 2 bars, 10-bar max holding or stop-first exit.
+2. **RS-B (Persistent Leader + Reacceleration):** Same rank and persistence criteria plus positive rank acceleration (RS velocity > 0).
+
+#### Development Period (2026-04-17 to 2026-06-30, 50 sessions)
+| Strategy | Closed Trades | Win Rate | Gross Expectancy | Net Expectancy | Profit Factor |
+|---|---:|---:|---:|---:|---:|
+| **RS-A** | 691 | 24.75% | −0.296% | −0.823% | 0.436 |
+| **RS-B** | 453 | 26.93% | −0.053% | −0.581% | 0.570 |
+
+#### Secondary Diagnostic Period (2026-07-01 to 2026-07-27, 17 sessions)
+| Strategy | Closed Trades | Win Rate | Gross Expectancy | Net Expectancy | Profit Factor |
+|---|---:|---:|---:|---:|---:|
+| **RS-A** | 219 | 26.03% | −0.058% | −0.587% | 0.534 |
+| **RS-B** | 173 | 28.32% | −0.215% | −0.743% | 0.472 |
+
+**Key observations:**
+- **Gross expectancy is negative across all cells** before transaction costs.
+- Adding reacceleration (RS-B) narrowed losses in Development but worsened performance in the Secondary diagnostic period.
+- Neither candidate demonstrated positive gross expectancy; under Rule 71 and Rule 100, tuning exits or filters on a gross-negative foundation is strictly prohibited.
+
+### Cost stress analysis
+
+| Scenario | Multiplier | RS-A Net Expectancy (PF) | RS-B Net Expectancy (PF) |
+|---|---:|---:|---:|
+| Baseline | 1.0x | −0.823% (0.436) | −0.581% (0.570) |
+| Moderate Friction | 1.5x | −1.086% (0.346) | −0.845% (0.453) |
+| Severe Friction | 2.0x | −1.348% (0.279) | −1.107% (0.365) |
+
+Under realistic friction escalation, the net drag compounds rapidly, driving Profit Factor below 0.35.
+
+### ₩100,000 whole-share portfolio replay
+
+A realistic whole-share replay was executed using the project's standard retail micro-capital constraints (₩100,000 initial capital, ₩20,000 order cap, 0.25% equity risk per trade, max 2 concurrent positions):
+- **Total Fills / Trades:** 193
+- **Win Rate:** 18.13%
+- **Total Net PnL:** −₩14,443.00 (−14.44% total return)
+- **Profit Factor:** 0.462
+- **Maximum Drawdown:** 14.47%
+- **Conclusion:** While the strategy is technically executable with whole-share lot sizes, it exhibits steady capital erosion. `100K = EXECUTABLE_NEGATIVE`.
+
+### Untouched external validation and holdout integrity
+
+- **External Block (2026-01-05 to 2026-04-16):** With both RS-A and RS-B failing primary viability gates on gross expectancy, the external historical block was intentionally kept untouched (`EXTERNAL_VALIDATION = NOT_AVAILABLE`) to prevent data snooping and conserve API quota (Rule 59, Rule 71).
+- **Fresh Holdout (2026-07-28 to 2026-08-28, 23 sessions):** Maintained strictly as `LOCKED_NOT_EVALUATED` (0 partitions opened, 0 features computed).
+
+### Final Status Matrix
+
+| Gate / Metric | Phase 5 Verdict | Operational Meaning |
+|---|---|---|
+| `DATA_QUALITY` | `PARTIAL` | 2,209 partitions loaded, missing slots fail-closed |
+| `COHORT_BREADTH` | `EXPANDED_PARTIAL` | 33 symbols loaded (30 KOSPI, 3 KOSDAQ) |
+| `RS-A` | `REJECTED` | Gross-negative (−0.296%), Net-negative (−0.823%) |
+| `RS-B` | `REJECTED` | Gross-negative (−0.053%), Net-negative (−0.581%) |
+| `RELATIVE_STRENGTH_FAMILY`| `REJECTED` | Cross-sectional continuation lacks edge in KRX |
+| `100K_PORTFOLIO` | `EXECUTABLE_NEGATIVE` | 193 fills, −14.44% PnL, steady capital erosion |
+| `SHADOW_NEXT_SESSION` | `NO` (`NOT_PROMOTED`) | Promotion criteria failed |
+| `ALPHA` | `UNPROVEN` | No demonstrable market edge |
+| `LIVE` | `DISABLED` | Live trading prohibited |
+| `PAPER` | `OUT_OF_SCOPE` | Paper trading withheld |
+
+Phase 5 machine artifacts are recorded under `runtime/research/phase5/`: `expanded-dq.json`, `data-acquisition-manifest.json`, `rs-preregistration.json`, `rs-anatomy-15m.json`, `rs-anatomy-30m.json`, `rs-a-development-results.json`, `rs-b-development-results.json`, `rs-a-secondary-results.json`, `rs-b-secondary-results.json`, `cost-stress-results.json`, `100k-feasibility.json`, `external-validation.json`, and `phase5-summary.json`. All 13 artifacts are verified with SHA-256 digests in `phase5-artifact-index.json`.

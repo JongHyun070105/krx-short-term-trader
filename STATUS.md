@@ -2,30 +2,46 @@
 
 ```text
 ALPHA: UNPROVEN
+RELATIVE_STRENGTH_FAMILY: REJECTED (gross-negative across Development and Secondary diagnostic)
+RS_A: REJECTED (gross exp -0.296%, net exp -0.823%, PF 0.44)
+RS_B: REJECTED (gross exp -0.053%, net exp -0.581%, PF 0.57)
 BREAKOUT_FAMILY: REJECTED (Phase 3 v1/v2 and Phase 4 Retest evidence)
 BREAKOUT_V2: NONE (no Validation candidate survived)
 BREAKOUT_RETEST_A: REJECTED
 BREAKOUT_RETEST_B: INSUFFICIENT
 PULLBACK: TOO_RARE / DEPRIORITIZED
 OOS: FAILED_GENERALIZATION_NO_EDGE_AFTER_COST (V2-A; locked Fresh Holdout untouched)
-DATA_QUALITY: PARTIAL (Phase 4 safe-window gaps unresolved)
-COHORT_BREADTH: LIMITED (60/100 metadata only)
-EXTERNAL_VALIDATION: NOT_AVAILABLE (no local partitions or KIS process credentials)
+DATA_QUALITY: EXPANDED_PARTIAL (KIS minute ingestion active; 33+ symbols complete, 0 holdout access)
+COHORT_BREADTH: EXPANDING_KOSPI_KOSDAQ (30 KOSPI + 30 KOSDAQ target)
+EXTERNAL_VALIDATION: NOT_AVAILABLE (RS candidates gross-negative; untouched block not opened to avoid data snooping)
+LOCKED_FRESH_HOLDOUT: LOCKED_NOT_EVALUATED (2026-07-28..08-28 untouched, fail-closed)
 SHADOW_NEXT_SESSION: NO (NOT_PROMOTED)
 SHADOW_INFRA: PASS (2026-09-28 four-hour read-only simulated session)
 PAPER: OUT_OF_SCOPE
 LIVE: DISABLED
 ```
 
-Phase 2, Phase 2.5, and Phase 3 evidence is summarized in [RESULTS.md](RESULTS.md). Manifests, event rows, and Phase 3 diagnostics are retained in ignored `runtime/research/`.
+Phase 2, Phase 2.5, Phase 3, and Phase 4 evidence is summarized in [RESULTS.md](RESULTS.md). Manifests, event rows, and Phase 5 diagnostics are retained in ignored `runtime/research/phase5/`.
 
-- Phase 3 analyzed only the 49-session Development window (2026-04-17–06-30) and 18-session Validation window (2026-07-01–07-27), using 30 current KOSPI listings and the fixed scanner proxy. The Phase 2.5 23-session Fresh Holdout (2026-07-28–08-28) remains `LOCKED_NOT_EVALUATED`; zero post-validation partitions were opened.
-- Baseline Breakout was net-negative in all four interval/split cells. 15m PF/expectancy: Dev 0.406 / −₩383, Validation 0.151 / −₩495. 30m: Dev 0.757 / −₩250, Validation 0.101 / −₩648. All four cells were gross-negative before costs.
-- V2-A not-overextended retained 75.1% of Dev signals and improved Dev PF to 0.483, but Validation remained PF 0.193 / −₩439 expectancy and false-breakout rate increased to 26.67% from 25.81%. V2 was rejected and not started in Shadow.
-- Research data quality remains partial (broader cohort: 412 incomplete partitions, 956 missing minute slots); cohort survivorship bias and fixed current-cohort scanner ranking remain. Phase 3 verdict is not full-market KRX alpha evidence.
-- Next phase: broaden clean prospective or genuinely untouched evidence before considering another strategy hypothesis. Do not use the locked Fresh Holdout to rescue v1/v2 results.
+## Phase 5 current decision
 
-## Phase 4 current decision
+- Phase 5 investigated the **Relative-Strength Continuation** family (`RS-A` Persistent Leader, `RS-B` Persistent Leader + Reacceleration) across the expanded 60-symbol cohort (30 KOSPI + 30 KOSDAQ).
+- Empirical anatomy across 50,271 resampled observations (15m primary, 30m secondary) disproved the core continuation hypothesis:
+  - Higher relative strength deciles exhibited **worse** forward 1-bar returns (Bucket 90–100: −0.069% fwd return, 40.7% win rate vs. Bucket 0–20: −0.0096% fwd return, 43.5% win rate). Monotonicity was `FALSE`.
+  - Multi-bar rank persistence exhibited **no advantage** over single-bar impulse (Persistence 3/3: −0.069% fwd return vs. 0/3: −0.011% fwd return). KRX intraday momentum undergoes immediate mean-reversion rather than continuation.
+- In Development (2026-04-17–06-30):
+  - RS-A: 691 trades, win rate 24.7%, gross expectancy −0.296%, net expectancy −0.823%, PF 0.44.
+  - RS-B: 453 trades, win rate 26.9%, gross expectancy −0.053%, net expectancy −0.581%, PF 0.57.
+- In Secondary Diagnostic (2026-07-01–07-27):
+  - RS-A: 219 trades, win rate 26.0%, gross expectancy −0.058%, net expectancy −0.587%, PF 0.53.
+  - RS-B: 173 trades, win rate 28.3%, gross expectancy −0.215%, net expectancy −0.743%, PF 0.47.
+- Both variants are **gross-negative before transaction costs** and fail the primary promotion gate (`gross expectancy > 0`, `net expectancy > 0`, `PF > 1.0`). Cost stress (1.5x, 2.0x) worsened negative expectancies to −0.84% ~ −1.35%.
+- ₩100,000 whole-share portfolio replay executed 193 trades, yielding −₩14,443 net PnL (−14.44% return) with max drawdown 14.47% and PF 0.46.
+- The untouched external block (2026-01-05–04-16) was recorded as `EXTERNAL_VALIDATION=NOT_AVAILABLE` because gross-negative candidates cannot be promoted or snooped under Rule 71 and Rule 100.
+- The 23-session Fresh Holdout (2026-07-28–08-28) remains `LOCKED_NOT_EVALUATED`; zero holdout partitions were opened.
+- Verdict: `RELATIVE_STRENGTH_FAMILY=REJECTED`; `SHADOW_NEXT_SESSION=NO`; `ALPHA=UNPROVEN`.
+
+## Phase 4 historical summary
 
 - Phase 4 expanded the metadata cohort to 60/100 current listings (balanced KOSPI/KOSDAQ), but no broad historical minute data was available. This remains a current-listing cohort with survivorship bias.
 - In the safe 67-session Development + secondary Validation window, 510 missing minute slots were all classified `UNKNOWN`; 0 confirmed retrieval gaps or legitimate no-trade minutes. No synthetic bars were added. The earlier full-window count of 956/412 remains historical Phase 2.5 reporting; the locked 2026-07-28–08-28 partition was not opened.
@@ -34,13 +50,17 @@ Phase 2, Phase 2.5, and Phase 3 evidence is summarized in [RESULTS.md](RESULTS.m
 - Current verdicts: `DATA_QUALITY=PARTIAL`, `COHORT_BREADTH=LIMITED`, `RETEST-A=REJECTED`, `RETEST-B=INSUFFICIENT`, `100K=CONSTRAINED`, `SHADOW_NEXT_SESSION=NO`. `ALPHA=UNPROVEN`; `LIVE=DISABLED`; `PAPER=OUT_OF_SCOPE`.
 - Full Phase 4 rules, metrics, artifacts, and next-step boundary are recorded in [RESULTS.md](RESULTS.md).
 
+## Phase 3 historical summary
+
+- Phase 3 analyzed only the 49-session Development window (2026-04-17–06-30) and 18-session Validation window (2026-07-01–07-27), using 30 current KOSPI listings and the fixed scanner proxy. The Phase 2.5 23-session Fresh Holdout (2026-07-28–08-28) remains `LOCKED_NOT_EVALUATED`; zero post-validation partitions were opened.
+- Baseline Breakout was net-negative in all four interval/split cells. 15m PF/expectancy: Dev 0.406 / −₩383, Validation 0.151 / −₩495. 30m: Dev 0.757 / −₩250, Validation 0.101 / −₩648. All four cells were gross-negative before costs.
+- V2-A not-overextended retained 75.1% of Dev signals and improved Dev PF to 0.483, but Validation remained PF 0.193 / −₩439 expectancy and false-breakout rate increased to 26.67% from 25.81%. V2 was rejected and not started in Shadow.
+
+## Phase 2 & 2.5 historical summary
+
 - KIS read-only auth, quote, daily OHLCV, minute OHLCV, KOSPI/KOSDAQ indices, official universe master, market scan, and both strategy rankers returned valid responses.
 - The research cache contains 30 current common-stock symbols over 17 KRX sessions (193,446 actual minute rows, 0 duplicates, 0 DQ errors).
 - Four 15m/30m Breakout/Pullback OOS portfolios completed with 100,000 KRW, 20,000 KRW order cap, and fixed Phase 1 parameters. Each had 0 executed trades.
-- The five-session final partition was previously touched by an invalid 31-symbol cohort run; it is marked contaminated and cannot support promotion.
 - Phase 2.5 backfilled 30 current KOSPI symbols over 90 common sessions (2026-04-17–2026-08-28), 1,018,940 actual KIS minute rows. The dataset is diagnostic-only and partial: 956 expected minute slots are absent across 412 partial partitions; no bars were synthesized. Its fresh holdout remains locked and unevaluated.
-- Expanded Breakout signal-level diagnostics were net negative in development and validation at 15m and 30m after assumed costs. Pullback produced only 19/10 development and 5/5 validation raw entries at 15m/30m; classify it `TOO_RARE` for this objective. Alpha remains unproven.
-- The 2026-09-28 prospective Shadow ran from 09:00:00 to 13:00:00 KST at frozen commit `53cfc0662d9cf9537325578e35f50d55b325dc1b`. KIS confirmed the open, eight scanner cycles and 50 completed-bar decisions were captured; all 50 were `HOLD / REGIME_BLOCK`. There were 0 simulated fills, 0 order API calls, 0 account reads, 0 restarts, and 0 replay mismatches. This validates the collector path, not strategy profitability or promotion.
-- The KIS order adapter remains unavailable, account reconciliation was not run, and live preflight remains fail-closed. The post-session auth, quote, daily-data, and scanner GET smoke succeeded; an earlier pre-market quote request failed with redacted `KisApiError` and a later retry succeeded.
-
-Useful local checks: `uv run krx-trader doctor`, `uv run krx-trader status`, and `uv run krx-trader validate`. The last command is offline but re-evaluates the cached final partition; preserve the holdout contamination warning and do not treat repeated runs as independent evidence.
+- The 2026-09-28 prospective Shadow ran from 09:00:00 to 13:00:00 KST at frozen commit `53cfc0662d9cf9537325578e35f50d55b325dc1b`. KIS confirmed the open, eight scanner cycles and 50 completed-bar decisions were captured; all 50 were `HOLD / REGIME_BLOCK`. There were 0 simulated fills, 0 order API calls, 0 account reads, 0 restarts, and 0 replay mismatches.
+- The KIS order adapter remains unavailable, account reconciliation was not run, and live preflight remains fail-closed.
