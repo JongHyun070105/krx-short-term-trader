@@ -91,6 +91,7 @@ def test_market_rank_source_union_deduplicates_by_symbol_deterministically():
 def test_kis_master_parser_keeps_common_stock_flags_and_reference_price():
     tail = list(" " * 227)
     fields = {
+        "security_group": (0, 2, "ST"),
         "etp": (22, 23, " "), "spac": (29, 30, " "), "reference_price": (41, 50, "000010000"),
         "halted": (60, 61, " "), "management": (62, 63, " "), "market_warning": (63, 65, "00"),
         "warning_alert": (65, 66, " "), "preferred": (158, 159, " "), "market_cap": (212, 221, "000100000"),
@@ -112,6 +113,7 @@ def test_kis_master_parser_keeps_common_stock_flags_and_reference_price():
 
 def test_kis_master_parser_excludes_official_etp_marker_2():
     tail = list(" " * 227)
+    tail[0:2] = "ST"
     tail[22] = "2"
     record = f"{'069500':<9}{'KR7069500007':<12}{'KODEX 200':<28}" + "".join(tail)
     stream = io.BytesIO()
@@ -120,6 +122,51 @@ def test_kis_master_parser_excludes_official_etp_marker_2():
     parsed = parse_master_archive(stream.getvalue(), "KOSPI")
     assert parsed[0].instrument_type == "ETF_ETN"
     assert parsed[0].is_etp
+
+
+def test_kis_master_parser_excludes_etn_product_codes():
+    tail = list(" " * 227)
+    tail[0:2] = "ST"
+    tail[22] = "3"
+    record = f"{'123456':<9}{'KR7123450000':<12}{'Test ETN':<28}" + "".join(tail)
+    stream = io.BytesIO()
+    with zipfile.ZipFile(stream, "w") as archive:
+        archive.writestr("kospi_code.mst", record + "\n")
+    parsed = parse_master_archive(stream.getvalue(), "KOSPI")
+    assert parsed[0].instrument_type == "ETF_ETN"
+    assert parsed[0].is_etp
+
+
+def test_kis_kosdaq_master_uses_its_own_suffix_and_field_offsets():
+    tail = list(" " * 221)
+    fields = {
+        "security_group": (0, 2, "ST"),
+        "etp": (18, 19, "0"),
+        "spac": (24, 25, "N"),
+        "reference_price": (36, 45, "000001657"),
+        "halted": (55, 56, "N"),
+        "management": (57, 58, "N"),
+        "market_warning": (58, 60, "00"),
+        "warning_alert": (60, 61, "N"),
+        "preferred": (153, 154, "N"),
+        "market_cap": (206, 215, "000038869"),
+    }
+    for start, end, value in fields.values():
+        tail[start:end] = value
+    record = f"{'000250':<9}{'KR7000250004':<12}{'KOSDAQ Test':<35}" + "".join(tail)
+    stream = io.BytesIO()
+    with zipfile.ZipFile(stream, "w") as archive:
+        archive.writestr("kosdaq_code.mst", record + "\n")
+    parsed = parse_master_archive(stream.getvalue(), "KOSDAQ")
+    assert len(parsed) == 1
+    assert parsed[0].symbol == "000250"
+    assert parsed[0].name == "KOSDAQ Test"
+    assert parsed[0].instrument_type == "COMMON"
+    assert parsed[0].reference_price == 1_657
+    assert parsed[0].market_cap_raw == 38_869
+    assert not parsed[0].halted
+    assert not parsed[0].management
+    assert parsed[0].warning_status is None
 
 
 def test_breakout_and_pullback_rankers_are_separate_and_tie_break_by_symbol():

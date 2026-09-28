@@ -21,20 +21,21 @@ MASTER_URLS = {
     "KOSPI": "https://new.real.download.dws.co.kr/common/master/kospi_code.mst.zip",
     "KOSDAQ": "https://new.real.download.dws.co.kr/common/master/kosdaq_code.mst.zip",
 }
-# The official KIS parser defines 227 fixed-width data characters. Its line
-# iterator's 228-character suffix includes the trailing newline; splitlines()
-# removes that newline before we split the fixed-width tail here.
-_TAIL_WIDTH = 227
-_TAIL_FIELDS = {
-    "etp": (22, 23),
-    "spac": (29, 30),
-    "reference_price": (41, 50),
-    "halted": (60, 61),
-    "management": (62, 63),
-    "market_warning": (63, 65),
-    "warning_alert": (65, 66),
-    "preferred": (158, 159),
-    "market_cap": (212, 221),
+_TAIL_LAYOUTS = {
+    # KIS's official examples use 228 KOSPI and 222 KOSDAQ suffix characters
+    # while iterating lines (including '\n'). splitlines() removes that newline.
+    "KOSPI": {
+        "width": 227, "security_group": (0, 2), "etp": (22, 23), "spac": (29, 30),
+        "reference_price": (41, 50), "halted": (60, 61), "management": (62, 63),
+        "market_warning": (63, 65), "warning_alert": (65, 66), "preferred": (158, 159),
+        "market_cap": (212, 221),
+    },
+    "KOSDAQ": {
+        "width": 221, "security_group": (0, 2), "etp": (18, 19), "spac": (24, 25),
+        "reference_price": (36, 45), "halted": (55, 56), "management": (57, 58),
+        "market_warning": (58, 60), "warning_alert": (60, 61), "preferred": (153, 154),
+        "market_cap": (206, 215),
+    },
 }
 
 
@@ -51,6 +52,11 @@ def _active_flag(value: str) -> bool:
     return value.strip().upper() in {"Y", "1", "2"}
 
 
+def _active_etp(value: str) -> bool:
+    # ETP product codes are 0 for none and 1..5 for ETF/ETN product types.
+    return value.strip().upper() in {"Y", "1", "2", "3", "4", "5"}
+
+
 def parse_master_archive(payload: bytes, market: str) -> list[StockMaster]:
     if market not in MASTER_URLS:
         raise ValueError("market must be KOSPI or KOSDAQ")
@@ -63,19 +69,26 @@ def parse_master_archive(payload: bytes, market: str) -> list[StockMaster]:
     except (OSError, zipfile.BadZipFile, UnicodeError) as exc:
         raise ValueError(f"invalid KIS {market} stock-master archive ({type(exc).__name__})") from None
 
+    layout = _TAIL_LAYOUTS[market]
+    tail_width = int(layout["width"])
     stocks: list[StockMaster] = []
     for record in records:
-        if len(record) <= _TAIL_WIDTH:
+        if len(record) <= tail_width:
             continue
-        prefix, tail = record[:-_TAIL_WIDTH], record[-_TAIL_WIDTH:]
+        prefix, tail = record[:-tail_width], record[-tail_width:]
         symbol = prefix[:9].strip()
         if len(symbol) != 6 or not symbol.isdigit():
             continue
         name = prefix[21:].strip()
         if not name:
             continue
-        values = {key: tail[start:end].strip() for key, (start, end) in _TAIL_FIELDS.items()}
-        etp = _active_flag(values["etp"])
+        values = {
+            key: tail[start:end].strip()
+            for key, field_range in layout.items()
+            if key != "width"
+            for start, end in [field_range]
+        }
+        etp = _active_etp(values["etp"])
         spac = _active_flag(values["spac"])
         preferred = _active_flag(values["preferred"])
         warning_raw = values["market_warning"]
@@ -83,7 +96,11 @@ def parse_master_archive(payload: bytes, market: str) -> list[StockMaster]:
         warning_status = warning_raw if warning_raw.strip("0") else None
         if warning_alert and warning_status is None:
             warning_status = "WARNING_ALERT"
-        kind = "ETF_ETN" if etp else "SPAC" if spac else "PREFERRED" if preferred else "COMMON"
+        security_group = values["security_group"].upper()
+        kind = (
+            "ETF_ETN" if etp else "SPAC" if spac else "PREFERRED" if preferred else
+            "COMMON" if security_group == "ST" else "OTHER"
+        )
         stocks.append(
             StockMaster(
                 symbol=symbol,
