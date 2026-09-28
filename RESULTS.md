@@ -240,3 +240,95 @@ For 30m V1, Dev had 3 / 9 fills and +₩210 / +₩616 in the two scenarios, but 
 - Research artifacts: ignored `runtime/research/phase3/breakout-signals-{15m,30m}.parquet`, `breakout-anatomy-{15m,30m}.json`, `breakout-v2-comparison-{15m,30m}.json`, `v2-hypotheses.json`, `v2-validation.json`, and `breakout-anatomy-summary.json`. `runtime/` remains untracked/ignored.
 - Regression: `uv run ruff check src tests` PASS; `uv run pytest -q` PASS (105 tests); `uv run python -m compileall -q src tests` PASS; `git diff --check` PASS. New tests cover lookahead isolation, holdout guard, feature calculations, outcome labeling, data-gap flags, deterministic buckets, filter attribution, retention, and validation isolation.
 - Phase 2/2.5 findings and the locked Holdout status were not changed. Source and research output are diagnostic only; no strategy promotion, V2 Shadow, account access, or live trading occurred.
+
+## Phase 4 — Clean evidence expansion and breakout retest / acceptance
+
+### Scope, freeze, and evidence boundaries
+
+- Retest strategy freeze commit: `d0fad5bf18a3e1eae010dca21490ad15ba04dddd` (`feat: preregister breakout retest strategies`). Frozen config SHA-256: `4076bb140d1e9452e7788bc2730497a77af11a28ece1bd8685c37eaddb34980b`. Retest source SHA-256: `6fb31201b8f36b12d1b36b21913a167a762d303b7756f8a37bfece922b72fd28`.
+- Historical dataset source SHA-256: `bb33c49aa0ce533a7a3f8a15360665f25dbba2d0f738ccabaceab560165e5304`. Retest used only 2,010 original-30 symbol/session partitions for Development (2026-04-17–06-30) and secondary Validation (2026-07-01–07-27); their selected partition SHA-256 is `9c9e41ccb650b3b10b2a1818b2742f21dd63bf8ea241ecd7a593ba945b3f06c`. V1 replay parity against the Phase 3 event files was exact for all four interval/split cells: 0 status mismatches, 0 exit-time mismatches, and 0 net-PnL differences above ₩0.02.
+- The 23-session Fresh Holdout, 2026-07-28–08-28, stayed `LOCKED_NOT_EVALUATED`. No Holdout minute partition, feature, signal, PnL, or index context was opened. The Phase 3 index row group that overlaps the locked period was not read.
+- Baseline costs remain assumptions: 0.015% broker fee, 0.20% sell tax, and 15 bps slippage. The study also records 1.5x and 2.0x stress. Regime v1 was OFF for primary evaluation; no V1/V2 threshold was retuned.
+
+### Data quality and missing-minute semantics
+
+The Phase 2.5 full 90-session summary remains as originally reported: 412 partial partitions and 956 expected minute slots absent. Phase 4 did not reopen all 90 sessions because that would cross the locked Holdout boundary. Its safe 67-session Development + Validation audit found 2,010/2,010 partition files, 759,420 expected slots, 758,910 observed slots, 510 absent slots, and 263 partial partitions (Development 178 partitions / 264 slots; Validation 85 / 246).
+
+All 510 Phase 4 safe-window absences remain `UNKNOWN`: 0 were confirmed as retrieval gaps, no-trade minutes, provider-omitted no-trade minutes, session semantics, or halt/special-status minutes. No synthetic bars were added. Two already-existing bounded pre-Holdout KIS rereads showed persistent omissions (001440, 2026-06-08, 09:04–09:33; 034220, 2026-05-13, 10:22), but neither identifies whether a trade occurred. A fresh KIS reread was not performed because app credentials were absent from the process environment; `.env` was not read. Therefore `DATA_QUALITY=PARTIAL`, not evidence of 510 confirmed corrupt records.
+
+### Expanded current-listing cohort
+
+The deterministic cohort selection was frozen before the Retest study from the 2026-09-28 KIS common-stock master. It preserves all original 30 KOSPI symbols and expands to 60 (30 KOSPI / 30 KOSDAQ) and 100 (50 / 50). Price buckets are 19 / 22 / 19 for the 60 cohort and 34 / 38 / 28 for the 100 cohort across ₩1k–10k / ₩10k–30k / ₩30k–50k. At current reference prices, 34/60 and 60/100 are affordable as a single share under the ₩20K order cap. Affordability did not filter selection.
+
+This remains a `CURRENT-LISTING COHORT`; historical point-in-time membership and survivorship are not reconstructed. Turnover was absent from the current master, so market-cap strata are only a labeled selection proxy. The 60/100 cohorts have metadata only—no expanded minute bars were acquired—so expanded-cohort strategy, KOSDAQ, liquidity-bucket, and breadth-generalization results are `NOT_AVAILABLE`. The Retest outcomes below use only the original 30 KOSPI names.
+
+### Frozen Retest / Acceptance rules
+
+Only two variants were registered. Both preserve the V1 breakout detector: a completed close above the previous 20 completed-bar highs and volume at least 1.5x the preceding 20-bar mean. They then wait up to three completed bars for the same breakout level to be retested. A retest bar's low must reach within 0.30% above the level, must not penetrate more than 0.30% below it, and must close above the level. A close at/below the level, excessive penetration, session boundary, duplicate level, or timeout invalidates/expires the setup.
+
+- **RETEST-A:** acceptance is the retest bar's completed close above the breakout level.
+- **RETEST-B:** after a valid retest, a later completed bar within the same window must close above the retest bar's high.
+- Both signal only after a completed bar. Entry is the next available bar open; the acceptance bar's OHLC is never a fill. Initial stop is the lower of breakout level and retest low minus a 0.30% structural buffer. The existing 10-bar max-holding/stop-first exit is reused. Same resistance level cannot create a duplicate setup within a session.
+
+The exact rules/config and 2026-01-05–2026-04-16, 100-symbol external block were frozen in ignored local artifact `runtime/research/phase4/retest-preregistration.json` before that block was inspected. External-block inspection afterward checked only 10,200 explicit parquet paths; 0 were present and 0 file contents were read.
+
+### Used-data results: V1 vs Retest-A / Retest-B
+
+Each expectancy is one-share event-level KRW expectancy after baseline modeled costs. Development is `DESIGN EVIDENCE`; the already-used Validation is only `SECONDARY DIAGNOSTIC`, never independent validation.
+
+| Interval / split | V1 closed; net exp / PF | RETEST-A closed; gross exp → net exp / PF | RETEST-B closed; gross exp → net exp / PF |
+|---|---:|---:|---:|
+| 15m Development | 293; −₩382.72 / 0.406 | 162; −₩7.89 → −₩183.81 / 0.447 | 30; +₩18.67 → −₩147.04 / 0.404 |
+| 15m Validation | 103; −₩495.22 / 0.151 | 64; −₩39.91 → −₩192.91 / 0.323 | 12; −₩3.07 → −₩173.56 / 0.341 |
+| 30m Development | 152; −₩249.66 / 0.757 | 59; +₩149.51 → −₩22.43 / 0.935 | 10; −₩84.71 → −₩273.11 / 0.426 |
+| 30m Validation | 47; −₩647.82 / 0.101 | 33; −₩18.13 → −₩165.27 / 0.513 | 5; +₩163.00 → +₩0.26 / 1.001 |
+
+Retest-A is negative after cost in all four cells. Retest-B is negative in three cells; its only positive cell is +₩0.26 expectancy from five 30m Validation trades, with PF 1.001. No candidate passes the project evidence gate. The B sample is too small to qualify, while A has enough events to reject on the observed cost-adjusted results.
+
+### Funnel, false-breakout failures, and frequency
+
+Summed across the separate interval/split replays, the A funnel is 1,362 breakouts → 817 retest attempts → 395 held retests/acceptances → 319 next-bar executable → 73 one-share affordable → 68 risk-eligible → 49 portfolio fills → 318 closed event-level trades. The B funnel is 1,333 → 797 → 381 → 66 → 57 → 16 → 8 → 7, with 57 closed event-level trades. These counts cover overlapping 15m/30m evidence and separate portfolio replays; they are not independent samples or one combined portfolio.
+
+| Interval / split | V1 immediate rejection / no-follow-through | A immediate rejection / no-follow-through | B immediate rejection / no-follow-through |
+|---|---:|---:|---:|
+| 15m Development | 28.3% / 18.4% | 39.5% / 46.3% | 16.7% / 23.3% |
+| 15m Validation | 28.2% / 31.1% | 46.9% / 45.3% | 16.7% / 25.0% |
+| 30m Development | 19.1% / 19.7% | 35.6% / 37.3% | 0.0% / 30.0% |
+| 30m Validation | 40.4% / 19.1% | 42.4% / 51.5% | 0.0% / 40.0% |
+
+Retest-B reduced the measured immediate-rejection rate in all four cells (11.5–40.4 percentage points), but no-follow-through improved only in 15m Validation and worsened in the other three cells. Counts range from 5 to 30 B closed trades per cell. Retest-A worsened both failures in all four cells. Removed V1 signals had worse expectancy than kept signals in 5/8 variant/split comparisons; the three exceptions included both 15m Retest-A cells. Kept V1 samples ranged from 2 to 52, and several very small B survivor groups remained net-negative. Filtering fewer trades is not sufficient evidence of an edge.
+
+### Cost stress, gaps, buckets, and concentration
+
+At 1.5x costs, all eight Retest interval/split/variant cells have negative expectancy; all are negative at 2.0x. The 30m Development A cell changes from +₩149.51 gross expectancy to −₩22.43 net. The 30m Validation B cell's +₩0.26 baseline expectancy falls to −₩561.97 at 1.5x. The small one-at-a-time Development neighborhood (tolerance 0.20% / 0.40%, expiry two bars) did not produce a stable cross-interval result: all 15m neighbors remained net-negative, while isolated 30m two-bar neighbors were positive on small samples and were not substituted for the frozen rules.
+
+Clean-window-only results do not change the rejection: they are net-negative in six of eight cells. A 30m Validation A clean subset is only 21 closed trades at +₩1.04 expectancy; the B clean subset is four trades at +₩377.49, with 100% of positive PnL in the top five trades. These are sparse gap-filtered diagnostics, not alternate candidates. The event files retain gap flags, retest depth/timing, MFE/MAE, time-to-MFE, and time-to-stop for every setup.
+
+Retest-A 15m Development lost across all price buckets; other cells contain sparse and inconsistent price/liquidity cells. A few 30m Dev or Validation buckets are positive but fail across the adjacent split or have only one to six events. All strategy samples are KOSPI; KOSDAQ performance is unavailable. In the only slightly positive all-data cell (RETEST-B 30m Validation), 81.8% of positive PnL came from its top trade and 100% from its top five; its positive contribution came from one KOSPI symbol/day. No result supports a price, liquidity, market, or concentration filter.
+
+### ₩100,000 whole-share portfolio diagnostic
+
+At the existing ₩100K capital / ₩20K order cap / 0.25% risk setting, Retest-A produced 27 / 9 / 9 / 4 fills in 15m Dev / Val and 30m Dev / Val, with portfolio net PnL −₩1,494 / −₩1,374 / −₩1,605 / −₩195, respectively. Retest-B produced 5 / 0 / 1 / 1 fills and −₩211 / ₩0 with no fills / −₩58 / −₩99. Baseline capital utilization ranges from 0% to 2.28%; idle cash remains high. 30K/.50% and 50K/.50% are retained as research-only scenarios and remained negative in nearly every cell; their higher fills did not create an edge. `100K=CONSTRAINED`, not a live recommendation.
+
+### Untouched historical validation and decision
+
+The frozen candidate block is 2026-01-05–2026-04-16 for the frozen 100-symbol cohort. Official KIS sample code documents up to 120 returned minute rows per call and a historical date input, with data bounded by what the service retains (up to one year); it does not guarantee that every requested old symbol/session is available ([KIS minute-chart example](https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_time_dailychartprice/inquire_time_dailychartprice.py)). This block had no local parquet partitions, and KIS app credentials were absent from the process environment. No API call was made, `.env` was not read, and no substitute provider was used. Therefore `EXTERNAL_VALIDATION=NOT_AVAILABLE`; the frozen Holdout remains locked.
+
+| Required verdict | Phase 4 result |
+|---|---|
+| `DATA_QUALITY` | `PARTIAL` — 510 safe-window gaps remain `UNKNOWN` |
+| `COHORT_BREADTH` | `LIMITED` — 60/100 metadata cohort frozen; no broad minute evidence |
+| `RETEST-A` | `REJECTED` — net-negative all four cells |
+| `RETEST-B` | `INSUFFICIENT` — immediate rejection falls, but samples are sparse and net/cost-stress evidence fails |
+| `BREAKOUT_FAMILY` | `REJECT` |
+| `100K` | `CONSTRAINED` |
+| `SHADOW_NEXT_SESSION` | `NO` — `NOT_PROMOTED` |
+
+- **Did retest/acceptance reduce false breakouts?** `INSUFFICIENT`: B lowered the immediate-rejection metric in all four used-data cells, but had 5–30 closed trades per cell and did not improve no-follow-through consistently; A worsened the rejection rate.
+- **Did reducing those failures improve cost-adjusted expectancy and PF?** `NO`. Every A cell was net-negative; B was negative in three cells and effectively flat on five trades in the fourth. Every 1.5x-cost expectancy was negative.
+- **Does it hold on untouched evidence?** `NOT_AVAILABLE`.
+- **Is the strategy executable with ₩100K whole-share limits?** `CONSTRAINED`; executions occurred, but fills were sparse and net results were negative.
+- **Promotion:** `BREAKOUT_FAMILY_REJECTED`; `SHADOW=NOT_PROMOTED`; `ALPHA=UNPROVEN`; `LIVE=DISABLED`; `PAPER=OUT_OF_SCOPE`.
+- Next step: do not run a Shadow for this family and do not open the locked Holdout. If a later research phase is authorized, consider only one newly preregistered family at a time; names for future consideration are relative-strength continuation, VWAP reclaim, or opening momentum with acceptance. None is implemented or evaluated in Phase 4.
+
+Phase 4 machine artifacts are intentionally ignored under `runtime/research/phase4/`: `data-quality-audit.json`, `cohort-manifest.json`, `retest-preregistration.json`, `retest-anatomy-{15m,30m}.json`, `retest-events-{retesta,retestb}-{15m,30m}.json`, `retest-neighborhood.json`, `external-cache-audit.json`, `external-validation.json`, `100k-feasibility.json`, and `phase4-artifact-index.json`. The index records SHA-256 for all 13 artifacts plus source dataset, selected partitions, cohort symbols/master, strategy config, costs, periods, freeze commit, and Holdout counters. Index SHA-256: `807ac406e088414c6b5826be036d70b611d72034f77d8d9cdd56976645516779`. Runtime data was not committed.
