@@ -990,6 +990,7 @@ def run_breakout_v2_comparison(
     *,
     interval: str,
     report_root: Path = DEFAULT_OUTPUT,
+    git_sha: str | None = None,
 ) -> dict:
     if interval not in INTERVAL_MINUTES:
         raise ValueError("interval must be 15m or 30m")
@@ -1033,6 +1034,26 @@ def run_breakout_v2_comparison(
 
     dev = [row for row in records if row["split"] == "development"]
     val = [row for row in records if row["split"] == "validation"]
+    volume_screen = {}
+    if interval == "15m":
+        volume_kept = [
+            row for row in dev
+            if row.get("relative_volume") is not None and float(row["relative_volume"]) < 3.0
+        ]
+        volume_removed = [row for row in dev if row not in volume_kept]
+        volume_screen = {
+            "name": "V2-C_AVOID_RVOL_EXHAUSTION",
+            "rule": "keep signal bars with relative_volume < 3.0",
+            "threshold_source": "predeclared Phase 3 volume bucket boundary",
+            "development_only": True,
+            "validation_metrics_computed": False,
+            "kept": _variant_metrics(volume_kept, len(dev), sessions_by_split["development"]),
+            "removed_signal_count": len(volume_removed),
+            "removed_signals": _variant_metrics(
+                volume_removed, len(dev), sessions_by_split["development"]
+            ),
+            "screening_decision": "REJECTED_DEV_RETENTION_AND_FALSE_BREAKOUT",
+        }
     sensitivity = {}
     if interval == "15m":
         for threshold in (p75 - 1.0, p75, p75 + 1.0):
@@ -1044,8 +1065,9 @@ def run_breakout_v2_comparison(
                 ) for segment in SEGMENTS
             }
     comparison = {
-        "schema_version": "phase3-breakout-v2-v1",
+        "schema_version": "phase3-breakout-v2-v2",
         "interval": interval,
+        "git_sha": git_sha or anatomy.get("git_sha"),
         "dataset_sha256": anatomy["dataset_sha256"],
         "selected_partition_hash_sha256": anatomy["selected_partition_hash_sha256"],
         "feature_schema_version": FEATURE_SCHEMA_VERSION,
@@ -1067,6 +1089,7 @@ def run_breakout_v2_comparison(
             ),
         },
         "development_validation": split_results,
+        "development_screening_only": volume_screen,
         "nearby_threshold_sensitivity_percentage_points": sensitivity,
         "promotion_gates": ({
             "validation_expectancy_gt_zero": split_results["validation"]["v2_a_not_overextended"]["expectancy_krw"] > 0,
@@ -1090,7 +1113,9 @@ def run_breakout_v2_comparison(
     return comparison
 
 
-def run_breakout_v2_validation(report_root: Path = DEFAULT_OUTPUT) -> dict:
+def run_breakout_v2_validation(
+    report_root: Path = DEFAULT_OUTPUT, *, git_sha: str | None = None
+) -> dict:
     reports = {
         interval: json.loads((report_root / f"breakout-v2-comparison-{interval}.json").read_text(encoding="utf-8"))
         for interval in INTERVAL_MINUTES
@@ -1100,10 +1125,11 @@ def run_breakout_v2_validation(report_root: Path = DEFAULT_OUTPUT) -> dict:
     feature_comparisons = source["winner_loser_feature_comparison"]
     hypothesis_log = {
         "schema_version": "phase3-v2-hypotheses-v1",
+        "git_sha": git_sha or reports["15m"].get("git_sha"),
         "dataset_sha256": source["dataset_sha256"],
         "fresh_holdout_state": source["holdout_integrity"]["state"],
         "hypotheses_screened": 3,
-        "development_variants_run": 1,
+        "development_variants_run": 2,
         "validation_candidates_run": 1,
         "hypotheses": [
             {
@@ -1129,15 +1155,15 @@ def run_breakout_v2_validation(report_root: Path = DEFAULT_OUTPUT) -> dict:
                 "status": "REJECTED_UNSTABLE_DIRECTION",
             },
             {
-                "name": "V2-C_VOLUME_PERSISTENCE",
-                "rule": "relative volume and relative turnover confirmation",
+                "name": "V2-C_AVOID_RVOL_EXHAUSTION",
+                "rule": "keep 15m signals with relative volume below 3.0",
                 "source_evidence": {
-                    "development": feature_comparisons["development"]["relative_volume"],
-                    "validation": feature_comparisons["validation"]["relative_volume"],
+                    "development_relative_volume": feature_comparisons["development"]["relative_volume"],
+                    "development_screen": reports["15m"]["development_screening_only"],
                     "baseline_volume_confirmation": source.get("baseline_parameters"),
                 },
-                "screening_only": True,
-                "status": "REJECTED_NO_INCREMENTAL_SEPARATION",
+                "validation_metrics_computed": False,
+                "status": "REJECTED_DEV_RETENTION_AND_FALSE_BREAKOUT",
             },
         ],
         "v2_a_parameters": {
@@ -1151,6 +1177,7 @@ def run_breakout_v2_validation(report_root: Path = DEFAULT_OUTPUT) -> dict:
     )
     hypotheses = {
         "schema_version": "phase3-v2-validation-v1",
+        "git_sha": git_sha or reports["15m"].get("git_sha"),
         "dataset_sha256": source["dataset_sha256"],
         "fresh_holdout_state": source["holdout_integrity"]["state"],
         "hypotheses_path": str(hypothesis_path),
@@ -1166,6 +1193,7 @@ def run_breakout_v2_validation(report_root: Path = DEFAULT_OUTPUT) -> dict:
     target.write_text(json.dumps(hypotheses, indent=2, ensure_ascii=False, allow_nan=False) + "\n", encoding="utf-8")
     anatomy_summary = {
         "schema_version": "phase3-breakout-anatomy-summary-v1",
+        "git_sha": git_sha or source.get("git_sha"),
         "dataset_sha256": source["dataset_sha256"],
         "fresh_holdout_state": source["holdout_integrity"]["state"],
         "interval_reports": {

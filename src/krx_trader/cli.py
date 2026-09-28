@@ -41,6 +41,15 @@ from krx_trader.universe.master import refresh_stock_master
 from krx_trader.universe.scanner import rank_market_candidates, scan_market
 
 
+def _current_git_sha() -> str:
+    try:
+        return subprocess.run(
+            ["git", "rev-parse", "HEAD"], check=True, capture_output=True, text=True
+        ).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        return "UNAVAILABLE"
+
+
 def _resolve_regime(
     stock_bars: list[Bar],
     kospi_bars: list[Bar] | None,
@@ -499,26 +508,20 @@ def main() -> None:
                     dataset_manifest=args.manifest,
                 ))
             elif args.research_command == "anatomy":
-                try:
-                    git_sha = subprocess.run(
-                        ["git", "rev-parse", "HEAD"], check=True, capture_output=True, text=True
-                    ).stdout.strip()
-                except (OSError, subprocess.CalledProcessError):
-                    git_sha = "UNAVAILABLE"
                 _emit_json(run_breakout_anatomy(
                     interval=args.interval,
                     manifest_path=args.manifest,
                     cache_root=args.cache_root,
                     report_root=args.output,
-                    git_sha=git_sha,
+                    git_sha=_current_git_sha(),
                 ))
             elif args.research_command == "breakout-v2":
                 if args.breakout_v2_command == "compare":
                     _emit_json(run_breakout_v2_comparison(
-                        interval=args.interval, report_root=args.output,
+                        interval=args.interval, report_root=args.output, git_sha=_current_git_sha(),
                     ))
                 else:
-                    _emit_json(run_breakout_v2_validation(report_root=args.output))
+                    _emit_json(run_breakout_v2_validation(report_root=args.output, git_sha=_current_git_sha()))
             else:
                 _emit_json(run_baseline(
                     settings,

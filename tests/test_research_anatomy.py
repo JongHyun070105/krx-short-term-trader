@@ -8,6 +8,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 import pytest
 
+from krx_trader import cli
 from krx_trader.backtest.costs import CostModel
 from krx_trader.data.cache import ParquetBarCache
 from krx_trader.models import Bar
@@ -316,6 +317,7 @@ def test_v2_comparison_attributes_removed_trades_and_preserves_holdout_lock(tmp_
     assert dev["filter_attribution"]["removed_signals"] == 1
     assert dev["filter_attribution"]["removed_closed_trade_metrics"]["net_pnl_krw"] == -40
     assert result["holdout_integrity"]["state"] == "LOCKED_NOT_EVALUATED"
+    assert result["development_screening_only"]["validation_metrics_computed"] is False
 
 
 def test_v2_comparison_rejects_event_dataset_containing_holdout_rows(tmp_path: Path):
@@ -326,3 +328,11 @@ def test_v2_comparison_rejects_event_dataset_containing_holdout_rows(tmp_path: P
     pq.write_table(pa.Table.from_pylist([{"split": "fresh_holdout"}]), tmp_path / "breakout-signals-15m.parquet")
     with pytest.raises(ValueError, match="non-permitted split"):
         run_breakout_v2_comparison(interval="15m", report_root=tmp_path)
+
+
+def test_git_sha_failure_keeps_research_cli_available(monkeypatch):
+    def fail(*args, **kwargs):
+        raise cli.subprocess.CalledProcessError(128, args[0])
+
+    monkeypatch.setattr(cli.subprocess, "run", fail)
+    assert cli._current_git_sha() == "UNAVAILABLE"
