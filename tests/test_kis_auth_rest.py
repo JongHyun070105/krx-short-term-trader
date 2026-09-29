@@ -131,6 +131,29 @@ def test_index_history_is_fetched_in_bounded_date_chunks(tmp_path):
     assert [bar.time.date().isoformat() for bar in bars] == ["2026-04-02", "2026-05-06"]
 
 
+def test_daily_history_adjustment_convention_is_explicit_and_configurable(tmp_path):
+    row = {
+        "stck_bsop_date": "20260630", "stck_oprc": "100", "stck_hgpr": "101",
+        "stck_lwpr": "99", "stck_clpr": "100", "acml_vol": "10",
+    }
+    transport = FakeTransport([
+        response({"access_token": "tok", "expires_in": 3600}),
+        response({"rt_cd": "0", "output2": [row]}),
+        response({"rt_cd": "0", "output2": [row]}),
+    ])
+    manager = TokenManager("app", "secret", transport, tmp_path / "token.json")
+    client = KisRestClient(
+        "app", "secret", manager, transport, min_request_interval=0,
+        rate_limit_path=tmp_path / "rate.json",
+    )
+
+    client.get_daily_bars("005930", date(2026, 6, 30), date(2026, 6, 30))
+    client.get_daily_bars("005930", date(2026, 6, 30), date(2026, 6, 30), adjusted=True)
+
+    calls = [call for call in transport.calls if call[1].endswith("inquire-daily-itemchartprice")]
+    assert [call[2]["params"]["FID_ORG_ADJ_PRC"] for call in calls] == ["1", "0"]
+
+
 def test_invalid_symbol_fails_before_network(tmp_path):
     transport = FakeTransport([])
     manager = TokenManager("app", "secret", transport, tmp_path / "token.json")

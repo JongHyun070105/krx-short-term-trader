@@ -310,7 +310,10 @@ class KisRestClient:
             volume=int(row["acml_vol"]),
         )
 
-    def get_daily_bars(self, symbol: str, start: date, end: date) -> list[Bar]:
+    def get_daily_bars(
+        self, symbol: str, start: date, end: date, *, adjusted: bool = False
+    ) -> list[Bar]:
+        """Fetch daily OHLCV; KIS flag 0 requests adjusted and 1 requests raw/original prices."""
         if len(symbol) != 6 or not symbol.isdigit():
             raise ValueError("symbol must be a six-digit KRX code")
         if start > end:
@@ -327,7 +330,7 @@ class KisRestClient:
                     "FID_INPUT_DATE_1": start.strftime("%Y%m%d"),
                     "FID_INPUT_DATE_2": current_end.strftime("%Y%m%d"),
                     "FID_PERIOD_DIV_CODE": "D",
-                    "FID_ORG_ADJ_PRC": "1",
+                    "FID_ORG_ADJ_PRC": "0" if adjusted else "1",
                 },
             )
             rows = payload.get("output2", [])
