@@ -1,3 +1,122 @@
+# Phase 6: Cross-Sectional Laggard Rebound and Mean-Reversion Strategy
+
+## Scope, freeze, and evidence boundaries
+
+- Research implementation SHA: `b66aae1a890894e4f68335a957f5d1bc1fa7ff75` (clean tree at Phase 6 research run).
+- Safe-period dataset: 46 complete symbols (30 KOSPI + 16 KOSDAQ), 67 safe sessions (2026-04-17 to 2026-07-27). One partial symbol (`125490`, 63/67 sessions) and 13 not-acquired symbols due to KIS API rate-limit timeouts.
+- Development window: 2026-04-17 to 2026-06-30 (50 sessions).
+- Secondary Diagnostic window: 2026-07-01 to 2026-07-27 (17 sessions).
+- Fresh Holdout 2026-07-28 to 2026-08-28 remained `LOCKED_NOT_EVALUATED`; exactly 0 partitions, 0 features, and 0 signals from the holdout window were accessed.
+- External untouched block (2026-01-05 to 2026-04-16) was not opened because no Secondary-surviving candidate exists.
+- Transaction cost assumptions: 0.015% broker fee, 0.20% sell tax, 15 bps slippage. Stress scenarios at 1.5x and 2.0x evaluated.
+- Primary interval: 15m. Secondary diagnostic interval: 30m.
+
+## Data acquisition
+
+- Target cohort: 60 symbols (30 KOSPI + 30 KOSDAQ) from Phase 4 frozen cohort manifest.
+- Acquired: 46 complete symbols (67/67 safe-period partitions each), 1 partial symbol (`125490`, 63/67), 13 not acquired.
+- KOSPI complete: 30 symbols. KOSDAQ complete: 16 symbols.
+- Safe-period dataset: 46 complete symbols loaded for research. Dataset hash and cohort hash recorded in all artifacts.
+- Holdout integrity: `holdout_partitions_opened = 0`.
+
+## Primary hypothesis
+
+> "Cross-sectional laggard stocks that show decelerating weakness, relative rank recovery, and absolute price reversal produce a cost-adjusted rebound edge."
+
+The hypothesis was tested through Development anatomy analysis. Neither MR-A nor MR-B was created because the anatomy gate failed.
+
+## Q1: Do bottom-ranked intraday stocks rebound?
+
+**WEAK.** Bottom-ranked stocks (0-10 percentile, n=6,377) showed a small positive 1-bar forward return (+0.032%, win rate 45.2%) but negative 4-bar (-0.020%) and 8-bar (-0.104%) returns. The rebound was small, short-lived, and did not persist. Bottom-ranked stocks also experienced worse MAE (-1.20%) than MFE (+1.27%), with time-to-MAE (3.83 bars) slightly longer than time-to-MFE (3.60 bars).
+
+## Q2: Does stabilization + rank recovery outperform blind laggard selection?
+
+**NO.** The stabilized relative+absolute reversal group (n=1,114) had:
+- 1-bar forward return: -0.023% (worse than blind laggard baseline -0.007%)
+- 2-bar forward return: -0.0004% (similar to baseline -0.017%)
+- 4-bar forward return: -0.019% (better than baseline -0.063% but still negative)
+- Win rate: 38.1% (1-bar), 42.3% (2-bar), 42.6% (4-bar) - consistently below 50%
+- Future rank change: +8.4 points (1-bar), +20.0 points (2-bar) - rank improved but price did not follow
+
+The stabilization filter reduced sample size without improving forward returns sufficiently to overcome transaction costs.
+
+## Q3: Does the effect persist on cleaner/fresher observations?
+
+**NO.** Clean-data sensitivity (high freshness + high completeness) showed negative direction, indicating the small observed rebound was not robust to data quality filtering.
+
+## Anatomy gate failure
+
+Both MR-A and MR-B were not created because the Development anatomy gate failed on three of four checks:
+1. Development sample at least 30: **PASS** (1,114 stabilized observations)
+2. Development forward 4-bar positive: **FAIL** (-0.019%)
+3. Development beats blind laggard: **FAIL** (worse 1-bar return than baseline)
+4. Clean data same positive direction: **FAIL**
+
+## Cross-sectional rank dynamics
+
+- Rank recovery was observed: bottom-ranked stocks improved their cross-sectional rank by +8.4 points (1-bar) to +40.9 points (4-bar).
+- However, rank improvement did not translate into price outperformance. The market's cross-sectional structure exhibited mean-reversion in rank but not in absolute returns for the laggard group.
+
+## Time-of-day analysis
+
+Forward returns were analyzed across all time buckets (09:00-09:30, 09:30-10:00, 10:00-11:00, 11:00-12:00, 12:00-13:00, 13:00-14:00, 14:00-15:00, 15:00+). No time bucket showed a persistent positive rebound effect for laggard stocks.
+
+## Market split
+
+- KOSPI complete: 30 symbols
+- KOSDAQ complete: 16 symbols
+- Both markets showed similar negative forward return patterns for bottom-ranked stocks.
+
+## Liquidity analysis
+
+Traded-value bucket analysis (0-20%, 20-40%, 40-60%, 60-80%, 80-100% percentile) was performed. No liquidity bucket showed a persistent positive rebound effect.
+
+## Extreme session losers
+
+Session return bins (≤-8%, -8 to -5%, -5 to -3%, above -3%) were analyzed. Extreme laggards showed falling-knife behavior rather than rebound.
+
+## Final verdicts
+
+| Gate / Metric | Phase 6 Verdict | Operational Meaning |
+|---|---|---|
+| `PHASE6_DATA_ACQUISITION` | `PARTIAL` | 46/60 symbols acquired; KIS rate limits prevented full coverage |
+| `MEAN_REVERSION_ANATOMY` | `COMPLETE` | Full anatomy analysis performed on available data |
+| `MR_A` | `INSUFFICIENT` | Anatomy gate failed; no positive rebound beating blind laggard |
+| `MR_B` | `INSUFFICIENT` | Same anatomy gate failure as MR-A |
+| `MEAN_REVERSION_FAMILY` | `INSUFFICIENT` | No viable candidate for Secondary Diagnostic |
+| `EXTERNAL_VALIDATION` | `NOT_AVAILABLE` | No Secondary-surviving candidate; untouched block preserved |
+| `100K` | `NO` | No candidate for portfolio replay |
+| `SHADOW_NEXT_SESSION` | `NO` | No candidate for prospective Shadow |
+| `ALPHA` | `UNPROVEN` | No demonstrable market edge |
+| `LIVE` | `DISABLED` | Live trading prohibited |
+
+## Answers to final questions
+
+- **Q1: Do bottom-ranked intraday stocks rebound?** WEAK (small positive 1-bar, negative longer-term)
+- **Q2: Does stabilization + rank recovery outperform blind laggard selection?** NO
+- **Q3: Does the effect persist on cleaner/fresher observations?** NO
+- **Q4: Does MR-A or MR-B have positive gross expectancy?** NO (neither variant was created)
+- **Q5: Does either have positive net expectancy?** NO
+- **Q6: Does Secondary preserve the same direction?** NO (Secondary was not run)
+- **Q7: Does untouched external evidence pass?** NOT_AVAILABLE
+- **Q8: Is the 100K whole-share implementation feasible?** NO
+- **Q9: Is there a candidate for a future prospective Shadow session?** NO
+
+## Phase 6 artifacts
+
+All 24 artifacts are recorded in `runtime/research/phase6/phase6-artifact-index.json`. Key artifacts:
+- `phase6-acquisition-manifest.json` - Data acquisition state
+- `phase6-dq.json` - Data quality report
+- `mean-reversion-anatomy-15m.json` - 15m anatomy analysis
+- `mean-reversion-anatomy-30m.json` - 30m anatomy analysis
+- `mr-hypotheses.json` - Hypothesis support analysis
+- `mr-a-development.json` / `mr-b-development.json` - Variant development results (both INSUFFICIENT)
+- `phase6-summary.json` - Complete research summary with verdicts and question answers
+
+Machine-readable Phase 6 artifacts are intentionally ignored under `runtime/research/phase6/`. Runtime data was not committed.
+
+---
+
 # Phase 2 Results
 
 ## Run and data

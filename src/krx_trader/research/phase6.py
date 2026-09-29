@@ -1764,9 +1764,9 @@ def run_phase6(
     q3 = "INSUFFICIENT" if clean_bottom_4 is None or bottom_4 is None or clean_bottom_20.get("n_fwd_4", 0) < 30 else (
         "YES" if clean_bottom_4 > 0 and bottom_4 > 0 else "NO"
     )
-    q4 = any((development[v.value]["primary"].get("gross_expectancy_pct") or 0) > 0
+    q4 = any((development.get(v.value, {}).get("primary", {}).get("gross_expectancy_pct") or 0) > 0
              for v in (MeanReversionVariant.MR_A, MeanReversionVariant.MR_B))
-    q5 = any((development[v.value]["primary"].get("net_expectancy_pct") or 0) > 0
+    q5 = any((development.get(v.value, {}).get("primary", {}).get("net_expectancy_pct") or 0) > 0
              for v in (MeanReversionVariant.MR_A, MeanReversionVariant.MR_B))
     q6 = any(secondary.get(v, {}).get("same_direction_as_development") for v in secondary)
     q7 = "YES" if external.get("status") == "PASS" else ("NOT_AVAILABLE" if external.get("status") == "NOT_AVAILABLE" else "NO")

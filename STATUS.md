@@ -2,6 +2,9 @@
 
 ```text
 ALPHA: UNPROVEN
+MEAN_REVERSION_FAMILY: INSUFFICIENT (anatomy gate did not support MR-A or MR-B creation on Development data)
+MR_A: INSUFFICIENT (Development anatomy did not show positive rebound beating blind laggard selection)
+MR_B: INSUFFICIENT (same anatomy gate failure; stabilization + rank recovery did not outperform blind laggards)
 RELATIVE_STRENGTH_FAMILY: REJECTED (gross-negative across Development and Secondary diagnostic)
 RS_A: REJECTED (gross exp -0.296%, net exp -0.823%, PF 0.44)
 RS_B: REJECTED (gross exp -0.053%, net exp -0.581%, PF 0.57)
@@ -11,11 +14,13 @@ BREAKOUT_RETEST_A: REJECTED
 BREAKOUT_RETEST_B: INSUFFICIENT
 PULLBACK: TOO_RARE / DEPRIORITIZED
 OOS: FAILED_GENERALIZATION_NO_EDGE_AFTER_COST (V2-A; locked Fresh Holdout untouched)
-DATA_QUALITY: PARTIAL (current safe data: 2,442 partitions / 861,756 rows; 66,204 unresolved missing minute slots; holdout unopened)
-COHORT_BREADTH: 33_STUDIED / 37_CURRENT_WITH_DATA (36 complete, 1 partial; 60-symbol target)
+DATA_QUALITY: PARTIAL (Phase 6 safe data: 46 complete symbols / 1 partial / 13 not acquired; holdout unopened)
+COHORT_BREADTH: 46_COMPLETE / 60_TARGET (Phase 6 acquisition; KIS API rate limits prevented full60-symbol coverage)
+PHASE6_DATA_ACQUISITION: PARTIAL (46 complete, 1 partial,13 not acquired of 60 target; KIS rate-limit timeouts)
+PHASE6_ARTIFACT_INTEGRITY: COMPLETE (24 artifacts generated; artifact index recorded)
 PHASE5_DATA_ACQUISITION: PARTIAL_INTERRUPTED (36 complete, 215000 has 30/67 sessions, 23 not started; manifest RUNNING is stale)
 PHASE5_ARTIFACT_INTEGRITY: RECONCILED
-EXTERNAL_VALIDATION: NOT_AVAILABLE (RS candidates gross-negative; untouched block not opened to avoid data snooping)
+EXTERNAL_VALIDATION: NOT_AVAILABLE (no Secondary-surviving candidate; untouched block not opened)
 LOCKED_FRESH_HOLDOUT: LOCKED_NOT_EVALUATED (2026-07-28..08-28 untouched, fail-closed)
 SHADOW_NEXT_SESSION: NO (NOT_PROMOTED)
 SHADOW_INFRA: PASS (2026-09-28 four-hour read-only simulated session)
@@ -23,7 +28,26 @@ PAPER: OUT_OF_SCOPE
 LIVE: DISABLED
 ```
 
-Phase 2, Phase 2.5, Phase 3, and Phase 4 evidence is summarized in [RESULTS.md](RESULTS.md). Manifests, event rows, and Phase 5 diagnostics are retained in ignored `runtime/research/phase5/`.
+Phase 2, Phase 2.5, Phase 3, Phase 4, and Phase 5 evidence is summarized in [RESULTS.md](RESULTS.md). Manifests, event rows, and Phase 5 diagnostics are retained in ignored `runtime/research/phase5/`. Phase 6 research artifacts are in ignored `runtime/research/phase6/`.
+
+## Phase 6 current decision
+
+- Phase 6 studied the **Cross-Sectional Laggard Rebound** family (MR-A Laggard Reversal, MR-B Laggard Stabilization + Recovery Confirmation) on 46 complete symbols (30 KOSPI + 16 KOSDAQ). The 60-symbol cohort was the acquisition target; 46 passed safe-period partition and bar-structure checks.
+- The core hypothesis tested whether bottom-ranked intraday stocks that show (1) decelerating weakness, (2) relative rank recovery, and (3) absolute price reversal produce a cost-adjusted rebound edge.
+- Empirical anatomy across Development data (2026-04-17 to 2026-06-30) found:
+  - Bottom-ranked stocks (0-10 percentile) showed a **WEAK** 1-bar rebound (+0.032% mean) but negative 4-bar (-0.020%) and 8-bar (-0.104%) forward returns. The rebound was small and short-lived.
+  - **Stabilization + rank recovery did NOT outperform blind laggard selection.** The stabilized relative+absolute reversal group (n=1,114) had worse1-bar forward return (-0.023%) than the blind laggard baseline (-0.007%), and the 4-bar return was similar negative (-0.019% vs -0.063%).
+  - **The effect did NOT persist on cleaner/fresher observations.** Clean-data sensitivity showed negative direction.
+- Both MR-A and MR-B were **not created** because the Development anatomy gate failed:
+  - Development sample at least 30: PASS (1,114 observations)
+  - Development forward 4-bar positive: FAIL (stabilized group mean 4-bar return = -0.019%)
+  - Development beats blind laggard: FAIL (stabilized group worse than baseline)
+  - Clean data same positive direction: FAIL (clean data showed negative returns)
+- Neither variant reached the Secondary Diagnostic. External validation was not performed. No preregistration was created.
+- The untouched external block (2026-01-05 to 2026-04-16) remains `NOT_AVAILABLE` because no Secondary-surviving candidate exists.
+- The 23-session Fresh Holdout (2026-07-28 to 2026-08-28) remains `LOCKED_NOT_EVALUATED`; zero holdout partitions were opened.
+- Verdict: `MEAN_REVERSION_FAMILY=INSUFFICIENT`; `MR_A=INSUFFICIENT`; `MR_B=INSUFFICIENT`; `SHADOW_NEXT_SESSION=NO`; `ALPHA=UNPROVEN`.
+- This completes the third strategy family rejection (Breakout, Relative-Strength, Mean-Reversion) using the fixed safe-period dataset.
 
 ## Phase 5 current decision
 
