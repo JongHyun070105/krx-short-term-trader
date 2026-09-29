@@ -28,6 +28,7 @@ from krx_trader.strategies.mean_reversion import (
     MeanReversionVariant,
     ReversalObservation,
     evaluate_mean_reversion,
+    preregistration_mr_config,
 )
 
 KST = ZoneInfo("Asia/Seoul")
@@ -242,6 +243,12 @@ def test_mr_b_adds_local_low_stabilization_to_mr_a():
     assert evaluate_mean_reversion(_reversal_observation(stabilized=True), variant=MeanReversionVariant.MR_B)
     assert evaluate_mean_reversion(_reversal_observation(stabilized=False), variant=MeanReversionVariant.MR_B) is None
     assert evaluate_mean_reversion(_reversal_observation(stabilized=False), variant=MeanReversionVariant.MR_A)
+
+
+def test_preregistration_records_the_fixed_structural_stop_rule():
+    config = preregistration_mr_config(MeanReversionVariant.MR_A)
+    assert "stop_lookback_bars" not in config["config"]
+    assert config["structural_stop_rule"] == "MIN_LOW_OF_SIGNAL_BAR_AND_PRIOR_2_VALID_SAME_SESSION_BARS"
 
 
 def test_freshness_and_liquidity_guards_exclude_stale_or_illiquid_signals():

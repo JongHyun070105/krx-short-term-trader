@@ -19,7 +19,6 @@ class MeanReversionConfig:
     minimum_turnover_percentile: float = 20.0
     maximum_freshness_minutes: float = 1.0
     minimum_clean_completeness: float = 0.8
-    stop_lookback_bars: int = 3
     max_holding_bars: int = 10
 
     def __post_init__(self) -> None:
@@ -33,8 +32,8 @@ class MeanReversionConfig:
             raise ValueError("maximum freshness cannot be negative")
         if not 0 < self.minimum_clean_completeness <= 1:
             raise ValueError("clean completeness must be in (0, 1]")
-        if self.stop_lookback_bars < 1 or self.max_holding_bars < 1:
-            raise ValueError("stop lookback and holding period must be positive")
+        if self.max_holding_bars < 1:
+            raise ValueError("holding period must be positive")
 
 
 DEFAULT_MR_CONFIG = MeanReversionConfig()
@@ -111,6 +110,7 @@ def preregistration_mr_config(
         "config": asdict(config),
         "entry_rule": "SIGNAL_AFTER_COMPLETED_BAR; FILL_AT_NEXT_EXECUTABLE_BAR_OPEN",
         "exit_rule": "STRUCTURAL_REVERSAL_LOW_OR_MAX_10_BARS",
+        "structural_stop_rule": "MIN_LOW_OF_SIGNAL_BAR_AND_PRIOR_2_VALID_SAME_SESSION_BARS",
         "mr_b_addition": "CURRENT_LOW_DID_NOT_BREAK_PRIOR_3_BAR_LOCAL_LOW",
         "lookahead_prevention": "point_in_time_cross_section; future bars excluded from feature construction",
     }
