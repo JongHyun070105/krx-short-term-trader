@@ -26,6 +26,17 @@ SHADOW_NEXT_SESSION: NO (NOT_PROMOTED)
 SHADOW_INFRA: PASS (2026-09-28 four-hour read-only simulated session)
 PAPER: OUT_OF_SCOPE
 LIVE: DISABLED
+PHASE9_PRICE_SEMANTICS: PARTIAL (daily CONFIGURABLE adjusted/raw; minute UNKNOWN)
+PHASE9_DAILY_MINUTE_ALIGNMENT: PASS (opens exact; closes expected closing-auction difference)
+PHASE9_TIMESTAMP_SEMANTICS: PASS
+PHASE9_CACHE_INTEGRITY: PARTIAL (606 absent Development partitions)
+PHASE9_EVIDENCE_INTEGRITY: DEGRADED_BUT_USABLE
+RESEARCH_PLATFORM: READY_WITH_LIMITATIONS
+PHASE9: COMPLETE
+PHASE10_OPPORTUNITY_MAP: FAIL (no broad state achieved 1% gross mean or positive net after costs)
+DAILY_A: NOT_CREATED (no qualifying family; best state gross -0.32%, payoff 0.83)
+PHASE10_SECONDARY: NOT_RUN
+PHASE10_EXTERNAL: NOT_RUN
 VWAP_RECLAIM_ANATOMY: FAIL (15m Development gate passed 2/5; no variants created)
 VWAP_A: NOT_CREATED
 VWAP_B: NOT_CREATED
@@ -47,6 +58,24 @@ PHASE8_SHADOW_NEXT_SESSION: NO
 ```
 
 Phase 2, Phase 2.5, Phase 3, Phase 4, and Phase 5 evidence is summarized in [RESULTS.md](RESULTS.md). Manifests, event rows, and Phase 5 diagnostics are retained in ignored `runtime/research/phase5/`. Phase 6 research artifacts are in ignored `runtime/research/phase6/`.
+
+## Phase 9 current decision
+
+- Phase 9 audited KIS daily and minute price semantics, alignment, cache integrity, and protected-data guards on Development data (2026-04-17–06-30). Daily prices use `FID_ORG_ADJ_PRC=0` (adjusted) for Phase 10; minute adjustment remains UNKNOWN. Open alignment is exact (KOSPI 98.9%, KOSDAQ 100%); close alignment reflects the expected closing-auction difference (KOSPI median 0.18%, KOSDAQ 0.24%). Timestamp semantics PASS. Cache integrity PARTIAL (606 absent Development partitions of 2,940 expected; 347,583 missing minute rows; cause UNKNOWN).
+- 94 suspicious Development gaps (>=20%) are classified ADJUSTMENT_MISMATCH: raw and adjusted daily prices for the same stock have different absolute scales (ratio cluster ~0.1), producing spurious gap magnitudes when mixed. All 94 are from 2 KOSDAQ symbols (154040, 208860).
+- Phase 8 evidence integrity: DEGRADED_BUT_USABLE. The 92 original Phase 8 suspicious gaps were from a raw-price search; Phase 9's adjusted-price search found 94 (the same set plus 2 additional sessions). The Phase 8 corrected replay was performed (DATA_CORRECTED_REPLAY).
+- Previous-phase manifest hashes verified unchanged. Phase 6 artifact integrity remains DEGRADED_RECONCILED.
+- Protected Holdout payload/sidecar reads: 0/0. Representative refresh comparison: 3 partitions showed PERSISTENT_PROVIDER_SHAPE (identical re-fetch).
+- Research platform: READY_WITH_LIMITATIONS. Phase 10 is authorized to start.
+- Verdicts: `PRICE_SEMANTICS=PARTIAL`; `DAILY_MINUTE_ALIGNMENT=PASS`; `TIMESTAMP_SEMANTICS=PASS`; `CORPORATE_ACTION_HANDLING=PARTIAL`; `CACHE_INTEGRITY=PARTIAL`; `PHASE8_EVIDENCE_INTEGRITY=DEGRADED_BUT_USABLE`; `RESEARCH_PLATFORM=READY_WITH_LIMITATIONS`; `PHASE9=COMPLETE`.
+
+## Phase 10 current decision
+
+- Phase 10 mapped daily-level trailing return states, volatility, range position, price, and liquidity against 2/3/5-session forward outcomes on Development data only (2026-04-17–06-30, 60 symbols, 2,940 observations, 11,100 outcomes). Source: Phase 9 adjusted daily cache (`FID_ORG_ADJ_PRC=0`). Entry: next-session open after completed signal day. Exit: fixed horizon close. No parameter search or ML.
+- The best broad state was 3-day trailing return bucket "-2% to 0%" at 2-day horizon (n=344/275 non-overlapping): gross mean −0.32%, win rate 36.4%, payoff ratio 0.83. No state achieved the 1.0% gross promotion threshold. Monthly: April +0.65%, May −1.66%, June +0.55%. Market: KOSPI −0.14%, KOSDAQ −0.69%. All cost multipliers (1×, 1.5×, 2×) were net-negative.
+- No qualifying family was found. The 0.53% round-trip cost exceeds every observed positive gross effect. Momentum vs. reversal: neither produced a cost-sized edge. Daily-level opportunity mapping did not uncover a repeatable low-turnover directional edge in the KRX Development window.
+- `PHASE10_OPPORTUNITY_MAP=FAIL`; `DAILY_A=NOT_CREATED`; Secondary, preregistration, external validation, 100K, and Shadow were not run.
+- Artifacts: ignored `runtime/research/phase10/` (features, outcomes, map JSON, summary, report, index, integrity). Artifact integrity PASS.
 
 ## Phase 8 current decision
 

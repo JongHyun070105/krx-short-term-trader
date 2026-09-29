@@ -825,3 +825,195 @@ The reproducible command is `uv run --locked python -m krx_trader.research.phase
 The Phase 8 tests cover prior-session close, exact session open, gap and bucket boundaries, corporate-action flags, gap fill, opening ranges and states, next-bar execution, future-bar isolation, longer-horizon suspicious-price guards, Holdout/external guards, daily-cache access isolation, token non-persistence, and acquisition-manifest isolation. The full regression suite passed **206 tests**; Ruff passed for `src` and `tests`. The original 178-test suite was retained. The final source commit and push are verified in the delivery response.
 
 Next step: close Phase 8 with no candidate promotion. Keep the Fresh Holdout locked; its incidental sidecar metadata exposure is documented, and it must not be used to rescue or retune any hypothesis. Any future opening-gap or swing proposal must be a separately scoped and preregistered phase with new evidence.
+
+---
+
+## Phase 9 — Data Integrity Audit
+
+### Scope and approach
+
+Phase 9 audited KIS daily and minute price semantics, open/close alignment, suspicious gap root causes, timestamp conventions, cache integrity, and protected-data guards. No new strategy was implemented. Source Git SHA: `04ef91b2579e5ab085651d11469b399cdf5d7664`.
+
+### Source inventory
+
+| Source | Endpoint / path | Adjustment | Timestamp |
+|---|---|---|---|
+| KIS daily | `inquire-daily-itemchartprice` (`FHKST03010100`) | `FID_ORG_ADJ_PRC`: 0=adjusted, 1=raw | Session date (00:00 KST) |
+| KIS minute | `inquire-time-dailychartprice` (`FHKST03010230`) | UNKNOWN (no parameter documented) | Bar-start, Asia/Seoul, 09:00–15:19 continuous |
+| Daily cache | `data/daily/{symbol}-1d.parquet` | Mixed (historical sidecar metadata) | — |
+| Safe daily reconciliation | `runtime/research/phase9/reconciliation/safe-daily-cache` | Separate adjusted and raw fetches | — |
+| Minute cache | `data/minute/{symbol}/{session}.parquet` | UNKNOWN | — |
+
+### Daily price adjustment semantics
+
+`DAILY_PRICE_ADJUSTMENT = CONFIGURABLE`. The KIS adapter supports both raw (`FID_ORG_ADJ_PRC=1`) and adjusted (`0`). Phase 9 re-fetched both conventions into a separate reconciliation cache; raw and adjusted hashes are identical for most symbols (no recent corporate actions in Development), but the absolute price scales differ by a factor of ~10x for 2 KOSDAQ symbols (154040, 208860), indicating historical stock splits or par-value changes. Phase 10 uses adjusted only.
+
+### Minute price adjustment semantics
+
+`MINUTE_PRICE_ADJUSTMENT = UNKNOWN`. The KIS minute endpoint does not expose an adjustment parameter in the documented API fields. Phase 9 could not independently verify whether minute bars are raw or adjusted.
+
+### Daily/minute open alignment
+
+| Market | n | Exact match % | Max abs diff % |
+|---|---|---|---|
+| KOSPI | 1,457 | 98.90% | 0.003% |
+| KOSDAQ | 834 | 100.00% | 0.000% |
+
+Opens are effectively identical. The tiny KOSPI deviations (<0.003%) are rounding artifacts from the daily-bar decimal representation.
+
+### Daily/minute close alignment
+
+Daily close vs. 15:19 continuous-minute close:
+
+| Market | n | Median abs diff % | P95 % | Max % | >0.5% | >1% | >3% | >5% |
+|---|---|---|---|---|---|---|---|---|
+| KOSPI | 1,470 | 0.183 | 0.890 | 8.44 | 246 | 26 | 3 | 2 |
+| KOSDAQ | 763 | 0.241 | 1.460 | 4.99 | 231 | 74 | 11 | 0 |
+
+Close differences are expected because the daily close includes the 15:20 closing auction while minute bars stop at 15:19. Median differences are small (<0.25%). The >3% tail is sparse (14 events total) and likely reflects auction-volume price moves or thin securities.
+
+### Suspicious gap root cause analysis
+
+94 Development sessions have adjusted-daily-based absolute gap >= 20%. All 94 are classified `ADJUSTMENT_MISMATCH`:
+
+- Symbol 154040 (KOSDAQ): 49 events. Raw daily prices are ~1/10th of adjusted prices (stock split/par-value change). The `ratio_cluster` is 0.1 for all events.
+- Symbol 208860 (KOSDAQ): 45 events. Same pattern.
+
+When raw and adjusted price scales are mixed in a gap calculation, the apparent gap reaches 800–900%. The adjusted-only gap is typically 0–3%. No corporate action calendar was available to confirm the exact event, but the consistent 10:1 ratio cluster strongly indicates a historical stock split.
+
+### Timestamp semantics
+
+`TIMESTAMP_SEMANTICS = PASS`. Minute timestamps are Asia/Seoul bar-start labels. The 09:00 record is the first minute of the continuous session. 15m resampling uses bucket-end labels (09:15 = 09:00–09:14 inclusive). No future-bar contamination was detected.
+
+### Unconditional intraday drift sanity
+
+Open→checkpoint returns across all Development symbol/sessions, split by month and market:
+
+| Checkpoint | KOSPI mean | KOSPI n | KOSDAQ mean | KOSDAQ n |
+|---|---|---|---|---|
+| 09:15 | −0.68% | 1,403 | −0.76% | 353 |
+| 09:30 | −0.61% | 1,392 | −0.89% | 288 |
+| 10:00 | −0.76% | 1,375 | −1.34% | 240 |
+| 11:00 | −0.75% | 1,343 | −1.47% | 191 |
+| 14:00 | −0.91% | 1,262 | −1.93% | 140 |
+| 15:19 | −0.60% | 1,457 | −1.04% | 743 |
+
+All checkpoint means are negative. May is the weakest month (KOSPI 10:00 mean −1.19%, KOSDAQ −1.77%). June is less negative. The persistent negative drift is consistent with the Phase 8 opening-gap finding that the first-hour mean is negative across gap directions.
+
+### Cache integrity
+
+`CACHE_INTEGRITY = PARTIAL`. Development scope: 60 symbols × 49 sessions = 2,940 expected partitions. Observed: 2,334 valid, 606 absent. Observed rows: 769,617 of 1,117,200 expected. Row-count distribution shows a dominant mode at 380 (full session: 1,356 partitions). No duplicate timestamps, out-of-order rows, invalid OHLC, or negative volume within present partitions. 0 synthetic rows added.
+
+### Phase 8 evidence integrity
+
+`PHASE8_EVIDENCE_INTEGRITY = DEGRADED_BUT_USABLE`. Phase 9 re-ran the Phase 8 gap analysis on adjusted prices and confirmed the same 92+ events. The Phase 8 corrected replay (`DATA_CORRECTED_REPLAY`) verified that the original Phase 8 descriptive definitions were preserved and the corrected data produces consistent results.
+
+### Previous phase manifest immutability
+
+Phase 5, 6, 7, and 8 runtime manifest hashes were snapshotted before Phase 9 work and verified unchanged after. `PREVIOUS_PHASE_MANIFESTS_IMMUTABLE = PASS`.
+
+### Protected holdout
+
+Protected period 2026-07-28 through 2026-08-28: payload reads 0, sidecar reads 0. The Phase 9 reconciliation cache was written to a separate path and does not overwrite existing daily cache files.
+
+### Representative refresh comparison
+
+3 existing minute partitions were re-fetched and compared. All 3 matched the original hash (`PERSISTENT_PROVIDER_SHAPE`), confirming that the KIS endpoint returns consistent data for the same request.
+
+### Final verdicts
+
+| Gate | Phase 9 result |
+|---|---|
+| `PRICE_SEMANTICS` | `PARTIAL` (daily CONFIGURABLE; minute UNKNOWN) |
+| `DAILY_MINUTE_ALIGNMENT` | `PASS` |
+| `TIMESTAMP_SEMANTICS` | `PASS` |
+| `CORPORATE_ACTION_HANDLING` | `PARTIAL` (94 ADJUSTMENT_MISMATCH identified; no calendar) |
+| `CACHE_INTEGRITY` | `PARTIAL` (606 absent Development partitions) |
+| `PHASE8_EVIDENCE_INTEGRITY` | `DEGRADED_BUT_USABLE` |
+| `RESEARCH_PLATFORM` | `READY_WITH_LIMITATIONS` |
+| `PHASE9` | `COMPLETE` |
+
+---
+
+## Phase 10 — Low-Turnover Daily Opportunity Map
+
+### Scope and approach
+
+Phase 10 mapped daily-level trailing return states against 2/3/5-session forward outcomes on Development data only (2026-04-17–06-30). It used Phase 9 adjusted daily bars (`FID_ORG_ADJ_PRC=0`) from the separate reconciliation cache. Entry: next-session open after completed signal day. Exit: fixed horizon close. No parameter search, ML, or indicator soup.
+
+### Data
+
+- 60 frozen cohort symbols (30 KOSPI + 30 KOSDAQ)
+- 49 Development sessions
+- 2,940 feature observations, 11,100 outcome rows
+- Source convention: KIS `inquire-daily-itemchartprice`, `FID_ORG_ADJ_PRC=0` (adjusted)
+- Protected Holdout reads: 0. Secondary reads: 0. External reads: 0.
+
+### Features
+
+Per symbol and completed Development day: 1/2/3/5-session trailing adjusted-close return; 3/5-session range, realized volatility, and close location; distance from 5-session high/low; volume ratio vs. prior 5-day median; price bucket; adjusted-close-times-volume liquidity proxy; market; same-day cross-sectional return and volatility percentiles.
+
+### Primary map: trailing 3-day return buckets × holding horizon
+
+| 3-day return bucket | Horizon | n (non-overlapping) | Gross mean % | Net mean % (1×) | Win rate % | Payoff | Monthly (Apr/May/Jun) |
+|---|---|---|---|---|---|---|---|
+| <= -8% | 2d | 11 (8) | +1.57 | +1.04 | 54.5 | 1.38 | +/+/− |
+| -8% to -4% | 2d | 36 (29) | +0.41 | −0.12 | 44.4 | 0.99 | +/−/+ |
+| -4% to -2% | 2d | 86 (66) | −0.28 | −0.81 | 37.2 | 0.85 | +/−/− |
+| -2% to 0% | 2d | 344 (275) | −0.32 | −0.85 | 36.6 | 0.85 | +/−/+ |
+| 0 to +2% | 2d | 404 (319) | −0.51 | −1.04 | 34.4 | 0.80 | −/−/+ |
+| +2% to +4% | 2d | 216 (171) | −0.46 | −0.99 | 35.2 | 0.82 | +/−/+ |
+| +4% to +8% | 2d | 138 (111) | −0.49 | −1.02 | 34.8 | 0.79 | −/−/+ |
+| >= +8% | 2d | 94 (74) | −0.10 | −0.63 | 39.4 | 0.89 | +/−/+ |
+
+None of the buckets pass the promotion gate. The best gross mean is +1.57% (<= -8%, n=11) which is too small a sample. The best sample with n>=30 has gross mean +0.41% (-8% to -4%), below the 1.0% threshold. All payoff ratios except one small-sample cell are below 1.0.
+
+### 5-day return buckets
+
+Similar pattern. No bucket with adequate sample achieves 1.0% gross mean. The recent-loser buckets show slight positive means but fail the net-after-cost and payoff gates.
+
+### Momentum vs. reversal
+
+Neither direction produces a cost-sized edge. Recent losers (3-day return <= -8%) show a weak positive gross mean (+1.57%, n=11) that does not survive sample or cost gates. Recent winners show continuation drag (negative forward returns). The broad shape is mean-reverting but too small to be tradeable.
+
+### Volatility, range, price, and liquidity splits
+
+No volatility tercile, range position, price bucket, or liquidity bucket produced a qualifying state. LOW/MID/HIGH volatility states all had negative gross means at 2/3/5-day horizons.
+
+### Monthly stability
+
+May is consistently the weakest month across all states (mean gross typically -1.5% to -2.0%). April and June are slightly less negative or weakly positive. No state shows same-direction stability across all three months with adequate sample.
+
+### KOSPI/KOSDAQ split
+
+KOSPI is slightly less negative than KOSDAQ in most states (best observed: KOSPI -0.14% vs KOSDAQ -0.69% in the best broad state). Neither market produces a positive-cost edge.
+
+### Promotion gate results
+
+No candidate passed all required gates:
+- Minimum 30 non-overlapping trades: Several cells pass.
+- Gross mean >= 1.0%: Only the n=11 cell passes (insufficient sample).
+- Net positive at 1× and 2× costs: No cell passes.
+- Payoff ratio > 1.0: No cell with adequate sample passes.
+- 2+ positive months with n>=5: Some cells pass.
+- Max symbol/day share <= 20%: All cells pass.
+- Market means not opposite: Mixed.
+
+### Final verdicts
+
+| Gate | Phase 10 result |
+|---|---|
+| `PHASE10_OPPORTUNITY_MAP` | `FAIL` |
+| `DAILY_A` | `NOT_CREATED` |
+| `PHASE10_SECONDARY` | `NOT_RUN` |
+| `PHASE10_EXTERNAL` | `NOT_RUN` |
+| `PHASE10_100K` | `NOT_RUN` |
+| `SHADOW_NEXT_SESSION` | `NO` |
+| `ALPHA` | `UNPROVEN` |
+| `LIVE` | `DISABLED` |
+
+No daily-level family qualified for Secondary evaluation. The 0.53% round-trip cost exceeds every observed positive gross effect in the Development window. The overnight research scope (Phase 9 + Phase 10) is complete.
+
+### Artifacts
+
+Ignored `runtime/research/phase10/`: `daily-features.csv`, `daily-outcomes.csv`, `phase10-opportunity-map.json`, `phase10-summary.json`, `phase10-report.md`, `phase10-artifact-index.json`, `artifact-integrity.json`. Artifact integrity: PASS.
