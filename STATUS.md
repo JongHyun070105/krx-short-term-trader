@@ -14,10 +14,10 @@ BREAKOUT_RETEST_A: REJECTED
 BREAKOUT_RETEST_B: INSUFFICIENT
 PULLBACK: TOO_RARE / DEPRIORITIZED
 OOS: FAILED_GENERALIZATION_NO_EDGE_AFTER_COST (V2-A; locked Fresh Holdout untouched)
-DATA_QUALITY: PARTIAL (latest Phase 7 safe cache: 46 complete / 2 partial / 12 not acquired; holdout unopened)
-COHORT_BREADTH: 46_COMPLETE / 60_TARGET (Phase 6 acquisition; KIS API rate limits prevented full60-symbol coverage)
+DATA_QUALITY: PARTIAL (Phase 8 safe cache: 47 complete / 1 partial / 12 not acquired; 0 synthetic minutes; holdout unopened)
+COHORT_BREADTH: 47_COMPLETE / 60_TARGET (Phase 8; 30 KOSPI + 17 KOSDAQ complete; KIS limiter respected)
 PHASE6_DATA_ACQUISITION: PARTIAL (46 complete, 1 partial,13 not acquired of 60 target; KIS rate-limit timeouts)
-PHASE6_ARTIFACT_INTEGRITY: RECONCILIATION_REQUIRED (Phase 7 backfill replaced ignored acquisition manifest; preserved index now mismatches)
+PHASE6_ARTIFACT_INTEGRITY: DEGRADED_RECONCILED (Phase 7 replaced ignored acquisition manifest; original unavailable; historical index and summary preserved)
 PHASE5_DATA_ACQUISITION: PARTIAL_INTERRUPTED (36 complete, 215000 has 30/67 sessions, 23 not started; manifest RUNNING is stale)
 PHASE5_ARTIFACT_INTEGRITY: RECONCILED
 EXTERNAL_VALIDATION: NOT_AVAILABLE (no Secondary-surviving candidate; untouched block not opened)
@@ -36,9 +36,27 @@ PHASE7_HOLDOUT: LOCKED_NOT_EVALUATED (2026-07-28..08-28; 0 partitions opened)
 PHASE7_SHADOW_NEXT_SESSION: NO
 PHASE7_SAFE_CACHE: 46_COMPLETE / 2_PARTIAL / 12_NOT_ACQUIRED (3,174 partitions; 36 added during bounded read-only KIS backfill)
 PHASE7_ACQUISITION: PARTIAL_INTERRUPTED_RATE_LIMIT (shared interval increased to 4s; resumable)
+PHASE8_OPENING_GAP_ANATOMY: FAIL (Development descriptive anatomy did not support a repeatable cost-sized edge)
+PHASE8_OPENING_GAP_FAMILY: REJECT
+PHASE8_GAP_A: NOT_CREATED (14 diagnostic events; Development gates failed)
+PHASE8_GAP_B: NOT_CREATED (6 diagnostic events; Development gates failed)
+PHASE8_SECONDARY: NOT_RUN (no Development survivor)
+PHASE8_EXTERNAL: NOT_AVAILABLE (no frozen Secondary survivor; 0 partitions opened)
+PHASE8_HOLDOUT: LOCKED_NOT_EVALUATED (2026-07-28..08-28; 0 partitions opened)
+PHASE8_SHADOW_NEXT_SESSION: NO
 ```
 
 Phase 2, Phase 2.5, Phase 3, Phase 4, and Phase 5 evidence is summarized in [RESULTS.md](RESULTS.md). Manifests, event rows, and Phase 5 diagnostics are retained in ignored `runtime/research/phase5/`. Phase 6 research artifacts are in ignored `runtime/research/phase6/`.
+
+## Phase 8 current decision
+
+- Phase 8 tested opening gaps against the latest safe prior close and measured first-hour price discovery on Development (2026-04-17–06-30). It found 2,244 valid sessions, including 1,051 absolute gaps of at least 1%; 92 of those were suspicious extreme gaps and are ineligible for candidates.
+- Across meaningful gap events with an observed 10:00 checkpoint, the open-to-price mean was −0.653% gross; the stricter 61-event high-confidence, non-suspicious daily-close subset averaged −1.484%. Direction-aligned gap outcomes were weak or negative, first-hour acceptance and early gap fill did not improve subsequent outcomes, and matched controls were slightly less negative than gap events.
+- The 0.53% assumed round-trip cost exceeded any positive descriptive edge. GAP-A and GAP-B were not created (14 and 6 diagnostic events, respectively); no Development candidate qualified. Secondary, preregistration, external validation, 100K replay, and Shadow were not run.
+- The safe cache is now 47 complete symbols (30 KOSPI + 17 KOSDAQ), 1 partial, and 12 not acquired. Six bounded KIS requests were attempted at the persistent 4-second interval; safe acquisition remains resumable. The 2026-07-28–08-28 Fresh Holdout and 2026-01-05–04-16 external block each remained unopened.
+- Phase 8 records the Phase 6 indexed-manifest mismatch as `DEGRADED_RECONCILED`: the original 11,410-byte copy is unavailable, the current 11,098-byte copy differs, and Phase 6 summary/verdicts and index were preserved. The Phase 8 isolation regression confirms its acquisition fixture leaves Phase 5/6/7 manifest hashes unchanged.
+- Verdicts: `OPENING_GAP_ANATOMY=FAIL`; `OPENING_GAP_FAMILY=REJECT`; `GAP_A=NOT_CREATED`; `GAP_B=NOT_CREATED`; `SWING_SIGNAL=NONE`; `SHADOW_NEXT_SESSION=NO`; `ALPHA=UNPROVEN`; `PAPER=OUT_OF_SCOPE`; `LIVE=DISABLED`.
+- Full Phase 8 evidence, source limitations, Q1–Q12 answers, and reproducibility manifests are appended to [RESULTS.md](RESULTS.md); ignored machine-readable artifacts are under `runtime/research/phase8/`.
 
 ## Phase 7 current decision
 

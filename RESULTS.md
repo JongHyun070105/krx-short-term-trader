@@ -723,3 +723,105 @@ The external block remains unopened because there is no frozen Secondary survivo
 The reproducible entry point is `./.venv/bin/python -m krx_trader.research.phase7_vwap`. It writes ignored local artifacts under `runtime/research/phase7/`, with `phase7-artifact-index.json` hashing the generated outputs. The artifact set includes acquisition and dataset manifests, DQ, formula audit, complete 15m/30m observation and event JSONL streams, anatomy and reclaim-failure reports, time/liquidity/market splits, hypothesis summaries, cost stress, and explicit not-run records for Secondary, external validation, and 100K feasibility. `phase7-preregistration.json` was not created because there is no qualified candidate. The acquisition manifest records 36 newly available safe partitions, the 4-second shared limiter, the incomplete Phase 6 collector state, and the Phase 6 indexed-hash mismatch. Each artifact records its applicable source SHA, research-code SHA, dataset SHA, partition-index SHA, cohort SHA, formula/source class, periods, timestamp convention, and cost assumptions. Runtime artifacts are ignored and not part of the public Git commit.
 
 Unit coverage checks hand-computable proxy cumulative math, explicit proxy labeling, session reset, zero volume, missing observations, future-price/future-volume/other-symbol isolation, cross events and sequence, acceptance and failure, next-executable-bar timing, confidence boundaries, 30m completeness, matched controls, gates, partition-delta reconciliation, Holdout/external guards, and deterministic artifacts. Phase 7 retained the original 156 tests and added targeted Phase 7 coverage; final regression evidence and commit/push identity are recorded in the delivery report.
+
+## Phase 8 — Opening gap / first-hour information shock
+
+### Status and Phase 6 reconciliation
+
+Phase 8 completed a Development-only opening-gap anatomy study. Verdicts are `OPENING_GAP_ANATOMY=FAIL`, `OPENING_GAP_FAMILY=REJECT`, `GAP_A=NOT_CREATED`, `GAP_B=NOT_CREATED`, `SWING_SIGNAL=NONE`, and `SHADOW_NEXT_SESSION=NO`. Alpha remains `UNPROVEN`; Paper remains `OUT_OF_SCOPE`; Live and Private API remain disabled.
+
+The Phase 6 artifact index expects the old `phase6-acquisition-manifest.json` at **11,410 bytes**, SHA-256 `0a29a04f9c362652f84370b2b327c0918d791143cea1d4b9d7e4bf7e41f51859`. The current manifest is **11,098 bytes**, SHA-256 `2591c05a59f20a8b90d2adff09a581fd552de9fa8e44de265afb1a788c5d0440`; it does not match the index. No copy matching the indexed hash was found, so the original bytes are unavailable and no restoration is claimed. The mutation chain is Phase 7 → `run_phase6_acquisition()` → `run_phase5_backfill()`, whose status output was the Phase 6 path. The Phase 6 summary digest remains `91339542969317a9226df145614d4250a4471d7d894fbb870ba44d40b32c3474`; the historical Phase 6 index and summary/verdict were not rewritten. Integrity is `DEGRADED_RECONCILED`, recorded in the Phase 8 reconciliation artifact.
+
+### Acquisition isolation, coverage, and data quality
+
+The Phase 5 backfill now accepts an explicit status output path and artifact name, request budget, and injected read-only client. Phase 8 passes its own `runtime/research/phase8/phase8-acquisition-manifest.json` path. The default Phase 8 acquisition is bounded to six new requests, honors a minimum four-second interval, and skips valid cached partitions. Its only research-manifest output is under Phase 8; cache and shared persistent limiter state are the other expected local writes. A regression fixture snapshots Phase 5, Phase 6, and Phase 7 manifest hashes, runs Phase 8 acquisition, and verifies all three hashes are unchanged.
+
+The safe 67-session acquisition now has **47 complete, 1 partial, and 12 not acquired** of 60 target symbols (47 complete = 30 KOSPI + 17 KOSDAQ). Six new read-only KIS requests were attempted; acquisition remains resumable and did not wait for complete cohort coverage. For the 49-session Development window, 2,334 of 2,940 symbol-session minute partitions were verified present, 606 were absent, and no bars were synthesized. The observed data contains 769,617 minute bars and 117,303 absent expected minute slots within present partitions; causes remain `UNKNOWN` rather than being labeled as no-trade or halt intervals. Eighteen symbols had safe Development daily rows.
+
+There are 2,244 valid opening observations and 1,051 with absolute gap at least 1%. Across all 2,244 rows, 817 prior closes came from the KIS daily cache and 1,427 from last-continuous-minute proxies (15:19 where present); within the meaningful 1,051, the source split is 379 daily closes and 672 proxies. The proxy is the previous safe session's last observed continuous-minute close; it is kept separate because the daily close may include the closing auction while the minute cache stops at 15:19.
+
+The current KIS adapter requests `FID_ORG_ADJ_PRC=1`, the unadjusted/raw-price setting shown in the [official KIS Open Trading API sample](https://github.com/koreainvestment/open-trading-api/blob/main/legacy/Sample01/kis_domstk.py). Older daily cache sidecars do not persist that parameter, so its semantics are inferred from the current adapter source, not proven independently for every historical row. Each event records its prior-close source. Candidate/high-confidence sensitivity requires complete minute observations, a raw daily-close reference, and a non-suspicious gap.
+
+No corporate-action calendar was available. Absolute gaps of at least 20% are flagged `UNVERIFIED_SUSPICIOUS_PRICE_JUMP` and excluded from candidates, high-confidence sensitivity, and longer-horizon outcomes. There were **92** such meaningful gaps. They also fall inside the deliberately broad ±28.5% approximate price-limit band, but applicable historical limits could not be determined exactly; the artifact says `NEAR_APPROX_30_PERCENT_BAND`, not that a legal limit event was verified. Extreme raw-price changes, including apparent multi-fold jumps, are not treated as alpha. A source-convention mismatch or unobserved corporate action below the 20% screen remains possible.
+
+The Fresh Holdout (2026-07-28–08-28) and external block (2026-01-05–04-16) were not opened: zero partitions for each. Secondary (2026-07-01–07-27) was also not opened because no Development candidate survived.
+
+### Gap, fill, range, and first-hour anatomy
+
+For each session the opening gap is `(current 09:00 minute-bar open / latest safe prior close − 1) × 100`. The prior close is the most recent safe daily close when its date is at least as recent as cached prior-minute data; otherwise it is a labeled previous-session continuous-minute proxy. Only sessions from the 2026-04-17–06-30 Development split are analyzed. Missing exact 09:00 opens (43) and missing safe prior closes (47) are excluded from event construction.
+
+The fixed coarse buckets below include valid observations with less than 1% gaps as comparison context. `10:00 mean` is the raw open-to-10:00 return, not direction-aligned; a negative value means the price fell. Counts in the last column are all valid bucket observations, while checkpoint means use the stated number with an observed 10:00 mark.
+
+| Opening-gap bucket | Events | Suspicious ≥20% | 10:00 observations | Mean open→10:00 |
+|---|---:|---:|---:|---:|
+| ≤ −5% | 32 | 0 | 30 | +1.980% |
+| −5% to −3% | 56 | 0 | 54 | −0.811% |
+| −3% to −1% | 279 | 0 | 270 | −0.822% |
+| −1% to 0% | 418 | 0 | 388 | −0.780% |
+| 0 to +1% | 775 | 0 | 684 | −0.740% |
+| +1% to +3% | 416 | 0 | 391 | −0.782% |
+| +3% to +5% | 113 | 0 | 106 | −0.437% |
+| ≥ +5% | 155 | 92 | 99 | −0.624% |
+
+The coarse magnitude curve is not monotone, and the most negative-gap bucket is small with zero high-confidence events. For meaningful gaps with observed marks, gap-up events averaged −0.695% open-to-10:00 (fade), while gap-down events averaged −0.582% (continued downside, descriptive only in this long-only project). The combined direction is therefore `MIXED`; it does not justify either long candidate.
+
+| Gap direction | Full prior-close touch by 15m | 30m | 60m | Session |
+|---|---:|---:|---:|---:|
+| Gap up | 65.3% (693/1,062 known) | 71.2% (752/1,056) | 75.2% (794/1,056) | 83.8% (877/1,047) |
+| Gap down | 56.5% (406/719) | 60.2% (432/718) | 63.0% (453/719) | 73.9% (512/693) |
+
+The partial-fill fraction is not clipped: it can exceed 100% after price crosses through the prior close, and can be negative if price extends away from it. The 30-minute fill-vs-no-fill comparison did not predict subsequent gap reversal: its direction-aligned fade delta was −0.176 percentage points, so Q4 is `NO`.
+
+Fixed opening ranges require every minute in the interval; they are descriptive and generated no breakout trades:
+
+| Gap side / range | Complete ranges | Mean width | Median width | Mean close position |
+|---|---:|---:|---:|---:|
+| Up / 15m | 941 | 3.59% | 3.08% | 0.375 |
+| Up / 30m | 898 | 3.99% | 3.57% | 0.415 |
+| Down / 15m | 647 | 3.40% | 3.00% | 0.355 |
+| Down / 30m | 630 | 3.82% | 3.40% | 0.392 |
+
+The completed first-hour states are descriptive. Gap-up events that reversed by 10:00 numbered 368 and averaged −3.006% open-to-10:00; gap-up extensions numbered 187 and averaged +2.213%. For gap-down events, 243 first-hour extensions averaged −2.413%, while 107 reversals averaged +2.976%. These state labels use the completed first hour and therefore describe the path through 10:00; they are not evidence that a 10:00 signal predicts its own contemporaneous return. For Q3's forward test, the next executable bar after 10:00 to the continuous-session final mark was compared: 275 accepted events underperformed unaccepted events by 0.461 percentage points direction-aligned, so Q3 is `NO`.
+
+### Market, price, liquidity, time stability, and costs
+
+Among meaningful gap events, KOSPI had 672 observations and a −0.651% mean open-to-10:00 return (672 checkpoints); KOSDAQ had 379 observations and −0.657% (278 checkpoints). At continuous-session final, the means were −0.465% for KOSPI and −0.799% for KOSDAQ. These results do not show a repeatable positive direction on either market.
+
+The coarse open-price means at 10:00 were: below ₩10K, +0.233% (129 observed marks; 180 events); ₩10K–₩30K, −0.722% (389/426); ₩30K–₩50K, −0.803% (313/322); and at least ₩50K, −0.992% (119/123). The below-₩10K bucket is positive but too small and not supported by the wider anatomy. Liquidity is a trailing close-times-volume proxy rather than verified traded value: <₩50M n=2 (+1.587%), ₩50M–₩250M n=102 (−0.538%), ₩250M–₩1B n=71 (−1.238%), ≥₩1B n=177 (−0.749%), and unknown n=699 (−0.608%); small and unknown buckets are not interpretable as an edge.
+
+Mean open-to-10:00 returns were −0.387% in April (n=144), −1.042% in May (n=401), and −0.408% in June (n=506); continuous-final means were −0.029%, −0.959%, and −0.449%. Direction was not a stable positive result across months. Among positive event returns, overlapping event contribution was concentrated as follows: at 10:00 top event 2.41%, top five events 9.10%, top symbol 7.39%, top three symbols 19.76%, top day 7.06%, and top five days 29.58%; at continuous final, corresponding shares were 2.20%, 8.57%, 8.47%, 20.61%, 9.36%, and 33.33%. These are sums over descriptive overlapping events, not portfolio PnL.
+
+For meaningful gaps, matched controls required same session, market, coarse opening-price bucket, and trailing-liquidity bucket, with absolute gap below 1%. There were 745 matches: gap events averaged −0.729% to 10:00 versus −0.610% for controls, a −0.119 percentage-point difference. This descriptive matching is not causal, but it provides no evidence that the gap event adds a positive return over the same-time baseline.
+
+The assumed cost model remains unchanged: fee 0.015% per side, sell tax 0.20%, and slippage 15 bps per side, for 0.53% round-trip. Meaningful events averaged −0.653% open-to-10:00 (950 available marks), −0.652% to 11:00 (929), −0.641% to 14:00 (906), and −0.586% to continuous final (1,051). At 10:00 mean net was −1.183% at 1.0× cost, −1.448% at 1.5×, and −1.713% at 2.0×. The clean 61-event subset averaged −1.484% at 10:00 and −1.682% at continuous final. There is no positive candidate for which a positive break-even friction can be reported; the observed gross results are negative before costs.
+
+### Candidate gates, longer horizons, and final answers
+
+GAP-A diagnostics used gap-up ≥1%, a completed 30-minute close above both open and prior close, next 09:30 bar open entry, and continuous-session final exit. Only 14 events met the descriptive condition; gross mean was −0.858%, net at assumed costs −1.388%, and concentration/monthly/high-confidence gates failed. GAP-B diagnostics used gap-down ≤−1%, a completed first-hour close above open, next 10:00 bar open entry, and the same non-optimized final exit. Only 6 events qualified; gross mean was −0.192% and net −0.722%. Both remained `NOT_CREATED`; their samples are below 30 and fail the required positive gross, positive net, PF >1, high-confidence, stability, and concentration gates. No entry rule was promoted, and no same-bar entry was used.
+
+Secondary is `NOT_RUN`; no preregistration or freeze commit was created. External validation is `NOT_AVAILABLE` because no candidate survived Secondary, and its 2026-01-05–04-16 data stayed unopened. The Fresh Holdout remains sealed. 100K feasibility is `NOT_RUN`; no execution system, Paper, Private API, or Live behavior was built or enabled.
+
+The separate swing description excluded all 92 suspicious opening gaps and additional raw daily jumps (8 next-session and 16 three-session outcomes). Of the remaining events, 274 next-session outcomes averaged −1.688% and 253 three-session outcomes averaged −4.114%; the stricter high-confidence subsets (60 and 57 outcomes) averaged −1.609% and −4.415%. These overlapping open-to-daily-close observations do not support a separate swing study; `SWING_SIGNAL=NONE`.
+
+| Question | Phase 8 answer |
+|---|---|
+| Q1. Continuation or reversal? | **MIXED** — gap-up mean faded; gap-down mean continued lower. |
+| Q2. Stable gap-magnitude relationship? | **NO** — coarse curve is not monotone and clean support is sparse. |
+| Q3. Does first-hour acceptance improve forward return? | **NO** — accepted-vs-unaccepted direction-aligned delta −0.461 pp. |
+| Q4. Does early gap fill predict reversal? | **NO** — 30m fill-vs-no-fill fade delta −0.176 pp. |
+| Q5. Is gross move large enough versus modeled costs? | **NO** — overall gross outcomes are negative; assumed friction is 0.53%. |
+| Q6. Does the result survive high-confidence data? | **NO** — 61-event clean daily-close subset is negative. |
+| Q7. Does GAP-A or GAP-B qualify on Development? | **NO**. |
+| Q8. Does Secondary preserve it? | **NOT_RUN**. |
+| Q9. Does external validation pass? | **NOT_AVAILABLE**; block unopened. |
+| Q10. Is 100K execution feasible? | **NOT_RUN**. |
+| Q11. Evidence for separate 1–3 day swing research? | **NO** — descriptive outcomes are negative; `SWING_SIGNAL=NONE`. |
+| Q12. Is a future Shadow candidate ready? | **NO**. |
+
+### Artifacts, source identity, and verification
+
+The reproducible command is `./.venv/bin/python -m krx_trader.research.phase8_opening_gap`; bounded safe acquisition is explicitly opt-in with `--acquire --max-new-requests 6`. The complete Phase 8 artifacts are local and ignored under `runtime/research/phase8/`, including the acquisition and dataset manifests, DQ, event stream, buckets, gap fills, opening ranges, first-hour states, splits, monthly/concentration anatomy, cost stress, swing description, not-run gates, reconciliation, and artifact index. The dataset manifest records the source Git SHA, Phase 8 research-code SHA-256, dataset and partition-index SHA-256, cohort and strategy-config SHA-256, provider, periods, price semantics, action treatment, and assumed costs. Runtime evidence is not added to the public repository.
+
+The Phase 8 test file contains 21 focused cases covering prior-session close, exact session open, gap and bucket boundaries, corporate-action flags, gap fill, opening ranges and states, next-bar execution, future-bar isolation, longer-horizon suspicious-price guards, Holdout/external guards, and acquisition-manifest isolation. The full regression suite passed **199 tests**; targeted Phase 8 Ruff checks passed. The original 178-test suite was retained. Final source commit, push, remote identity, and clean-tree verification are recorded in the delivery report.
+
+Next step: close Phase 8 with no candidate promotion. Any future opening-gap or swing proposal must be a separately scoped and preregistered phase with new evidence; do not use the sealed Fresh Holdout to rescue these results.

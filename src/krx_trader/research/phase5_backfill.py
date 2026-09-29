@@ -8,6 +8,7 @@ import time
 from collections.abc import Callable
 from datetime import date, datetime
 from pathlib import Path
+from typing import Protocol
 from zoneinfo import ZoneInfo
 
 from krx_trader.config import Settings
@@ -16,6 +17,7 @@ from krx_trader.data.quality import require_healthy_bars
 from krx_trader.kis.auth import TokenManager
 from krx_trader.kis.rest import KisRestClient
 from krx_trader.kis.transport import UrllibTransport
+from krx_trader.models import Bar
 
 KST = ZoneInfo("Asia/Seoul")
 LOCKED_HOLDOUT_START = date(2026, 7, 28)
@@ -23,6 +25,12 @@ DEVELOPMENT_START = date(2026, 4, 17)
 DEVELOPMENT_END = date(2026, 6, 30)
 VALIDATION_START = date(2026, 7, 1)
 VALIDATION_END = date(2026, 7, 27)
+
+
+class HistoricalBarsClient(Protocol):
+    def get_daily_bars(self, symbol: str, start: date, end: date) -> list[Bar]: ...
+
+    def get_minute_bars(self, symbol: str, session_date: date) -> list[Bar]: ...
 
 
 def assert_safe_research_date(session_date: date) -> None:
@@ -53,14 +61,17 @@ def get_used_period_sessions(manifest_path: Path) -> list[date]:
 
 
 def backfill_symbol_sessions(
-    client: KisRestClient,
+    client: HistoricalBarsClient,
     symbol: str,
     sessions: list[date],
     cache: ParquetBarCache,
     *,
     market: str = "KOSDAQ",
     on_progress: Callable[[dict[str, object]], None] | None = None,
+    max_new_requests: int | None = None,
 ) -> dict[str, object]:
+    if max_new_requests is not None and max_new_requests < 0:
+        raise ValueError("max_new_requests cannot be negative")
     for session in sessions:
         assert_safe_research_date(session)
 
@@ -76,8 +87,20 @@ def backfill_symbol_sessions(
         except (OSError, ValueError, json.JSONDecodeError):
             daily_bars = []
 
+    new_requests = 0
     if not daily_bars:
+        if max_new_requests == 0:
+            return {
+                "symbol": symbol,
+                "status": "BUDGET_EXHAUSTED",
+                "succeeded_sessions": 0,
+                "failed_sessions": 0,
+                "skipped_existing": 0,
+                "new_requests_attempted": 0,
+                "unattempted_sessions": [session.isoformat() for session in sessions],
+            }
         try:
+            new_requests += 1
             daily_bars = client.get_daily_bars(symbol, start_date, end_date)
             if daily_bars:
                 cache.save(
@@ -98,12 +121,15 @@ def backfill_symbol_sessions(
                 "succeeded_sessions": 0,
                 "failed_sessions": len(sessions),
                 "skipped_existing": 0,
+                "new_requests_attempted": new_requests,
+                "unattempted_sessions": [],
             }
 
     # 2. Iterate minute sessions
     succeeded = 0
     skipped_existing = 0
     failed: dict[str, str] = {}
+    unattempted: list[str] = []
     total_minute_rows = 0
 
     for session in sessions:
@@ -119,7 +145,12 @@ def backfill_symbol_sessions(
             except (OSError, ValueError, json.JSONDecodeError):
                 cached_bars = []
 
+        if max_new_requests is not None and new_requests >= max_new_requests:
+            unattempted.append(day_str)
+            continue
+
         try:
+            new_requests += 1
             bars = client.get_minute_bars(symbol, session)
             if not bars:
                 failed[day_str] = "EMPTY_MINUTE_RESPONSE"
@@ -150,11 +181,13 @@ def backfill_symbol_sessions(
 
     return {
         "symbol": symbol,
-        "status": "SUCCESS" if not failed else "PARTIAL",
+        "status": "SUCCESS" if not failed and not unattempted else "PARTIAL",
         "succeeded_sessions": succeeded,
         "failed_sessions": len(failed),
         "skipped_existing": skipped_existing,
         "failures": failed,
+        "unattempted_sessions": unattempted,
+        "new_requests_attempted": new_requests,
         "total_minute_rows": total_minute_rows,
     }
 
@@ -167,7 +200,12 @@ def run_phase5_backfill(
     status_output_path: Path = Path("runtime/research/phase5/data-acquisition-manifest.json"),
     target_cohort: str = "cohort_60",
     min_request_interval: float = 0.4,
+    client: HistoricalBarsClient | None = None,
+    max_new_requests: int | None = None,
+    artifact_name: str = "phase5-data-acquisition-manifest",
 ) -> dict[str, object]:
+    if max_new_requests is not None and max_new_requests < 0:
+        raise ValueError("max_new_requests cannot be negative")
     cohort = json.loads(cohort_manifest_path.read_text(encoding="utf-8"))
     symbols = list(cohort[target_cohort]["symbols"])
     sessions = get_used_period_sessions(split_manifest_path)
@@ -176,21 +214,22 @@ def run_phase5_backfill(
         assert_safe_research_date(session)
 
     cache = ParquetBarCache(cache_root)
-    settings = Settings.from_env()
-    transport = UrllibTransport()
-    manager = TokenManager(settings.kis_app_key, settings.kis_app_secret, transport)
-    client = KisRestClient(
-        settings.kis_app_key,
-        settings.kis_app_secret,
-        manager,
-        transport,
-        min_request_interval=min_request_interval,
-    )
+    if client is None:
+        settings = Settings.from_env()
+        transport = UrllibTransport()
+        manager = TokenManager(settings.kis_app_key, settings.kis_app_secret, transport)
+        client = KisRestClient(
+            settings.kis_app_key,
+            settings.kis_app_secret,
+            manager,
+            transport,
+            min_request_interval=min_request_interval,
+        )
 
     status_output_path.parent.mkdir(parents=True, exist_ok=True)
     state: dict[str, object] = {
         "schema_version": 1,
-        "artifact": "phase5-data-acquisition-manifest",
+        "artifact": artifact_name,
         "created_at": datetime.now(KST).isoformat(),
         "target_cohort": target_cohort,
         "total_symbols": len(symbols),
@@ -204,10 +243,12 @@ def run_phase5_backfill(
         "period": [sessions[0].isoformat(), sessions[-1].isoformat()],
         "symbol_results": {},
         "status": "RUNNING",
+        "max_new_requests": max_new_requests,
+        "new_requests_attempted": 0,
     }
 
     print(
-        f"Starting Phase 5 Backfill: {target_cohort} ({len(symbols)} symbols) x {len(sessions)} sessions "
+        f"Starting {artifact_name}: {target_cohort} ({len(symbols)} symbols) x {len(sessions)} sessions "
         f"({len(symbols) * len(sessions)} partitions)",
         flush=True,
     )
@@ -217,14 +258,22 @@ def run_phase5_backfill(
 
     for idx, symbol in enumerate(symbols, 1):
         market = "KOSPI" if idx <= 30 else "KOSDAQ"
+        remaining_requests = (
+            max_new_requests - int(state["new_requests_attempted"])
+            if max_new_requests is not None else None
+        )
         res = backfill_symbol_sessions(
             client,
             symbol,
             sessions,
             cache,
             market=market,
+            max_new_requests=remaining_requests,
         )
         state["symbol_results"][symbol] = res
+        state["new_requests_attempted"] = (
+            int(state["new_requests_attempted"]) + int(res.get("new_requests_attempted", 0))
+        )
         completed_partitions += int(res["succeeded_sessions"])
         elapsed = time.time() - start_time
         rate = completed_partitions / max(0.1, elapsed)
@@ -240,7 +289,7 @@ def run_phase5_backfill(
         os.replace(tmp_status, status_output_path)
 
     state["finished_at"] = datetime.now(KST).isoformat()
-    all_succeeded = all(
+    all_succeeded = len(state["symbol_results"]) == len(symbols) and all(
         res.get("status") == "SUCCESS" for res in state["symbol_results"].values()
     )
     state["status"] = "COMPLETE" if all_succeeded else "PARTIAL"
