@@ -594,3 +594,131 @@ A realistic whole-share replay was executed using the project's standard retail 
 | `PAPER` | `OUT_OF_SCOPE` | Paper trading withheld |
 
 The original 13 Phase 5 artifacts remain under ignored `runtime/research/phase5/`. The original `phase5-artifact-index.json` is preserved: 12 entries still match, while its manifest entry records the earlier 7,776-byte / `21931d2909a31e6aae4321ec955dbae071ba1724fbf7742a025b6c6c1d5e2634` state. The current manifest is 8,435 bytes / `0d744dd815c9eb44611918c10518825d98fdfd5f5631ac3a50c6cd9b8f2daa9f` because acquisition continued after the index was generated. `phase5-current-dq.json`, `phase5-reconciliation-final.json`, `post-study-breadth-sensitivity.json`, and `phase5-artifact-index-final.json` record the reconciled local state; runtime data remains ignored and is not committed.
+
+## Phase 7 — VWAP reclaim / acceptance
+
+### Final status and scope
+
+Phase 7 tested whether a completed-bar reclaim of session VWAP, optionally followed by acceptance, has positive forward returns. This was a new session-VWAP hypothesis; it did not revive or retune the rejected Breakout family.
+
+**Final verdict:** `VWAP_RECLAIM_ANATOMY=FAIL` on the primary 15m Development interval. The predeclared anatomy gate passed only 2 of 5 checks (enough events and a 10 percentage-point acceptance failure reduction). Gross four-bar opportunity, improvement over the matched baseline, and positive direction in the high-confidence subset all failed. The 30m secondary interval within Development was `WEAK` (3/5) and is descriptive support only. No VWAP-A or VWAP-B strategy variant was created.
+
+| Research question | Phase 7 result | Evidence summary |
+|---|---|---|
+| Q1. Do reclaims beat comparable baseline bars? | **NO** | 15m four-bar mean −0.0471% vs. matched −0.0157%; event-minus-control −0.0314 pp. |
+| Q2. Does first reclaim beat repeats? | **NO** | First −0.0634%; second +0.0268%; third+ −0.1202%. |
+| Q3. Does time below VWAP matter? | **WEAK** | Non-monotone: 1 bar −0.0690%, 2 bars +0.0611%, 3–4 −0.1545%, 5+ −0.0120%. |
+| Q4. Does acceptance reduce failure? | **YES** | Acceptance A four-bar recross failure 47.62% vs. unrestricted 62.23% (−14.61 pp). |
+| Q5. Does acceptance improve gross expectancy, beyond reducing trades? | **YES, descriptively** | Acceptance A next-executable-bar four-bar mean +0.0365% vs. −0.0471% unrestricted (+0.0835 pp); only 1,470 accepted events had that full outcome. Within the same accepted cohort, waiting for confirmation reduced its immediate-entry mean by 0.2414 pp. This is not a viable strategy result. |
+| Q6. Does the effect survive high-confidence data? | **NO** | High-confidence 15m events averaged −0.0674% over four bars. |
+| Q7. Is VWAP-A positive before costs? | **NO** | No A variant passed the Development gate or was implemented/backtested. |
+| Q8. Is either variant positive after costs? | **NO** | No candidate; descriptive event-hold mean was −0.5766% after base modeled costs. |
+| Q9. Does Secondary preserve direction? | **NOT_RUN** | No frozen Development survivor qualified for strategy-level Secondary evaluation. |
+| Q10. Does untouched external validation pass? | **NOT_AVAILABLE** | No preregistered Secondary survivor; external block remained unopened. |
+| Q11. Is it feasible in the 100K whole-share portfolio? | **NOT_RUN** | No qualified strategy candidate to replay. |
+| Q12. Is there a prospective Shadow candidate? | **NO** | `SHADOW_NEXT_SESSION=NO`; `LIVE=DISABLED`. |
+
+### Repository, acquisition, and dataset snapshot
+
+- Work started on `main` at the expected clean baseline `50314bd13d42caa168857f11f8c118843fa1bd6a`; fetched `origin/main`, which was at the same SHA. The existing 156-test suite passed before implementation.
+- The 60-symbol cohort was unchanged: 46 complete (30 KOSPI, 16 KOSDAQ), one partial (`006910`, 56 of 67 safe sessions), and 13 KOSDAQ symbols not acquired. Phase 7 reused the existing safe partitions; no duplicate download occurred. The cohort therefore remained **46/60 complete**, not an acquisition expansion.
+- The phase contained 3,138 available safe partitions (3,082 from complete symbols plus 56 for the partial symbol), 1,012,302 minute rows from the 46 complete symbols, 49 Development sessions (2026-04-17–2026-06-30), and 18 Secondary sessions (2026-07-01–2026-07-27). Event research uses the 46 complete symbols. The partial symbol is retained in acquisition/DQ counts, not treated as fully covered.
+- No private KIS API call was made. The existing cache was sufficient to start and complete Development anatomy; acquisition stayed resumable, and the Phase 6 46/1/13 counts remain the actual end state.
+- Fresh Holdout (`2026-07-28`–`2026-08-28`) and external block (`2026-01-05`–`2026-04-16`) partitions opened: **0** each. Holdout features, signals, VWAP, outcomes, and DQ were not calculated. The external block was not evaluated because no frozen candidate qualified.
+
+### VWAP formula, session, and point-in-time rules
+
+The cached KIS minute Parquet schema is `timestamp/open/high/low/close/volume`. The retained minute parser also exposes OHLC and `cntg_vol`; neither has actual interval traded value or cumulative traded value. Exact traded-value VWAP could not be calculated. Phase 7 therefore labels every calculation `OHLCV_PROXY` / `PROXY`, never exact transaction VWAP.
+
+For each symbol and KST session, at observed minute `t`:
+
+```text
+typical_price[t] = (high[t] + low[t] + close[t]) / 3
+VWAP_PROXY[t] = sum(typical_price[i] * observed_volume[i], i <= t)
+                / sum(observed_volume[i], i <= t)
+```
+
+The accumulator resets for every symbol/session at 09:00 KST. A completed 15m/30m bar uses only observed one-minute bars through that interval’s final minute. There is no forward fill, future volume, or future turnover. Missing one-minute observations are not synthesized; incomplete aggregate bars are omitted. Zero volume contributes zero; VWAP stays null until cumulative volume is positive, and a null VWAP cannot trigger a reclaim.
+
+Data timestamps are `Asia/Seoul`, `bar_start`, for the continuous regular session 09:00–15:19. The 15:20 closing auction is excluded. The same semantics apply to 15m primary and 30m secondary anatomy; no auction records were added.
+
+### Data quality and reliability
+
+Across 3,138 cached symbol-sessions, the session DQ manifest records 1,033,527 observed minute slots of 1,192,440 expected and 158,913 missing slots. No missing cause is inferred: an absence could be provider omission, no trade, halt, session semantics, or retrieval loss. No synthetic minutes were added. Volume sum was 7,364,507,478 units; OHLCV turnover proxy sum was ₩162,991,466,686,996.66 (not provider turnover).
+
+Confidence rules were fixed before outcome aggregation: `HIGH_CONFIDENCE` requires all 380 continuous-session minutes observed and positive volume; `PARTIAL` requires at least 361/380 observed and positive volume; otherwise `UNRELIABLE`. Counts were 1,770, 408, and 960 symbol-sessions, respectively. For 15m reclaim outcomes, high-confidence events were n=1,970 with −0.0674% mean four-bar return and 62.08% four-bar failure; partial events n=258 were +0.3165% and unreliable events n=131 were −0.4573%. The partial subset’s positive mean does not replace the negative high-confidence result.
+
+The all-events vs. high-confidence comparison is a required sensitivity, not evidence that the missing slots are no-trade minutes. Because both the source VWAP and liquidity turnover are OHLC-based proxies, no exact-versus-proxy crossing comparison is available.
+
+### Development anatomy — 15m primary
+
+The event dataset has 42,029 completed-bar observations and 2,761 up-reclaim events; 2,359 have complete four-bar outcomes. The event identity is deterministic by symbol/session/reclaim sequence. Down-crosses, first/second/third-plus reclaims, previous/current point-in-time VWAP distances, run length below VWAP, excursion, slope, age, time-of-day, session context, bar quality, liquidity proxy, confidence, acceptance definitions, and 1/2/4/8-bar outcomes are recorded. Forward return uses the next executable bar open after the signal/confirmation and the corresponding completed horizon; no signal or acceptance bar close is treated as a fill. MFE/MAE and their time-to fields are recorded per event.
+
+Across the 2,359 reclaim events with four-bar outcomes:
+
+- Mean forward gross return was −0.0556% at 1 bar, −0.0336% at 2 bars, −0.0471% at 4 bars, and −0.0141% at 8 bars (2,045 observations for the 8-bar horizon). Mean four-bar MFE was +0.9923% and MAE −0.9481%; median time-to-MFE was 2 bars and time-to-MAE was 2 bars. These excursion values overlap across event windows and are not independent trade results.
+- Four-bar VWAP recross/failure rate was 62.23%; 1-bar 34.97%, 2-bar 48.66%.
+- The same-market, same completed-bar time-bucket, same fixed 15m OHLCV turnover-proxy bucket control (excluding the event symbol-session) had a −0.0157% four-bar mean. Reclaims underperformed it by 0.0314 percentage points; the positive event-minus-control share was 46.08%.
+- 30m Development anatomy had 19,694 observations, 1,524 reclaim events, and 1,090 four-bar outcomes. Mean four-bar gross return was −0.0411% vs. matched baseline −0.0599% (+0.0188 pp), but the event return and high-confidence subset (n=926, −0.0341%) remained negative. Its `WEAK` gate (3/5) did not satisfy the primary 15m gate.
+
+#### First/repeated reclaim, time below, depth, and slope
+
+| 15m Development group | Events with 4-bar outcome | Mean 4-bar gross | Failure within 4 bars |
+|---|---:|---:|---:|
+| First reclaim | 1,264 | −0.0634% | 62.97% |
+| Second reclaim | 685 | +0.0268% | 60.44% |
+| Third or later | 410 | −0.1202% | 62.93% |
+| Below VWAP 1 bar | 945 | −0.0690% | 61.90% |
+| Below VWAP 2 bars | 426 | +0.0611% | 62.68% |
+| Below VWAP 3–4 bars | 421 | −0.1545% | 62.00% |
+| Below VWAP 5+ bars | 567 | −0.0120% | 62.61% |
+| Shallow excursion (>−0.25%) | 291 | +0.0270% | 59.45% |
+| Moderate (−0.25% to −0.75%) | 711 | +0.0051% | 60.90% |
+| Deep (≤−0.75%) | 1,357 | −0.0903% | 63.52% |
+
+The first reclaim did not beat repeats: first-minus-mean(repeated) was −0.0167 pp. “Time below” results are non-monotone and do not support a robust duration gate. Shallow/moderate/deep excursion groups show some ordering in return/failure but all remain too small or negative to define an entry filter; no thresholds were optimized.
+
+| 60m VWAP slope state at reclaim | n | Mean 4-bar gross | Failure within 4 bars |
+|---|---:|---:|---:|
+| Falling | 712 | −0.0855% | 64.47% |
+| Flat | 717 | −0.0534% | 60.81% |
+| Rising | 249 | +0.0221% | 53.41% |
+| Unavailable | 681 | −0.0255% | 64.61% |
+
+Rising slope was less negative/weakly positive, but n=249 and the rest of the anatomy does not validate it as a gate. It remains descriptive.
+
+#### Acceptance and failure
+
+Acceptance definitions were descriptive: A, next completed close remains above VWAP; B, next low touches VWAP and closes above; C, next close exceeds reclaim close; D, two consecutive closes above VWAP. For 15m, A applied to 1,732 events, with 1,470 full four-bar post-confirmation outcomes. Four-bar failure after A confirmation was 47.62%, versus 62.23% unrestricted (−14.61 pp). The confirmed next-executable-bar gross return was +0.0365%, compared with +0.2779% for those A events measured at immediate event entry; confirmation delayed that cohort’s mean by −0.2414 pp. Against the unrestricted −0.0471% mean, A’s post-confirmation mean is +0.0835 pp better, which is the descriptive basis for Q5=YES. It is still only 3.65 bp gross and does not establish an executable edge.
+
+Other confirmations also reduced some failures, with weak/negative delayed-entry outcomes: B had 55.63% post-confirmation four-bar failure and +0.0525% delayed gross; C 40.00% and +0.0143%; D 39.98% and +0.0292%. The 30m A definition instead had 50.58% failure and −0.0933% delayed gross. Acceptance conditions are not strategy rules, and none received a parameter search.
+
+#### Time, liquidity, market, and stability splits
+
+15m four-bar means by time bucket were: 09:00–09:30 n=309, −0.1798%; 09:30–10:00 n=339, +0.1349%; 10:00–11:00 n=628, −0.0950%; 11:00–12:00 n=399, +0.0721%; 12:00–13:00 n=331, −0.1126%; 13:00–14:00 n=274, −0.1147%; and 14:00–15:00 n=79, −0.0203%. The 4-bar anatomy has no reportable 15:00+ horizon because continuous trading ends at 15:19; closing-auction data is excluded. The positive 09:30 and 11:00 buckets are not stable support for a narrow time window.
+
+Completed 15m bar OHLCV-proxy turnover results were: <₩10M n=2, +0.0330%; ₩10M–₩50M n=10, +0.0752%; ₩50M–₩200M n=180, +0.0433%; ≥₩200M n=2,167, −0.0552%. The thin buckets are too small, and the dominant turnover group is negative.
+
+| Market | n | Mean 4-bar gross | Failure within 4 bars |
+|---|---:|---:|---:|
+| KOSPI | 2,104 | −0.0193% | 61.55% |
+| KOSDAQ | 255 | −0.2765% | 67.84% |
+
+Monthly 15m means were April n=554, +0.0052%; May n=852, −0.0981%; June n=953, −0.0319%. They do not show stable positive direction. Session-direction four-bar means were down −0.0521%, near-flat +0.0552%, and up −0.1159%. Reclaim after early strength followed by VWAP loss (n=945) averaged −0.0257%, vs. first reclaim after morning weakness (n=710) at −0.0821%; neither was positive. Concentration shares are diagnostic sums over overlapping event outcomes, not trade PnL: top event 2.54%, top five 6.88%; top symbol 8.83%, top three symbols 25.59%; top day 6.76%, top five days 26.32% of positive gross contribution.
+
+### Strategy gate, costs, freeze, and final boundaries
+
+The 15m gate criteria were fixed before inspecting returns. Although event count and acceptance failure reduction passed, gross return, matched-baseline improvement, and high-confidence direction failed. Therefore neither proposed family concept was instantiated:
+
+- **VWAP-A:** not created. The anatomy did not justify setting a time-below, VWAP-age, confidence/liquidity, holding, or structural-exit rule.
+- **VWAP-B:** not created. A/B/C/D acceptance descriptions were measured but none met the family gate as an executable candidate.
+
+No strategy-level Development trade list, Secondary strategy diagnostic, strategy preregistration, strategy freeze SHA, external evaluation, or 100K whole-share portfolio replay exists. The costs below are **descriptive event-hold calculations, not strategy backtest results**. Cost assumptions: 0.015% broker fee per side, 0.20% sell tax, 15 bps slippage per side; approximate round trip 53 bps. On 15m four-bar events, mean gross −0.0471% became net −0.5766% at 1.0× costs, −0.8411% at 1.5×, and −1.1055% at 2.0×. Costs were not adjusted to rescue a gross-negative hypothesis.
+
+The external block remains unopened because there is no frozen Secondary survivor; the Fresh Holdout remains `LOCKED_NOT_EVALUATED`; both have zero opened partitions. `VWAP_RECLAIM_FAMILY=REJECT`, `VWAP_A=NOT_CREATED`, `VWAP_B=NOT_CREATED`, `SHADOW_NEXT_SESSION=NO`, `ALPHA=UNPROVEN`, `PAPER=OUT_OF_SCOPE`, and `LIVE=DISABLED`. Phase 6 remains `MEAN_REVERSION_FAMILY=INSUFFICIENT`; no Phase 2–6 verdict was rewritten.
+
+### Artifacts, reproducibility, and validation
+
+The reproducible entry point is `./.venv/bin/python -m krx_trader.research.phase7_vwap`. It writes ignored local artifacts under `runtime/research/phase7/`, with `phase7-artifact-index.json` hashing the generated outputs. The artifact set includes acquisition and dataset manifests, DQ, formula audit, complete 15m/30m observation and event JSONL streams, anatomy and reclaim-failure reports, time/liquidity/market splits, hypothesis summaries, cost stress, and explicit not-run records for Secondary, external validation, and 100K feasibility. `phase7-preregistration.json` was not created because there is no qualified candidate. Each artifact records its applicable source SHA, research-code SHA, dataset SHA, partition-index SHA, cohort SHA, formula/source class, periods, timestamp convention, and cost assumptions. Runtime artifacts are ignored and not part of the public Git commit.
+
+Unit coverage checks exact hand-computable proxy cumulative math, explicit proxy labeling, session reset, zero volume, missing observations, future-price/future-volume/other-symbol isolation, cross events and sequence, acceptance and failure, next-executable-bar timing, confidence boundaries, 30m completeness, matched controls, gates, Holdout/external guards, and deterministic artifacts. Phase 7 retained the original 156 tests and added targeted Phase 7 coverage; final regression evidence and commit/push identity are recorded in the delivery report.

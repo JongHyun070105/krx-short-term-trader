@@ -26,9 +26,26 @@ SHADOW_NEXT_SESSION: NO (NOT_PROMOTED)
 SHADOW_INFRA: PASS (2026-09-28 four-hour read-only simulated session)
 PAPER: OUT_OF_SCOPE
 LIVE: DISABLED
+VWAP_RECLAIM_ANATOMY: FAIL (15m Development gate passed 2/5; no variants created)
+VWAP_A: NOT_CREATED
+VWAP_B: NOT_CREATED
+VWAP_RECLAIM_FAMILY: REJECT
+PHASE7_SECONDARY_DIAGNOSTIC: NOT_RUN (no Development candidate)
+PHASE7_EXTERNAL_VALIDATION: NOT_AVAILABLE (no frozen Secondary survivor; block unopened)
+PHASE7_HOLDOUT: LOCKED_NOT_EVALUATED (2026-07-28..08-28; 0 partitions opened)
+PHASE7_SHADOW_NEXT_SESSION: NO
 ```
 
 Phase 2, Phase 2.5, Phase 3, Phase 4, and Phase 5 evidence is summarized in [RESULTS.md](RESULTS.md). Manifests, event rows, and Phase 5 diagnostics are retained in ignored `runtime/research/phase5/`. Phase 6 research artifacts are in ignored `runtime/research/phase6/`.
+
+## Phase 7 current decision
+
+- Phase 7 tested a **session VWAP reclaim / acceptance** hypothesis on the existing safe-period cache. The 15m Development anatomy failed its predeclared five-part support gate (2/5); 30m was weak (3/5) and did not override the primary result.
+- Cached KIS minute data has OHLCV only, with no transaction value/turnover field. The calculation is explicitly `VWAP_PROXY`: session cumulative `((high + low + close) / 3) * observed_volume / cumulative_observed_volume`; each symbol/session resets at 09:00 KST. Continuous bars are 09:00–15:19; the closing auction is excluded. No missing minutes were synthesized.
+- The study used 46 complete symbols (30 KOSPI + 16 KOSDAQ), 1 partial symbol, and 13 not acquired, over 67 safe sessions (49 Development, 18 Secondary). Acquisition remained 46/60 complete; no private KIS API call was made. Holdout and external partitions opened: 0 each.
+- 15m reclaim events with four-bar outcomes averaged −0.0471% gross vs. −0.0157% for the matched baseline (−0.0314 percentage points); the high-confidence subset was −0.0674%. Reclaim failure within four bars was 62.23%. Acceptance A cut post-confirmation failure to 47.62%, but its delayed-entry four-bar mean was only +0.0365% gross and the one-bar confirmation delay reduced mean return by 0.2414 percentage points within that accepted subset.
+- No VWAP-A/B strategy variant was justified or evaluated. Secondary strategy evaluation was not run, preregistration was not created, external validation is unavailable, 100K feasibility was not run, and Shadow remains NO. Historical Phase 2–6 decisions are preserved; in particular `MEAN_REVERSION_FAMILY=INSUFFICIENT` remains unchanged.
+- Full methods, outcomes, explicit research questions, and artifact inventory are recorded in [RESULTS.md](RESULTS.md). Ignored machine-readable artifacts are in `runtime/research/phase7/`.
 
 ## Phase 6 current decision
 
