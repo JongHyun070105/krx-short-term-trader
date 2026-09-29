@@ -97,6 +97,7 @@ def backfill_symbol_sessions(
                 "error": type(exc).__name__,
                 "succeeded_sessions": 0,
                 "failed_sessions": len(sessions),
+                "skipped_existing": 0,
             }
 
     # 2. Iterate minute sessions
@@ -136,7 +137,7 @@ def backfill_symbol_sessions(
             succeeded += 1
             total_minute_rows += len(bars)
         except (OSError, ValueError, RuntimeError) as exc:
-            failed[day_str] = f"{type(exc).__name__}: {exc}"
+            failed[day_str] = type(exc).__name__
 
         if on_progress:
             on_progress({
@@ -230,7 +231,7 @@ def run_phase5_backfill(
 
         print(
             f"[{idx}/{len(symbols)}] {symbol} ({market}): {res['succeeded_sessions']}/{len(sessions)} sessions "
-            f"(skipped {res['skipped_existing']}), rate={rate:.1f} part/s",
+            f"(skipped {res.get('skipped_existing', 0)}), rate={rate:.1f} part/s",
             flush=True,
         )
 
