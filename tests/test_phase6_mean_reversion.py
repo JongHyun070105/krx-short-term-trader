@@ -16,6 +16,7 @@ from krx_trader.research.phase6 import (
     ResampledResearchBar,
     _portfolio_replay,
     _rank_percentiles,
+    anatomy_summary,
     assert_external_evidence_allowed,
     attach_forward_outcomes,
     build_point_in_time_snapshots,
@@ -230,6 +231,55 @@ def test_stabilization_features_are_independent_and_recorded():
     assert isinstance(final["stabilization"]["new_local_low"], bool)
     assert isinstance(final["stabilization"]["rank_deterioration_stopped"], bool)
     assert isinstance(final["stabilization"]["session_low_distance_recovery"], bool)
+
+
+def test_missing_prior_rank_is_unavailable_not_rank_deterioration():
+    start = datetime(2026, 6, 1, 9, 15, tzinfo=KST)
+    full_offsets = range(9)
+    sparse_offsets = (0, 1, 2, 4, 5, 7, 8)
+    bars = {}
+    for symbol, offsets in (("000001", full_offsets), ("000002", sparse_offsets), ("000003", sparse_offsets)):
+        bars[symbol] = [
+            _research_bar(start + timedelta(minutes=15 * offset), 100 + offset)
+            for offset in offsets
+        ]
+
+    rows, _ = build_point_in_time_snapshots(
+        bars, interval_minutes=15,
+        market_by_symbol={symbol: "KOSPI" for symbol in bars},
+        minimum_participants=3,
+    )
+    latest = [row for row in rows if row["timestamp"] == bars["000001"][-1].bar.time.isoformat()]
+    assert len(latest) == 3
+    assert all(row["rank_delta_points"] is None for row in latest)
+    assert all(row["stabilization"]["rank_deterioration_stopped"] is None for row in latest)
+    assert all(row["stabilization"]["rank_improvement"] is None for row in latest)
+
+
+def test_stabilization_anatomy_reports_unavailable_separately():
+    stabilization = {
+        key: None for key in (
+            "new_local_low", "lower_low_stopped", "negative_return_magnitude_decreased",
+            "close_above_previous", "positive_current_bar", "close_in_upper_half",
+            "lower_wick_rejection", "rank_deterioration_stopped", "rank_improvement",
+            "session_low_distance_recovery",
+        )
+    }
+    row = {
+        "percentile_short": 5.0,
+        "prior_percentile_short": 10.0,
+        "prior_short_return": -0.01,
+        "stabilization": stabilization,
+        "time_of_day": "10:00-11:00",
+        "market": "KOSPI",
+        "turnover_percentile": 50.0,
+    }
+    summary = anatomy_summary([row], interval_name="15m", minimum_participants=3,
+                              participant_counts={"2026-06-01T10:00:00+09:00": 3}, clean_only=False)
+    comparison = summary["stabilization_among_prior_laggards"]["rank_improvement"]
+    assert comparison["yes"]["sample_size"] == 0
+    assert comparison["no"]["sample_size"] == 0
+    assert comparison["unavailable"]["sample_size"] == 1
 
 
 def test_mr_a_requires_laggard_recovery_and_price_reversal():

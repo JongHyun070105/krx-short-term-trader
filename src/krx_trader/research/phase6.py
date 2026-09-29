@@ -426,11 +426,14 @@ def build_point_in_time_snapshots(
                 "recent_realized_range": statistics.mean(recent_range) if recent_range else None,
                 "recent_realized_volatility": statistics.pstdev(recent_returns) if len(recent_returns) >= 2 else None,
                 "stopped_making_local_low": stopped_making_local_low,
-                "negative_return_magnitude_decreased": bool(current_bar_return < 0 and previous_return is not None and previous_return < 0 and abs(current_bar_return) < abs(previous_return)),
+                "negative_return_magnitude_decreased": (
+                    None if previous_return is None else current_bar_return < 0 and previous_return < 0
+                    and abs(current_bar_return) < abs(previous_return)
+                ),
                 "close_above_previous": bar.close > previous.bar.close,
                 "positive_current_bar": current_bar_return > 0,
-                "close_in_upper_half": close_location is not None and close_location >= 0.5,
-                "lower_wick_rejection": lower_wick is not None and lower_wick >= 0.4,
+                "close_in_upper_half": close_location >= 0.5 if close_location is not None else None,
+                "lower_wick_rejection": lower_wick >= 0.4 if lower_wick is not None else None,
                 "freshness_minutes": row.freshness_minutes,
                 "completeness": row.completeness,
                 "observed_minute_count": row.observed_minute_count,
@@ -464,6 +467,9 @@ def build_point_in_time_snapshots(
             prev_snapshot = row_history.get((symbol, timestamp - period))
             low_distance = item["distance_from_session_low"]
             prev_low_distance = prev_snapshot.get("distance_from_session_low") if prev_snapshot else None
+            session_low_recovery = (
+                None if prev_low_distance is None or low_distance is None else low_distance > prev_low_distance
+            )
             row = {
                 "timestamp": timestamp.isoformat(),
                 "session_date": timestamp.date().isoformat(),
@@ -488,7 +494,7 @@ def build_point_in_time_snapshots(
                 "distance_from_local_low": item["distance_from_local_low"],
                 "distance_from_session_low": low_distance,
                 "distance_from_session_high": item["distance_from_session_high"],
-                "session_low_distance_recovery": prev_low_distance is not None and low_distance is not None and low_distance > prev_low_distance,
+                "session_low_distance_recovery": session_low_recovery,
                 "current_bar_return": item["current_bar_return"],
                 "body_fraction": item["body_fraction"],
                 "signed_body_fraction": item["signed_body_fraction"],
@@ -518,13 +524,12 @@ def build_point_in_time_snapshots(
                     "positive_current_bar": item["positive_current_bar"],
                     "close_in_upper_half": item["close_in_upper_half"],
                     "lower_wick_rejection": item["lower_wick_rejection"],
-                    "rank_deterioration_stopped": rank_delta is not None and rank_delta >= 0,
-                    "rank_improvement": rank_delta is not None and rank_delta >= 10.0,
-                    "session_low_distance_recovery": False,
+                    "rank_deterioration_stopped": None if rank_delta is None else rank_delta >= 0,
+                    "rank_improvement": None if rank_delta is None else rank_delta >= 10.0,
+                    "session_low_distance_recovery": session_low_recovery,
                 },
                 "stop_price": stop_price,
             }
-            row["stabilization"]["session_low_distance_recovery"] = row["session_low_distance_recovery"]
             snapshots.append(row)
             row_history[(symbol, timestamp)] = row
             rank_history[(symbol, timestamp)] = current_rank
@@ -655,7 +660,12 @@ def anatomy_summary(rows: list[dict[str, Any]], *, interval_name: str, minimum_p
     for field in stabilization_fields:
         yes = [row for row in laggard if row["stabilization"].get(field) is True]
         no = [row for row in laggard if row["stabilization"].get(field) is False]
-        stabilization[field] = {"yes": summarize_observations(yes), "no": summarize_observations(no)}
+        unavailable = [row for row in laggard if row["stabilization"].get(field) is None]
+        stabilization[field] = {
+            "yes": summarize_observations(yes),
+            "no": summarize_observations(no),
+            "unavailable": summarize_observations(unavailable),
+        }
     blind_laggards = [row for row in rows if row.get("prior_percentile_short") is not None
                       and row["prior_percentile_short"] <= DEFAULT_MR_CONFIG.laggard_percentile
                       and row["prior_short_return"] < 0]
