@@ -39,3 +39,5 @@ The July–August period above remains contaminated for any future promotion bec
 5. Any pre-freeze payload or sidecar exposure invalidates the interval for promotion. Preserve the evidence and move the replacement interval forward; do not repair the record or relabel the data pristine.
 
 This policy does not authorize Phase 10 external evaluation, paper execution, shadow deployment, or live trading. `LIVE` remains disabled.
+
+The one fixed Phase 8 correction replay uses the adjusted daily input and publishes the source as adjusted. It reuses the frozen Phase 8 descriptive calculations without changing Phase 8 manifests or outputs. It does not open Secondary, External, or Holdout data and does not run candidate promotion.

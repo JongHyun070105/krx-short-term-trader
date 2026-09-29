@@ -931,6 +931,8 @@ def run_phase9_audit(
         dict(Counter(item.get("classification", "UNKNOWN") for item in refresh_report.get("results", [])))
         if refresh_report else {}
     )
+    replay_path = output_root / "phase8-data-corrected-replay.json"
+    replay_report = json.loads(replay_path.read_text(encoding="utf-8")) if replay_path.is_file() else None
     summary = {
         "artifact": "phase9-summary", "source_git_sha": _current_git_sha(),
         "cohort_sha256": hashlib.sha256(json.dumps(symbols, separators=(",", ":")).encode()).hexdigest(),
@@ -977,6 +979,7 @@ def run_phase9_audit(
         "protected_holdout": {"start": PROTECTED_START.isoformat(), "payload_reads": 0, "sidecar_reads": 0},
         "previous_phase_manifests_immutable": immutability["status"],
         "representative_refresh_comparison": refresh_classifications,
+        "phase8_fixed_replay": replay_report.get("status", "UNKNOWN") if replay_report else "NOT_RUN",
         "daily_alignment_convention": "FID_ORG_ADJ_PRC=0 (adjusted); raw flag 1 retained for frozen Phase 8 gap comparison",
         "note": "KIS daily prices are configurable. Minute adjustment remains UNKNOWN; adjusted daily was checked against minute data. No Phase 8 replay performed.",
     }
@@ -991,6 +994,7 @@ def run_phase9_audit(
         f"- Cache integrity: **{cache_status}**; verified Development sessions: {len(minute_by_symbol_session)} symbol-session partitions\n"
         f"- Suspicious Development gaps >=20%: {len(suspicious_gaps)}\n"
         f"- Representative refresh comparison: {json.dumps(refresh_classifications, sort_keys=True)}\n"
+        f"- Frozen Phase 8 corrected replay: {replay_report.get('status', 'UNKNOWN') if replay_report else 'NOT_RUN'}\n"
         f"- Phase 8 evidence integrity: **DEGRADED_BUT_USABLE**\n"
         f"- Protected Holdout payload/sidecar reads: **0 / 0**\n"
         f"- Previous phase manifest hashes unchanged: **{immutability['status']}**\n"
@@ -1039,6 +1043,11 @@ def run_phase9_audit(
             for artifact_path in (data_path, sidecar_path):
                 if artifact_path.is_file():
                     indexed_files.append(artifact_path.relative_to(output_root).as_posix())
+    if replay_report:
+        indexed_files.append(replay_path.relative_to(output_root).as_posix())
+        event_path = output_root / "phase8-data-corrected-events.jsonl.gz"
+        if event_path.is_file():
+            indexed_files.append(event_path.relative_to(output_root).as_posix())
     index = artifact_index(output_root, indexed_files)
     _write_json(output_root / "phase9-artifact-index.json", index)
     integrity = verify_artifact_index(output_root, index)
