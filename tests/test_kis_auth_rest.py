@@ -1,11 +1,14 @@
 import json
 import stat
 from datetime import date, datetime, timedelta
+from http.client import IncompleteRead
 from zoneinfo import ZoneInfo
+
+import pytest
 
 from krx_trader.kis.auth import TokenManager
 from krx_trader.kis.rest import KisApiError, KisRestClient
-from krx_trader.kis.transport import HttpResponse
+from krx_trader.kis.transport import HttpResponse, TransportError, UrllibTransport
 
 KST = ZoneInfo("Asia/Seoul")
 
@@ -235,3 +238,24 @@ def test_per_second_rate_limit_error_gets_bounded_retry(tmp_path):
     assert client.get_current_price("005930") == 12345
     assert sleeps == [61.0]
     assert len(transport.calls) == 3
+
+
+def test_incomplete_http_body_becomes_redacted_retryable_transport_error(monkeypatch):
+    class IncompleteResponse:
+        status = 200
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return None
+
+        def read(self):
+            raise IncompleteRead(b"private-response-fragment", 100)
+
+    monkeypatch.setattr("krx_trader.kis.transport.urlopen", lambda *_args, **_kwargs: IncompleteResponse())
+
+    with pytest.raises(TransportError, match=r"network response failed \(IncompleteRead\)") as error:
+        UrllibTransport().request("GET", "https://example.invalid")
+
+    assert "private-response-fragment" not in str(error.value)

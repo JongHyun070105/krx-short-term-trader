@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
+from http.client import HTTPException
 from typing import Any, Protocol
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode
@@ -56,6 +57,11 @@ class UrllibTransport:
             with urlopen(request, timeout=timeout) as response:
                 return HttpResponse(response.status, response.read())
         except HTTPError as exc:
-            return HttpResponse(exc.code, exc.read())
+            try:
+                return HttpResponse(exc.code, exc.read())
+            except HTTPException as read_error:
+                raise TransportError(f"network response failed ({type(read_error).__name__})") from None
         except URLError as exc:
             raise TransportError(f"network request failed ({type(exc.reason).__name__})") from None
+        except HTTPException as exc:
+            raise TransportError(f"network response failed ({type(exc).__name__})") from None
