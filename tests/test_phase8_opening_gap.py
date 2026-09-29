@@ -7,8 +7,10 @@ from zoneinfo import ZoneInfo
 
 import pytest
 
+from krx_trader.data.cache import ParquetBarCache
 from krx_trader.models import Bar
 from krx_trader.research import phase8_opening_gap as phase8
+from krx_trader.research.phase5_backfill import backfill_symbol_sessions
 from krx_trader.research.phase8_opening_gap import (
     _clean_confidence_events,
     _daily_return_horizons,
@@ -347,7 +349,7 @@ def test_phase8_acquisition_regression_keeps_phase5_6_7_manifests_unchanged(tmp_
 
     class FakeClient:
         def get_daily_bars(self, symbol, start, end):
-            return [_daily(start, 100)]
+            raise AssertionError("Phase 8 acquisition must not read or fetch daily cache data")
 
         def get_minute_bars(self, symbol, session_date):
             return [_bar(session_date, 0, 100)]
@@ -362,8 +364,46 @@ def test_phase8_acquisition_regression_keeps_phase5_6_7_manifests_unchanged(tmp_
     assert state["artifact"] == "phase8-acquisition-manifest"
     assert state["new_requests_attempted"] == 3
     assert set(state["symbol_results"]) == set(symbols)
+    assert state["runtime_write_scope"].endswith("daily cache is neither read nor written")
     assert all(hashlib.sha256(path.read_bytes()).hexdigest() == hashes_before[path] for path in preserved)
     assert not (runtime / "phase6" / "phase6-acquisition-manifest.json.tmp").exists()
+
+
+def test_safe_phase8_backfill_skips_a_shared_daily_cache_partition(tmp_path):
+    class DailyReadGuardCache(ParquetBarCache):
+        def load(self, kind, symbol, interval, session_date=None):
+            if kind == "daily":
+                raise AssertionError("daily partition was opened")
+            return super().load(kind, symbol, interval, session_date)
+
+    class FakeClient:
+        daily_requests = 0
+
+        def get_daily_bars(self, symbol, start, end):
+            self.daily_requests += 1
+            raise AssertionError("Phase 8 must not fetch or overwrite daily cache data")
+
+        def get_minute_bars(self, symbol, session_date):
+            return [_bar(session_date, 0, 100)]
+
+    cache = DailyReadGuardCache(tmp_path / "data")
+    daily_path = cache.partition_path("daily", "000001", "1d")
+    daily_path.parent.mkdir(parents=True)
+    daily_path.write_bytes(b"synthetic sealed shared daily cache")
+    daily_sidecar = daily_path.with_suffix(".metadata.json")
+    daily_sidecar.write_text('{"last_timestamp":"2026-08-28T00:00:00+09:00"}')
+    before = (daily_path.read_bytes(), daily_sidecar.read_bytes())
+    client = FakeClient()
+
+    result = backfill_symbol_sessions(
+        client, "000001", [DAY], cache,
+        max_new_requests=1, ensure_daily=False,
+    )
+
+    assert result["status"] == "SUCCESS"
+    assert result["new_requests_attempted"] == 1
+    assert client.daily_requests == 0
+    assert (daily_path.read_bytes(), daily_sidecar.read_bytes()) == before
 
 
 def test_phase8_acquisition_uses_secure_loader_and_ephemeral_token_cache(tmp_path, monkeypatch):
@@ -390,6 +430,7 @@ def test_phase8_acquisition_uses_secure_loader_and_ephemeral_token_cache(tmp_pat
 
     def fake_backfill(**kwargs):
         captured["status_output_path"] = kwargs["status_output_path"]
+        captured["ensure_daily"] = kwargs["ensure_daily"]
         return {"artifact": "phase8-acquisition-manifest", "total_sessions": 67,
                 "symbol_results": {}, "status": "PARTIAL"}
 
@@ -404,6 +445,7 @@ def test_phase8_acquisition_uses_secure_loader_and_ephemeral_token_cache(tmp_pat
 
     assert captured["cache_path"] is None
     assert captured["status_output_path"] == output
+    assert captured["ensure_daily"] is False
     assert not (tmp_path / "runtime" / "kis_token.json").exists()
     persisted = output.read_text(encoding="utf-8")
     assert "test-key" not in persisted

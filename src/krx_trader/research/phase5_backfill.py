@@ -69,61 +69,64 @@ def backfill_symbol_sessions(
     market: str = "KOSDAQ",
     on_progress: Callable[[dict[str, object]], None] | None = None,
     max_new_requests: int | None = None,
+    ensure_daily: bool = True,
 ) -> dict[str, object]:
     if max_new_requests is not None and max_new_requests < 0:
         raise ValueError("max_new_requests cannot be negative")
     for session in sessions:
         assert_safe_research_date(session)
 
-    # 1. Ensure daily bars are cached for the entire period
+    # 1. Optionally ensure daily bars; Phase 8 skips this to avoid opening a
+    #    shared daily cache partition that may also contain its sealed Holdout.
     start_date = sessions[0]
     end_date = sessions[-1]
-    daily_path = cache.partition_path("daily", symbol, "1d")
-    daily_meta_path = daily_path.with_suffix(".metadata.json")
-    daily_bars = []
-    if daily_path.is_file() and daily_meta_path.is_file():
-        try:
-            daily_bars = cache.load("daily", symbol, "1d")
-        except (OSError, ValueError, json.JSONDecodeError):
-            daily_bars = []
-
     new_requests = 0
-    if not daily_bars:
-        if max_new_requests == 0:
-            return {
-                "symbol": symbol,
-                "status": "BUDGET_EXHAUSTED",
-                "succeeded_sessions": 0,
-                "failed_sessions": 0,
-                "skipped_existing": 0,
-                "new_requests_attempted": 0,
-                "unattempted_sessions": [session.isoformat() for session in sessions],
-            }
-        try:
-            new_requests += 1
-            daily_bars = client.get_daily_bars(symbol, start_date, end_date)
-            if daily_bars:
-                cache.save(
-                    daily_bars,
-                    kind="daily",
-                    symbol=symbol,
-                    interval="1d",
-                    market=market,
-                    source="KIS daily OHLCV",
-                    requested_start=start_date,
-                    requested_end=end_date,
-                )
-        except (OSError, ValueError, RuntimeError) as exc:
-            return {
-                "symbol": symbol,
-                "status": "DAILY_FETCH_FAILED",
-                "error": type(exc).__name__,
-                "succeeded_sessions": 0,
-                "failed_sessions": len(sessions),
-                "skipped_existing": 0,
-                "new_requests_attempted": new_requests,
-                "unattempted_sessions": [],
-            }
+    if ensure_daily:
+        daily_path = cache.partition_path("daily", symbol, "1d")
+        daily_meta_path = daily_path.with_suffix(".metadata.json")
+        daily_bars = []
+        if daily_path.is_file() and daily_meta_path.is_file():
+            try:
+                daily_bars = cache.load("daily", symbol, "1d")
+            except (OSError, ValueError, json.JSONDecodeError):
+                daily_bars = []
+
+        if not daily_bars:
+            if max_new_requests == 0:
+                return {
+                    "symbol": symbol,
+                    "status": "BUDGET_EXHAUSTED",
+                    "succeeded_sessions": 0,
+                    "failed_sessions": 0,
+                    "skipped_existing": 0,
+                    "new_requests_attempted": 0,
+                    "unattempted_sessions": [session.isoformat() for session in sessions],
+                }
+            try:
+                new_requests += 1
+                daily_bars = client.get_daily_bars(symbol, start_date, end_date)
+                if daily_bars:
+                    cache.save(
+                        daily_bars,
+                        kind="daily",
+                        symbol=symbol,
+                        interval="1d",
+                        market=market,
+                        source="KIS daily OHLCV",
+                        requested_start=start_date,
+                        requested_end=end_date,
+                    )
+            except (OSError, ValueError, RuntimeError) as exc:
+                return {
+                    "symbol": symbol,
+                    "status": "DAILY_FETCH_FAILED",
+                    "error": type(exc).__name__,
+                    "succeeded_sessions": 0,
+                    "failed_sessions": len(sessions),
+                    "skipped_existing": 0,
+                    "new_requests_attempted": new_requests,
+                    "unattempted_sessions": [],
+                }
 
     # 2. Iterate minute sessions
     succeeded = 0
@@ -203,6 +206,7 @@ def run_phase5_backfill(
     client: HistoricalBarsClient | None = None,
     max_new_requests: int | None = None,
     artifact_name: str = "phase5-data-acquisition-manifest",
+    ensure_daily: bool = True,
 ) -> dict[str, object]:
     if max_new_requests is not None and max_new_requests < 0:
         raise ValueError("max_new_requests cannot be negative")
@@ -269,6 +273,7 @@ def run_phase5_backfill(
             cache,
             market=market,
             max_new_requests=remaining_requests,
+            ensure_daily=ensure_daily,
         )
         state["symbol_results"][symbol] = res
         state["new_requests_attempted"] = (

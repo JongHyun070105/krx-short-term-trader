@@ -1489,6 +1489,7 @@ def run_phase8_acquisition(
         client=client,
         max_new_requests=max_new_requests,
         artifact_name="phase8-acquisition-manifest",
+        ensure_daily=False,
     )
     state.update({
         "artifact": "phase8-acquisition-manifest",
@@ -1503,7 +1504,8 @@ def run_phase8_acquisition(
         "bounded_new_request_budget": max_new_requests,
         "holdout_partitions_opened": 0,
         "external_partitions_opened": 0,
-        "runtime_write_scope": "runtime/research/phase8/phase8-acquisition-manifest.json only, plus safe cache partitions and shared KIS limiter state",
+        "runtime_write_scope": "runtime/research/phase8/phase8-acquisition-manifest.json only, plus safe minute cache partitions and shared KIS limiter state; daily cache is neither read nor written",
+        "daily_cache_access": "NOT_READ_OR_WRITTEN_BY_PHASE8_ACQUISITION; study loader reads only filtered Development daily rows",
     })
     _write_json(status_output_path, state)
     return state
