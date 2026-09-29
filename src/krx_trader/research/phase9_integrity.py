@@ -925,6 +925,12 @@ def run_phase9_audit(
     config_sha = hashlib.sha256(
         json.dumps(config_record, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode()
     ).hexdigest()
+    refresh_path = output_root / "reconciliation" / "refresh-comparison.json"
+    refresh_report = json.loads(refresh_path.read_text(encoding="utf-8")) if refresh_path.is_file() else None
+    refresh_classifications = (
+        dict(Counter(item.get("classification", "UNKNOWN") for item in refresh_report.get("results", [])))
+        if refresh_report else {}
+    )
     summary = {
         "artifact": "phase9-summary", "source_git_sha": _current_git_sha(),
         "cohort_sha256": hashlib.sha256(json.dumps(symbols, separators=(",", ":")).encode()).hexdigest(),
@@ -970,6 +976,7 @@ def run_phase9_audit(
         "index_first_hour_cross_check": "NOT_AVAILABLE",
         "protected_holdout": {"start": PROTECTED_START.isoformat(), "payload_reads": 0, "sidecar_reads": 0},
         "previous_phase_manifests_immutable": immutability["status"],
+        "representative_refresh_comparison": refresh_classifications,
         "daily_alignment_convention": "FID_ORG_ADJ_PRC=0 (adjusted); raw flag 1 retained for frozen Phase 8 gap comparison",
         "note": "KIS daily prices are configurable. Minute adjustment remains UNKNOWN; adjusted daily was checked against minute data. No Phase 8 replay performed.",
     }
@@ -983,6 +990,7 @@ def run_phase9_audit(
         f"- Daily/minute alignment: **{daily_minute_alignment}**; timestamp semantics: **{timestamp_status}**\n"
         f"- Cache integrity: **{cache_status}**; verified Development sessions: {len(minute_by_symbol_session)} symbol-session partitions\n"
         f"- Suspicious Development gaps >=20%: {len(suspicious_gaps)}\n"
+        f"- Representative refresh comparison: {json.dumps(refresh_classifications, sort_keys=True)}\n"
         f"- Phase 8 evidence integrity: **DEGRADED_BUT_USABLE**\n"
         f"- Protected Holdout payload/sidecar reads: **0 / 0**\n"
         f"- Previous phase manifest hashes unchanged: **{immutability['status']}**\n"
@@ -1017,6 +1025,20 @@ def run_phase9_audit(
             ])
     if baseline_file.is_file():
         indexed_files.append(baseline_file.relative_to(output_root).as_posix())
+    if refresh_report:
+        indexed_files.append(refresh_path.relative_to(output_root).as_posix())
+        for result in refresh_report.get("results", []):
+            session = date.fromisoformat(result["session"])
+            assert_development_date(session)
+            symbol = result["symbol"]
+            data_path = (
+                output_root / "reconciliation" / "refresh-cache" / "minute"
+                / symbol / f"{session.isoformat()}.parquet"
+            )
+            sidecar_path = data_path.with_suffix(".metadata.json")
+            for artifact_path in (data_path, sidecar_path):
+                if artifact_path.is_file():
+                    indexed_files.append(artifact_path.relative_to(output_root).as_posix())
     index = artifact_index(output_root, indexed_files)
     _write_json(output_root / "phase9-artifact-index.json", index)
     integrity = verify_artifact_index(output_root, index)

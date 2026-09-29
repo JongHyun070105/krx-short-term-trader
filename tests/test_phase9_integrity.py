@@ -172,6 +172,8 @@ def test_cache_audit_only_loads_explicit_development_partitions(tmp_path: Path) 
     locked_path = cache.partition_path("minute", "000001", "1m", locked_day)
     locked_path.parent.mkdir(parents=True, exist_ok=True)
     locked_path.write_bytes(b"protected fixture must not be touched")
+    protected_sidecar = locked_path.with_suffix(".metadata.json")
+    protected_sidecar.write_text("{this protected metadata must not be parsed", encoding="utf-8")
     loaded, report = audit_development_minute_cache(
         symbols=["000001"], sessions=[DEV_DAY], market_by_symbol={"000001": "KOSPI"},
         cache_root=tmp_path,
@@ -179,6 +181,7 @@ def test_cache_audit_only_loads_explicit_development_partitions(tmp_path: Path) 
     assert len(loaded) == 1
     assert report["partition_counts"]["valid_full_session"] == 1
     assert report["partition_counts"]["expected"] == 1
+    assert report["partition_counts"]["invalid"] == 0
 
 
 def test_cache_audit_keeps_sparse_valid_bars_as_partial_provider_shape(tmp_path: Path) -> None:
