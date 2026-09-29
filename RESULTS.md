@@ -335,11 +335,11 @@ Phase 4 machine artifacts are intentionally ignored under `runtime/research/phas
 
 ---
 
-## Phase 5: Expanded Market Evidence and Relative-Strength Continuation
+## Phase 5: Relative-Strength Continuation and Post-Study Acquisition Reconciliation
 
 ### Research context and problem formulation
 
-Following the definitive rejection of the Breakout family in Phase 4 (`BREAKOUT_FAMILY = REJECTED`), Phase 5 investigates an entirely distinct, newly preregistered strategy family: **Relative-Strength Continuation**.
+Following the definitive rejection of the Breakout family in Phase 4 (`BREAKOUT_FAMILY = REJECTED`), Phase 5 evaluated an entirely distinct, preregistered strategy family: **Relative-Strength Continuation**. The 60-symbol cohort was the acquisition target; it was not the breadth of the strategy evidence.
 
 The core hypothesis examines:
 > *"Does selecting intraday leaders that consistently outperform their peers across the market yield a statistically significant, cost-adjusted continuation edge after realistic KRX transaction costs and market frictions?"*
@@ -351,10 +351,21 @@ The core hypothesis examines:
 
 ### Data acquisition and expanded cohort breadth
 
-Phase 5 successfully expanded market coverage beyond the initial 30 KOSPI cohort toward a diversified 60-symbol universe (`cohort_60`: 30 KOSPI, 30 KOSDAQ across large, mid, and small market-cap strata):
-- **Downloaded data:** 33 symbols (30 KOSPI + 3 KOSDAQ) were fully loaded and partitioned across 67 safe trading sessions (`2026-04-17` to `2026-07-27`), producing **2,209 valid Parquet partitions**.
-- **Data quality semantics:** Missing minute slots were handled under Fail-Closed semantics without injecting synthetic bars.
-- **Cohort breadth status:** `EXPANDED_PARTIAL` (KOSDAQ representation initialized, multi-market cross-sectional evaluation unlocked).
+The frozen target cohort has 60 symbols (30 KOSPI and 30 KOSDAQ). The strategy study used the data available at its run time:
+- **Study input:** 33 symbols (30 KOSPI + 3 KOSDAQ), 67 safe sessions (`2026-04-17` to `2026-07-27`), 2,209 loaded partitions, and 807,223 rows. It did not use the full 60-symbol target.
+- **Reconstructed study symbols:** `001440, 001450, 003490, 004020, 005940, 006360, 006800, 009830, 010140, 011200, 015760, 018880, 022100, 024110, 028670, 029780, 032640, 034220, 035720, 036460, 047040, 082740, 088350, 088980, 138930, 175330, 199430, 208860, 316140, 323410, 336260, 377300, 457370`.
+- **Study dataset hash:** `a58a63d77a3110b74927b64820c26bd8b969aba6e74d40400534f917e6f91b0f`. The original run did not persist an input partition manifest/hash; this value is reconstructed from the 2,209 safe-period partitions that existed by the `expanded-dq.json` load-completion timestamp, not a contemporaneously frozen input digest.
+- **Post-study acquisition:** The acquisition target remained 60. Current safe-period files cover 36 complete symbols (67/67 partitions each), one partial symbol (`215000`, 30/67), and 23 symbols with no partitions. The three complete post-study additions are `222080`, `101680`, and `010240`; `215000` is partial. These later files were not blended into the original 33-symbol results.
+
+| Post-study symbol | Market | Safe-period partitions | First partition mtime (KST) |
+|---|---|---:|---|
+| `222080` | KOSDAQ | 67 | 2026-09-28 23:09:18.470335 |
+| `101680` | KOSDAQ | 67 | 2026-09-28 23:13:46.463411 |
+| `010240` | KOSDAQ | 67 | 2026-09-28 23:15:54.026185 |
+| `215000` | KOSDAQ | 30 | 2026-09-28 23:19:59.668464 |
+
+- **Current safe-period DQ:** 2,442 readable and sidecar-verified partitions, 861,756 rows, 0 duplicate timestamps, 0 out-of-order rows, 0 invalid OHLC rows, 0 negative-volume rows, and 0 hash/row-count mismatches. There are 66,204 missing minute slots across 768 present partitions (380 start-labelled minutes per session); their cause remains unknown, and no bars were synthesized. The 23 not-started symbols are reported separately from within-partition gaps.
+- **Acquisition state:** The historical manifest still says `RUNNING`, but no Phase 5 worker was present. Its last write predates the final 30 `215000` partitions. Reconciliation classifies the acquisition as `PARTIAL_INTERRUPTED`; the manifest was preserved unchanged.
 
 ### Cross-sectional feature anatomy and persistence decay
 
@@ -416,6 +427,19 @@ Two distinct candidate formulations were preregistered before backtesting:
 
 Under realistic friction escalation, the net drag compounds rapidly, driving Profit Factor below 0.35.
 
+### Post-study fixed-rule breadth sensitivity
+
+Because 36 complete symbols passed safe-period partition and bar-structure checks, one fixed-rule sensitivity replay used the original preregistered RS-A/RS-B configuration on the same Development and Secondary Diagnostic windows. It included the three fully acquired additions (`222080`, `101680`, `010240`) and excluded partial `215000`. This is labeled `POST_STUDY_BREADTH_SENSITIVITY`; it is not promotion evidence and no thresholds, stops, exits, scanner rules, or parameters were changed.
+
+| Strategy | Window | Closed Trades | Gross Expectancy | Net Expectancy | Profit Factor |
+|---|---|---:|---:|---:|---:|
+| RS-A | Development | 698 | −0.168% | −0.696% | 0.506 |
+| RS-B | Development | 453 | −0.104% | −0.632% | 0.536 |
+| RS-A | Secondary Diagnostic | 212 | −0.066% | −0.595% | 0.534 |
+| RS-B | Secondary Diagnostic | 181 | −0.273% | −0.800% | 0.443 |
+
+Gross expectancy remained negative in all four fixed-rule cells. The original rejection conclusion does not change; no further sensitivity or optimization was run.
+
 ### ₩100,000 whole-share portfolio replay
 
 A realistic whole-share replay was executed using the project's standard retail micro-capital constraints (₩100,000 initial capital, ₩20,000 order cap, 0.25% equity risk per trade, max 2 concurrent positions):
@@ -435,8 +459,12 @@ A realistic whole-share replay was executed using the project's standard retail 
 
 | Gate / Metric | Phase 5 Verdict | Operational Meaning |
 |---|---|---|
-| `DATA_QUALITY` | `PARTIAL` | 2,209 partitions loaded, missing slots fail-closed |
-| `COHORT_BREADTH` | `EXPANDED_PARTIAL` | 33 symbols loaded (30 KOSPI, 3 KOSDAQ) |
+| `PHASE5_CODE` | `COMPLETE` | Existing Phase 5 implementation is preserved |
+| `PHASE5_STRATEGY_RESEARCH` | `COMPLETE` | Preregistered study and one permitted fixed-rule sensitivity are recorded |
+| `PHASE5_DATA_ACQUISITION` | `PARTIAL_INTERRUPTED` | 36 complete, 1 partial, 23 not started of 60 target symbols |
+| `PHASE5_ARTIFACT_INTEGRITY` | `RECONCILED` | Original index preserved; final index records the later manifest and current safe-period DQ |
+| `DATA_QUALITY` | `PARTIAL` | Current safe period: 2,442 partitions, 861,756 rows; 66,204 unresolved missing minute slots |
+| `COHORT_BREADTH` | `33_STUDIED / 37_CURRENT_WITH_DATA` | Study: 33; current: 36 complete + 1 partial; target: 60 |
 | `RS-A` | `REJECTED` | Gross-negative (−0.296%), Net-negative (−0.823%) |
 | `RS-B` | `REJECTED` | Gross-negative (−0.053%), Net-negative (−0.581%) |
 | `RELATIVE_STRENGTH_FAMILY`| `REJECTED` | Cross-sectional continuation lacks edge in KRX |
@@ -446,4 +474,4 @@ A realistic whole-share replay was executed using the project's standard retail 
 | `LIVE` | `DISABLED` | Live trading prohibited |
 | `PAPER` | `OUT_OF_SCOPE` | Paper trading withheld |
 
-Phase 5 machine artifacts are recorded under `runtime/research/phase5/`: `expanded-dq.json`, `data-acquisition-manifest.json`, `rs-preregistration.json`, `rs-anatomy-15m.json`, `rs-anatomy-30m.json`, `rs-a-development-results.json`, `rs-b-development-results.json`, `rs-a-secondary-results.json`, `rs-b-secondary-results.json`, `cost-stress-results.json`, `100k-feasibility.json`, `external-validation.json`, and `phase5-summary.json`. All 13 artifacts are verified with SHA-256 digests in `phase5-artifact-index.json`.
+The original 13 Phase 5 artifacts remain under ignored `runtime/research/phase5/`. The original `phase5-artifact-index.json` is preserved: 12 entries still match, while its manifest entry records the earlier 7,776-byte / `21931d2909a31e6aae4321ec955dbae071ba1724fbf7742a025b6c6c1d5e2634` state. The current manifest is 8,435 bytes / `0d744dd815c9eb44611918c10518825d98fdfd5f5631ac3a50c6cd9b8f2daa9f` because acquisition continued after the index was generated. `phase5-current-dq.json`, `phase5-reconciliation-final.json`, `post-study-breadth-sensitivity.json`, and `phase5-artifact-index-final.json` record the reconciled local state; runtime data remains ignored and is not committed.

@@ -11,8 +11,10 @@ BREAKOUT_RETEST_A: REJECTED
 BREAKOUT_RETEST_B: INSUFFICIENT
 PULLBACK: TOO_RARE / DEPRIORITIZED
 OOS: FAILED_GENERALIZATION_NO_EDGE_AFTER_COST (V2-A; locked Fresh Holdout untouched)
-DATA_QUALITY: EXPANDED_PARTIAL (KIS minute ingestion active; 33+ symbols complete, 0 holdout access)
-COHORT_BREADTH: EXPANDING_KOSPI_KOSDAQ (30 KOSPI + 30 KOSDAQ target)
+DATA_QUALITY: PARTIAL (current safe data: 2,442 partitions / 861,756 rows; 66,204 unresolved missing minute slots; holdout unopened)
+COHORT_BREADTH: 33_STUDIED / 37_CURRENT_WITH_DATA (36 complete, 1 partial; 60-symbol target)
+PHASE5_DATA_ACQUISITION: PARTIAL_INTERRUPTED (36 complete, 215000 has 30/67 sessions, 23 not started; manifest RUNNING is stale)
+PHASE5_ARTIFACT_INTEGRITY: RECONCILED
 EXTERNAL_VALIDATION: NOT_AVAILABLE (RS candidates gross-negative; untouched block not opened to avoid data snooping)
 LOCKED_FRESH_HOLDOUT: LOCKED_NOT_EVALUATED (2026-07-28..08-28 untouched, fail-closed)
 SHADOW_NEXT_SESSION: NO (NOT_PROMOTED)
@@ -25,7 +27,7 @@ Phase 2, Phase 2.5, Phase 3, and Phase 4 evidence is summarized in [RESULTS.md](
 
 ## Phase 5 current decision
 
-- Phase 5 investigated the **Relative-Strength Continuation** family (`RS-A` Persistent Leader, `RS-B` Persistent Leader + Reacceleration) across the expanded 60-symbol cohort (30 KOSPI + 30 KOSDAQ).
+- Phase 5 studied the **Relative-Strength Continuation** family (`RS-A` Persistent Leader, `RS-B` Persistent Leader + Reacceleration) on 33 symbols (30 KOSPI + 3 KOSDAQ). The 60-symbol cohort was an acquisition target, not the study breadth.
 - Empirical anatomy across 50,271 resampled observations (15m primary, 30m secondary) disproved the core continuation hypothesis:
   - Higher relative strength deciles exhibited **worse** forward 1-bar returns (Bucket 90–100: −0.069% fwd return, 40.7% win rate vs. Bucket 0–20: −0.0096% fwd return, 43.5% win rate). Monotonicity was `FALSE`.
   - Multi-bar rank persistence exhibited **no advantage** over single-bar impulse (Persistence 3/3: −0.069% fwd return vs. 0/3: −0.011% fwd return). KRX intraday momentum undergoes immediate mean-reversion rather than continuation.
@@ -40,6 +42,9 @@ Phase 2, Phase 2.5, Phase 3, and Phase 4 evidence is summarized in [RESULTS.md](
 - The untouched external block (2026-01-05–04-16) was recorded as `EXTERNAL_VALIDATION=NOT_AVAILABLE` because gross-negative candidates cannot be promoted or snooped under Rule 71 and Rule 100.
 - The 23-session Fresh Holdout (2026-07-28–08-28) remains `LOCKED_NOT_EVALUATED`; zero holdout partitions were opened.
 - Verdict: `RELATIVE_STRENGTH_FAMILY=REJECTED`; `SHADOW_NEXT_SESSION=NO`; `ALPHA=UNPROVEN`.
+- Post-study reconciliation found 36 complete safe-period symbols, one partial symbol (`215000`, 30/67 sessions), and 23 not started. One fixed-rule `POST_STUDY_BREADTH_SENSITIVITY` on 36 complete symbols remained gross-negative in Development and Secondary Diagnostic; the rejection is unchanged.
+- `data-acquisition-manifest.json` still says `RUNNING`, but no backfill worker remains. The historical manifest is preserved; the final reconciliation artifact classifies it as `PARTIAL_INTERRUPTED`. The original artifact index is retained and `phase5-artifact-index-final.json` records the reconciled state locally under ignored runtime data.
+- Phase 5 is closed for strategy research and evidence reconciliation. The 60-symbol acquisition remains partial and is not being resumed here.
 
 ## Phase 4 historical summary
 
