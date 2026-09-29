@@ -909,6 +909,122 @@ def _cohort_market_counts(dataset: SafeDataset) -> dict[str, dict[str, int]]:
     return result
 
 
+def _partition_index_delta(
+    current: dict[str, str], previous: dict[str, str]
+) -> dict[str, Any]:
+    added = {key: value for key, value in current.items() if key not in previous}
+    changed = sorted(key for key in current.keys() & previous.keys() if current[key] != previous[key])
+    by_symbol = Counter(key.split(":", 1)[0] for key in added)
+    return {
+        "previous_snapshot_available": bool(previous),
+        "newly_available_safe_partitions": len(added),
+        "newly_available_partitions_by_symbol": dict(sorted(by_symbol.items())),
+        "changed_existing_partition_count": len(changed),
+        "changed_existing_partition_keys": changed,
+    }
+
+
+def _read_json_object(path: Path) -> dict[str, Any]:
+    try:
+        value = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return value if isinstance(value, dict) else {}
+
+
+def _acquisition_reconciliation(
+    *,
+    dataset: SafeDataset,
+    current_partition_index: dict[str, str],
+    previous_dataset_manifest: dict[str, Any],
+    acquisition_manifest: dict[str, Any],
+    acquisition_request_interval_seconds: float | None,
+    observed_rate_limit_interval_seconds: float | None,
+    acquisition_stop_reason: str | None,
+) -> dict[str, Any]:
+    previous_index = previous_dataset_manifest.get("partition_hashes", {})
+    if not isinstance(previous_index, dict):
+        previous_index = {}
+    delta = _partition_index_delta(current_partition_index, previous_index)
+    previous_cohort = previous_dataset_manifest.get("cohort", {})
+    current_counts = {
+        "complete": len(dataset.complete_symbols),
+        "partial": len(dataset.partial_symbols),
+        "not_acquired": len(dataset.missing_symbols),
+    }
+    previous_counts = {
+        "complete": previous_cohort.get("available_complete_symbols"),
+        "partial": previous_cohort.get("available_partial_symbols"),
+        "not_acquired": previous_cohort.get("not_acquired_symbols"),
+    }
+    collector_results = acquisition_manifest.get("symbol_results", {})
+    if not isinstance(collector_results, dict):
+        collector_results = {}
+    recorded_new_partitions = sum(
+        max(0, int(result.get("succeeded_sessions", 0)) - int(result.get("skipped_existing", 0)))
+        for result in collector_results.values()
+        if isinstance(result, dict)
+    )
+    collector_index_path = Path("runtime/research/phase6/phase6-artifact-index.json")
+    collector_index = _read_json_object(collector_index_path)
+    indexed_files = collector_index.get("files", [])
+    expected_entry = next(
+        (entry for entry in indexed_files if isinstance(entry, dict)
+         and entry.get("file") == "phase6-acquisition-manifest.json"),
+        None,
+    ) if isinstance(indexed_files, list) else None
+    current_manifest_path = Path("runtime/research/phase6/phase6-acquisition-manifest.json")
+    current_manifest_sha = sha256_file(current_manifest_path) if current_manifest_path.is_file() else None
+    return {
+        "artifact": "phase7-acquisition-manifest",
+        "status": "COMPLETE" if not dataset.missing_symbols and not dataset.partial_symbols else "PARTIAL",
+        "network_acquisition_attempted": bool(collector_results),
+        "network_acquisition_scope": (
+            "KIS official read-only regular-session historical OHLCV; safe-period dates only; no account or order endpoints"
+            if collector_results else "no acquisition attempt found in the Phase 6 collector manifest"
+        ),
+        "request_interval_seconds": acquisition_request_interval_seconds,
+        "observed_persistent_rate_limit_interval_seconds": observed_rate_limit_interval_seconds,
+        "stop_reason": acquisition_stop_reason,
+        "complete_symbols": current_counts["complete"],
+        "partial_symbols": current_counts["partial"],
+        "not_acquired_symbols": current_counts["not_acquired"],
+        "previous_complete_to_current": {
+            "previous_snapshot": previous_counts,
+            "current_snapshot": current_counts,
+        },
+        "reused_existing_valid_partitions_reported_by_collector": sum(
+            int(result.get("skipped_existing", 0))
+            for result in collector_results.values()
+            if isinstance(result, dict)
+        ),
+        **delta,
+        "new_partitions_recorded_by_collector_results": recorded_new_partitions,
+        "new_partitions_present_in_cache_but_not_recorded_by_completed_collector_result": max(
+            0, delta["newly_available_safe_partitions"] - recorded_new_partitions
+        ),
+        "collector_manifest": {
+            "path": str(current_manifest_path),
+            "status": acquisition_manifest.get("status", "MISSING"),
+            "symbol_result_count": len(collector_results),
+            "current_sha256": current_manifest_sha,
+            "artifact_index_expected_entry": expected_entry,
+            "matches_preserved_phase6_artifact_index": bool(
+                expected_entry
+                and current_manifest_sha == expected_entry.get("sha256")
+                and current_manifest_path.stat().st_size == expected_entry.get("bytes")
+            ),
+            "interpretation": (
+                "the collector writes to a Phase 6-owned output path; its observed status and current hash are reported "
+                "against the unchanged Phase 6 artifact-index entry"
+            ),
+        },
+        "resume_ready": True,
+        "holdout_partitions_opened": 0,
+        "external_partitions_opened": 0,
+    }
+
+
 def _build_formula_audit(*, source_git_sha: str, code_sha256: str, sample_schema: list[str]) -> dict[str, Any]:
     required = {"timestamp", "open", "high", "low", "close", "volume"}
     if not required <= set(sample_schema):
@@ -940,6 +1056,9 @@ def run_phase7_study(
     cohort_manifest_path: Path = Path("runtime/research/phase4/cohort-manifest.json"),
     split_manifest_path: Path = Path("runtime/research/phase25-diagnostic-dataset-manifest-v1.json"),
     development_only: bool = True,
+    acquisition_request_interval_seconds: float | None = None,
+    observed_rate_limit_interval_seconds: float | None = None,
+    acquisition_stop_reason: str | None = None,
 ) -> dict[str, Any]:
     """Run Phase 7 Development anatomy; never opens Holdout or external partitions."""
     del development_only  # Phase 7 starts and stops at Development anatomy in this pass.
@@ -986,6 +1105,37 @@ def run_phase7_study(
     cohort_sha = canonical_sha256(list(dataset.cohort_symbols))
     dataset_sha = canonical_sha256({"partition_hashes": safe_partition_index, "cohort_sha256": cohort_sha})
     cohort_counts = _cohort_market_counts(dataset)
+    previous_dataset_manifest = _read_json_object(output_dir / "phase7-dataset-manifest.json")
+    phase6_acquisition_manifest = _read_json_object(
+        Path("runtime/research/phase6/phase6-acquisition-manifest.json")
+    )
+    acquisition_manifest = _acquisition_reconciliation(
+        dataset=dataset,
+        current_partition_index=safe_partition_index,
+        previous_dataset_manifest=previous_dataset_manifest,
+        acquisition_manifest=phase6_acquisition_manifest,
+        acquisition_request_interval_seconds=acquisition_request_interval_seconds,
+        observed_rate_limit_interval_seconds=observed_rate_limit_interval_seconds,
+        acquisition_stop_reason=acquisition_stop_reason,
+    )
+    acquisition_manifest.update({
+        "source_git_sha": source_git_sha,
+        "research_code_sha256": code_sha256,
+        "dataset_sha256": dataset_sha,
+        "partition_index_sha256": partition_index_sha,
+        "cohort_sha256": cohort_sha,
+        "vwap_source": VWAP_SOURCE,
+        "vwap_formula": VWAP_FORMULA,
+        "exact_or_proxy": "PROXY",
+        "period": {"start": SAFE_START.isoformat(), "end": SAFE_END.isoformat()},
+        "provider": "KIS official read-only historical regular-session OHLCV in the local cache",
+        "timestamp_convention": "Asia/Seoul; minute timestamps label bar start; closing auction excluded",
+        "cost_assumptions": {"broker_fee_rate": 0.00015, "sell_tax_rate": 0.0020,
+                             "slippage_bps_per_side": 15.0, "stress_multipliers": [1.0, 1.5, 2.0]},
+        "holdout_integrity": {"state": "LOCKED_NOT_EVALUATED", "holdout_partitions_opened": 0},
+        "external_block_integrity": {"state": "NOT_ACCESSED", "external_partitions_opened": 0},
+        "complete_symbol_count_by_market": cohort_counts["complete"],
+    })
     cohort_snapshot = {
         "target_symbols": len(dataset.cohort_symbols),
         "available_complete_symbols": len(dataset.complete_symbols),
@@ -1018,7 +1168,7 @@ def run_phase7_study(
         "exact_or_proxy": "PROXY",
         "period": {"development": [SAFE_START.isoformat(), DEVELOPMENT_END.isoformat()],
                    "secondary": [SECONDARY_START.isoformat(), SAFE_END.isoformat()]},
-        "provider": "locally cached KIS regular-session minute OHLCV; no API call in this run",
+        "provider": "KIS regular-session minute OHLCV from the local safe-period Parquet cache",
         "timestamp_convention": "Asia/Seoul; bar_start; continuous session 09:00-15:19; auction excluded",
         "cost_assumptions": {"broker_fee_rate": 0.00015, "sell_tax_rate": 0.0020, "slippage_bps_per_side": 15.0,
                              "stress_multipliers": [1.0, 1.5, 2.0]},
@@ -1026,21 +1176,9 @@ def run_phase7_study(
         "external_block_integrity": {"state": "NOT_ACCESSED", "external_partitions_opened": 0},
     }
 
-    acquisition_manifest = {
-        **common,
-        "artifact": "phase7-acquisition-manifest",
-        "range": [SAFE_START.isoformat(), SAFE_END.isoformat()],
-        "previous_complete_to_current": f"46/60 -> {len(dataset.complete_symbols)}/60 complete",
-        "complete_symbols": len(dataset.complete_symbols),
-        "partial_symbols": len(dataset.partial_symbols),
-        "not_acquired_symbols": len(dataset.missing_symbols),
-        "complete_symbol_count_by_market": cohort_counts["complete"],
-        "reused_existing_valid_partitions": len(safe_partition_index),
-        "network_acquisition_attempted": False,
-        "network_acquisition_reason": "repository safety boundary prohibits private brokerage API calls; existing safe-period cache is sufficient to begin Development anatomy",
-        "resume_ready": True,
-        "holdout_partitions_opened": 0,
-    }
+    acquisition_manifest.update(common)
+    acquisition_manifest["artifact"] = "phase7-acquisition-manifest"
+    acquisition_manifest["range"] = [SAFE_START.isoformat(), SAFE_END.isoformat()]
     dataset_manifest = {
         **common,
         "artifact": "phase7-dataset-manifest",
@@ -1310,8 +1448,17 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Run the fail-closed Phase 7 VWAP reclaim Development anatomy")
     parser.add_argument("--output", type=Path, default=Path("runtime/research/phase7"))
     parser.add_argument("--cache", type=Path, default=Path("data"))
+    parser.add_argument("--acquisition-request-interval", type=float)
+    parser.add_argument("--observed-rate-limit-interval", type=float)
+    parser.add_argument("--acquisition-stop-reason")
     args = parser.parse_args()
-    summary = run_phase7_study(output_dir=args.output, cache_root=args.cache)
+    summary = run_phase7_study(
+        output_dir=args.output,
+        cache_root=args.cache,
+        acquisition_request_interval_seconds=args.acquisition_request_interval,
+        observed_rate_limit_interval_seconds=args.observed_rate_limit_interval,
+        acquisition_stop_reason=args.acquisition_stop_reason,
+    )
     print(json.dumps({
         "phase7_status": summary["phase7_status"],
         "vwap_reclaim_anatomy": summary["vwap_reclaim_anatomy"],

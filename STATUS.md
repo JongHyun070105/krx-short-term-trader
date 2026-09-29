@@ -14,10 +14,10 @@ BREAKOUT_RETEST_A: REJECTED
 BREAKOUT_RETEST_B: INSUFFICIENT
 PULLBACK: TOO_RARE / DEPRIORITIZED
 OOS: FAILED_GENERALIZATION_NO_EDGE_AFTER_COST (V2-A; locked Fresh Holdout untouched)
-DATA_QUALITY: PARTIAL (Phase 6 safe data: 46 complete symbols / 1 partial / 13 not acquired; holdout unopened)
+DATA_QUALITY: PARTIAL (latest Phase 7 safe cache: 46 complete / 2 partial / 12 not acquired; holdout unopened)
 COHORT_BREADTH: 46_COMPLETE / 60_TARGET (Phase 6 acquisition; KIS API rate limits prevented full60-symbol coverage)
 PHASE6_DATA_ACQUISITION: PARTIAL (46 complete, 1 partial,13 not acquired of 60 target; KIS rate-limit timeouts)
-PHASE6_ARTIFACT_INTEGRITY: COMPLETE (24 artifacts generated; artifact index recorded)
+PHASE6_ARTIFACT_INTEGRITY: RECONCILIATION_REQUIRED (Phase 7 backfill replaced ignored acquisition manifest; preserved index now mismatches)
 PHASE5_DATA_ACQUISITION: PARTIAL_INTERRUPTED (36 complete, 215000 has 30/67 sessions, 23 not started; manifest RUNNING is stale)
 PHASE5_ARTIFACT_INTEGRITY: RECONCILED
 EXTERNAL_VALIDATION: NOT_AVAILABLE (no Secondary-surviving candidate; untouched block not opened)
@@ -34,6 +34,8 @@ PHASE7_SECONDARY_DIAGNOSTIC: NOT_RUN (no Development candidate)
 PHASE7_EXTERNAL_VALIDATION: NOT_AVAILABLE (no frozen Secondary survivor; block unopened)
 PHASE7_HOLDOUT: LOCKED_NOT_EVALUATED (2026-07-28..08-28; 0 partitions opened)
 PHASE7_SHADOW_NEXT_SESSION: NO
+PHASE7_SAFE_CACHE: 46_COMPLETE / 2_PARTIAL / 12_NOT_ACQUIRED (3,174 partitions; 36 added during bounded read-only KIS backfill)
+PHASE7_ACQUISITION: PARTIAL_INTERRUPTED_RATE_LIMIT (shared interval increased to 4s; resumable)
 ```
 
 Phase 2, Phase 2.5, Phase 3, Phase 4, and Phase 5 evidence is summarized in [RESULTS.md](RESULTS.md). Manifests, event rows, and Phase 5 diagnostics are retained in ignored `runtime/research/phase5/`. Phase 6 research artifacts are in ignored `runtime/research/phase6/`.
@@ -42,10 +44,11 @@ Phase 2, Phase 2.5, Phase 3, Phase 4, and Phase 5 evidence is summarized in [RES
 
 - Phase 7 tested a **session VWAP reclaim / acceptance** hypothesis on the existing safe-period cache. The 15m Development anatomy failed its predeclared five-part support gate (2/5); 30m was weak (3/5) and did not override the primary result.
 - Cached KIS minute data has OHLCV only, with no transaction value/turnover field. The calculation is explicitly `VWAP_PROXY`: session cumulative `((high + low + close) / 3) * observed_volume / cumulative_observed_volume`; each symbol/session resets at 09:00 KST. Continuous bars are 09:00–15:19; the closing auction is excluded. No missing minutes were synthesized.
-- The study used 46 complete symbols (30 KOSPI + 16 KOSDAQ), 1 partial symbol, and 13 not acquired, over 67 safe sessions (49 Development, 18 Secondary). Acquisition remained 46/60 complete; no private KIS API call was made. Holdout and external partitions opened: 0 each.
+- The study used 46 complete symbols (30 KOSPI + 16 KOSDAQ), 2 partial KOSDAQ symbols, and 12 not acquired, over 67 safe sessions (49 Development, 18 Secondary). Complete breadth remained 46/60; a bounded authenticated read-only KIS historical OHLCV backfill added 36 safe partitions without changing any prior partition. It was stopped while waiting after the persistent request interval rose to 4 seconds. Holdout and external partitions opened: 0 each.
+- Latest safe cache DQ covers 3,174 symbol-sessions: 1,771 HIGH_CONFIDENCE, 412 PARTIAL, 991 UNRELIABLE; 1,041,514 of 1,206,120 expected minutes observed and none synthesized. Missing-slot cause remains unknown.
 - 15m reclaim events with four-bar outcomes averaged −0.0471% gross vs. −0.0157% for the matched baseline (−0.0314 percentage points); the high-confidence subset was −0.0674%. Reclaim failure within four bars was 62.23%. Acceptance A cut post-confirmation failure to 47.62%, but its delayed-entry four-bar mean was only +0.0365% gross and the one-bar confirmation delay reduced mean return by 0.2414 percentage points within that accepted subset.
 - No VWAP-A/B strategy variant was justified or evaluated. Secondary strategy evaluation was not run, preregistration was not created, external validation is unavailable, 100K feasibility was not run, and Shadow remains NO. Historical Phase 2–6 decisions are preserved; in particular `MEAN_REVERSION_FAMILY=INSUFFICIENT` remains unchanged.
-- Full methods, outcomes, explicit research questions, and artifact inventory are recorded in [RESULTS.md](RESULTS.md). Ignored machine-readable artifacts are in `runtime/research/phase7/`.
+- The interrupted collector wrote through the existing Phase 6 runtime path. Its preserved artifact index still records the previous `phase6-acquisition-manifest.json` hash, so current Phase 6 artifact integrity needs reconciliation; the historical Phase 6 summary, research verdict, and index were not rewritten. Full details and Phase 7 machine-readable artifacts are in [RESULTS.md](RESULTS.md) and ignored `runtime/research/phase7/`.
 
 ## Phase 6 current decision
 

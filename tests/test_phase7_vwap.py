@@ -15,6 +15,7 @@ from krx_trader.research.phase7_vwap import (
     _answer_questions,
     _build_formula_audit,
     _matched_baseline,
+    _partition_index_delta,
     _session_classification,
     _strategy_gate,
     _write_jsonl_gz,
@@ -308,6 +309,18 @@ def test_matched_baseline_excludes_same_symbol_session_and_uses_fixed_group():
     assert result["event_count_with_control"] == 1
     assert result["matched_baseline_mean_4bar_gross_pct"] == pytest.approx(0.2)
     assert result["mean_event_minus_matched_baseline_pct"] == pytest.approx(-0.3)
+
+
+def test_partition_delta_records_new_and_changed_safe_period_entries():
+    delta = _partition_index_delta(
+        {"000001:2026-06-01": "same", "000001:2026-06-02": "new-a", "000002:2026-06-01": "new-b"},
+        {"000001:2026-06-01": "same", "000001:2026-06-02": "old"},
+    )
+    assert delta["previous_snapshot_available"] is True
+    assert delta["newly_available_safe_partitions"] == 1
+    assert delta["newly_available_partitions_by_symbol"] == {"000002": 1}
+    assert delta["changed_existing_partition_count"] == 1
+    assert delta["changed_existing_partition_keys"] == ["000001:2026-06-02"]
 
 
 def test_vwap_age_and_missing_bar_do_not_create_a_completed_observation():
