@@ -503,17 +503,20 @@ def build_opening_gap_events(
     return events, dict(excluded)
 
 
-def _daily_return_horizons(events: list[dict[str, Any]], daily_by_symbol: dict[str, tuple[Bar, ...]]) -> None:
-    """Attach safe Development-only next-session and 3-session close outcomes."""
+def _daily_return_horizons(
+    events: list[dict[str, Any]],
+    daily_by_symbol: dict[str, tuple[Bar, ...]],
+    session_calendar: Sequence[date],
+) -> None:
+    """Attach outcomes only when the exact next Development sessions have daily closes."""
+    calendar = tuple(sorted(set(session_calendar)))
+    calendar_index = {session: index for index, session in enumerate(calendar)}
     for event in events:
         session = date.fromisoformat(event["session"])
         daily = sorted(daily_by_symbol.get(event["symbol"], ()), key=lambda item: item.time)
-        same_day = [item for item in daily if item.time.astimezone(KST).date() == session]
-        prior_daily = [item for item in daily if item.time.astimezone(KST).date() < session]
-        future = [
-            item for item in daily
-            if session < item.time.astimezone(KST).date() <= DEVELOPMENT_END
-        ]
+        bars_by_session: dict[date, list[Bar]] = defaultdict(list)
+        for item in daily:
+            bars_by_session[item.time.astimezone(KST).date()].append(item)
         open_price = float(event["current_open"])
         outcomes: dict[str, float | None] = {}
         statuses: dict[str, str] = {}
@@ -522,21 +525,36 @@ def _daily_return_horizons(events: list[dict[str, Any]], daily_by_symbol: dict[s
                 outcomes[label] = None
                 statuses[label] = "SUSPICIOUS_OPENING_GAP_OR_CORPORATE_ACTION"
                 continue
-            bar = future[horizon - 1] if len(future) >= horizon else None
-            if not same_day or bar is None:
+            index = calendar_index.get(session)
+            if index is None:
+                outcomes[label] = None
+                statuses[label] = "SESSION_OUTSIDE_DEVELOPMENT_CALENDAR"
+                continue
+            future_sessions = calendar[index + 1:index + horizon + 1]
+            if len(future_sessions) != horizon:
                 outcomes[label] = None
                 statuses[label] = "SAFE_DAILY_HORIZON_UNAVAILABLE"
                 continue
-            path = [*prior_daily[-1:], *same_day[-1:], *future[:horizon]]
+            daily_path = [bars_by_session.get(day, []) for day in (session, *future_sessions)]
+            if any(len(rows) != 1 for rows in daily_path):
+                outcomes[label] = None
+                statuses[label] = "SAFE_DAILY_HORIZON_UNAVAILABLE"
+                continue
+            session_bar = daily_path[0][0]
+            future_bars = [rows[0] for rows in daily_path[1:]]
+            prior_close = float(event.get("previous_close", 0.0))
+            path_prices = ([prior_close] if prior_close > 0 else []) + [
+                bar.close for bar in (session_bar, *future_bars)
+            ]
             suspicious_step = any(
-                abs(right.close / left.close - 1.0) * 100.0 >= EXTREME_GAP_THRESHOLD_PCT
-                for left, right in pairwise(path) if left.close > 0
+                abs(right / left - 1.0) * 100.0 >= EXTREME_GAP_THRESHOLD_PCT
+                for left, right in pairwise(path_prices) if left > 0
             )
             if suspicious_step:
                 outcomes[label] = None
                 statuses[label] = "SUSPICIOUS_RAW_PRICE_JUMP_DURING_HORIZON"
                 continue
-            outcomes[label] = (bar.close / open_price - 1.0) * 100.0
+            outcomes[label] = (future_bars[-1].close / open_price - 1.0) * 100.0
             statuses[label] = "CLEAN_RAW_DAILY_HORIZON"
         event["longer_horizon_daily_close_return_pct"] = outcomes
         event["longer_horizon_status"] = statuses
@@ -609,7 +627,12 @@ def load_phase8_period_dataset(
     missing_minutes = 0
     for symbol in symbols:
         for session in sessions:
-            assert_phase8_development_session(session)
+            if period_name == "development":
+                assert_phase8_development_session(session)
+            else:
+                if not SECONDARY_START <= session <= SAFE_END:
+                    raise ValueError("Phase 8 Secondary partitions escaped the locked safe-period range")
+                assert_safe_research_date(session)
             path = cache.partition_path("minute", symbol, "1m", session)
             sidecar = path.with_suffix(".metadata.json")
             if not path.is_file() and not sidecar.is_file():
@@ -1382,6 +1405,11 @@ def _phase6_reconciliation(
     candidates = [path for path in Path("runtime").rglob("*phase6*acquisition*manifest*")
                   if path.is_file() and path != manifest_path]
     matching_candidates = [str(path) for path in candidates if sha256_file(path) == indexed_hash]
+    summary_entry = next((item for item in index.get("files", [])
+                          if item.get("file") == "phase6-summary.json"), None)
+    if not summary_entry:
+        raise ValueError("Phase 6 artifact index lacks its historical summary entry")
+    indexed_summary_hash = str(summary_entry["sha256"])
     summary_hash_before = sha256_file(summary_path)
     summary = json.loads(summary_path.read_text(encoding="utf-8"))
     payload = {
@@ -1399,16 +1427,18 @@ def _phase6_reconciliation(
         "mutation_source": {
             "phase": 7,
             "chain": [
-                "src/krx_trader/research/phase7_vwap.py run_phase7_study",
+                "Phase 7 safe-period acquisition invocation (exact command not recorded in the repository)",
                 "src/krx_trader/research/phase6.py run_phase6_acquisition",
                 "src/krx_trader/research/phase5_backfill.py run_phase5_backfill",
             ],
             "output_path_used": "runtime/research/phase6/phase6-acquisition-manifest.json",
-            "cause": "Phase 7 resumed the shared Phase 6 collector without redirecting its status output.",
+            "cause": "Phase 7 safe-period acquisition reused the Phase 6 collector without redirecting its status output; the exact top-level invocation is not preserved in tracked source.",
         },
-        "phase6_summary": {"sha256_before": summary_hash_before,
+        "phase6_summary": {"sha256_indexed": indexed_summary_hash,
+                            "sha256_current": summary_hash_before,
+                            "matches_artifact_index": summary_hash_before == indexed_summary_hash,
                             "verdicts": summary.get("verdicts", {}),
-                            "summary_and_verdict_unchanged": True},
+                            "summary_and_verdict_unchanged": summary_hash_before == indexed_summary_hash},
         "phase6_artifact_index": {"sha256": sha256_file(index_path), "rewritten": False},
         "scope": "reconciliation record only; original failed/superseded evidence was not edited",
     }
@@ -1442,7 +1472,9 @@ def run_phase8_acquisition(
         if not settings.kis_app_key or not settings.kis_app_secret:
             raise ValueError("KIS market-data credentials are unavailable")
         transport = UrllibTransport()
-        token_manager = TokenManager(settings.kis_app_key, settings.kis_app_secret, transport)
+        token_manager = TokenManager(
+            settings.kis_app_key, settings.kis_app_secret, transport, cache_path=None
+        )
         client = KisRestClient(
             settings.kis_app_key, settings.kis_app_secret, token_manager, transport,
             min_request_interval=min_request_interval,
@@ -1532,10 +1564,25 @@ def run_phase8_study(
         daily_by_symbol=dataset.daily_by_symbol,
         market_by_symbol=dataset.market_by_symbol,
     )
-    _daily_return_horizons(events, dataset.daily_by_symbol)
+    _daily_return_horizons(events, dataset.daily_by_symbol, dataset.period_sessions)
     source_counts = Counter(item["prior_close_source"] for item in events)
     dataset.dq["opening_gap_reference_source_counts"] = dict(source_counts)
     dataset.dq["sessions_without_valid_open_or_prior_close"] = exclusions
+    buckets = _gap_bucket_analysis(events)
+    gap_fill = _gap_fill_analysis(events)
+    opening_range = _opening_range_analysis(events)
+    first_hour = _first_hour_state_analysis(events)
+    market_split = _split_analysis(events, "market")
+    price_split = _split_analysis(events, "market_price_bucket")
+    liquidity_split = _split_analysis(events, "liquidity_bucket")
+    monthly = _monthly_stability(events)
+    matched = _matched_controls(events)
+    magnitude = _magnitude_analysis(_meaningful(events))
+    price_source_split = _prior_close_source_analysis(events)
+    cost_stress = _cost_stress(events)
+    swing = _swing_summary(events)
+
+    # Complete Development anatomy before evaluating either of the two fixed candidate examples.
     candidates = _candidate_diagnostics(events, dataset.minutes_by_symbol_session)
     candidate_rows = {variant: value[0] for variant, value in candidates.items()}
     qualified_dev = [key for key, value in candidate_rows.items() if _candidate_status(value)]
@@ -1557,16 +1604,20 @@ def run_phase8_study(
         )
         secondary_results: dict[str, Any] = {}
         for variant in qualified_dev:
-            summary, trades = _candidate_metric(secondary_events, secondary_dataset.minutes_by_symbol_session, variant)
+            summary, trades = _candidate_metric(
+                secondary_events, secondary_dataset.minutes_by_symbol_session, variant
+            )
             values = [row["gross_return_pct"] for row in trades]
             net = [value - ROUND_TRIP_COST_PCT for value in values]
             pf = _profit_factor(net)
             passed = len(trades) >= 30 and (_mean(values) or 0.0) > 0 and (_mean(net) or 0.0) > 0 and (
                 pf == "INF" or (isinstance(pf, (int, float)) and pf > 1.0)
             )
-            secondary_results[variant] = {"status": "PASS" if passed else "FAIL", "summary": summary,
-                                          "events": len(trades), "mean_gross_pct": _mean(values),
-                                          "mean_net_pct": _mean(net), "net_pf": pf}
+            secondary_results[variant] = {
+                "status": "PASS" if passed else "FAIL", "summary": summary,
+                "events": len(trades), "mean_gross_pct": _mean(values),
+                "mean_net_pct": _mean(net), "net_pf": pf,
+            }
         secondary_status = "PASS" if all(item["status"] == "PASS" for item in secondary_results.values()) else "FAIL"
         secondary_artifact = {
             "artifact": "phase8-secondary-diagnostic", "status": secondary_status,
@@ -1580,20 +1631,6 @@ def run_phase8_study(
     else:
         secondary_status = "NOT_RUN"
         secondary_artifact = _not_run("phase8-secondary-diagnostic", "no Development survivor", opened=0)
-
-    buckets = _gap_bucket_analysis(events)
-    gap_fill = _gap_fill_analysis(events)
-    opening_range = _opening_range_analysis(events)
-    first_hour = _first_hour_state_analysis(events)
-    market_split = _split_analysis(events, "market")
-    price_split = _split_analysis(events, "market_price_bucket")
-    liquidity_split = _split_analysis(events, "liquidity_bucket")
-    monthly = _monthly_stability(events)
-    matched = _matched_controls(events)
-    magnitude = _magnitude_analysis(_meaningful(events))
-    price_source_split = _prior_close_source_analysis(events)
-    cost_stress = _cost_stress(events)
-    swing = _swing_summary(events)
     answers = _answer_questions(events, candidates, matched, magnitude, cost_stress, swing, secondary_status)
     concentrations = {
         horizon: _concentration(_meaningful(events), horizon)

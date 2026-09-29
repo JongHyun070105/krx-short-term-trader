@@ -25,7 +25,7 @@ class TokenManager:
         app_key: str,
         app_secret: str,
         transport: JsonTransport,
-        cache_path: Path = Path("runtime/kis_token.json"),
+        cache_path: Path | None = Path("runtime/kis_token.json"),
         *,
         now=None,
         refresh_before: timedelta = timedelta(minutes=5),
@@ -34,11 +34,14 @@ class TokenManager:
         self._app_secret = app_secret
         self._transport = transport
         self._cache_path = cache_path
+        self._memory_cache: tuple[str, datetime] | None = None
         self._now = now or (lambda: datetime.now(KST))
         self._refresh_before = refresh_before
         self._fingerprint = hashlib.sha256(app_key.encode()).hexdigest()
 
     def _read_cache(self) -> tuple[str, datetime] | None:
+        if self._cache_path is None:
+            return self._memory_cache
         try:
             record = json.loads(self._cache_path.read_text(encoding="utf-8"))
             if record.get("app_fingerprint") != self._fingerprint:
@@ -54,6 +57,9 @@ class TokenManager:
             return None
 
     def _write_cache(self, token: str, expires_at: datetime) -> None:
+        if self._cache_path is None:
+            self._memory_cache = (token, expires_at.astimezone(KST))
+            return
         parent = self._cache_path.parent
         parent.mkdir(parents=True, exist_ok=True, mode=0o700)
         try:
@@ -124,6 +130,11 @@ class TokenManager:
         return token
 
     def invalidate(self, token: str | None = None) -> None:
+        if self._cache_path is None:
+            cached = self._memory_cache
+            if cached and (token is None or cached[0] == token):
+                self._memory_cache = None
+            return
         cached = self._read_cache()
         if cached and (token is None or cached[0] == token):
             try:

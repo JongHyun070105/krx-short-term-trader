@@ -8,11 +8,13 @@ from zoneinfo import ZoneInfo
 import pytest
 
 from krx_trader.models import Bar
+from krx_trader.research import phase8_opening_gap as phase8
 from krx_trader.research.phase8_opening_gap import (
     _clean_confidence_events,
     _daily_return_horizons,
     _gap_fraction,
     _gap_state,
+    _phase6_reconciliation,
     _range_metrics,
     _window_bars,
     assert_phase8_development_session,
@@ -171,6 +173,7 @@ def test_missing_daily_reference_uses_labeled_prior_safe_minute_close_proxy():
 def test_raw_daily_jump_during_swing_horizon_is_excluded():
     event = {
         "symbol": "000001", "session": DAY.isoformat(), "current_open": 100,
+        "previous_close": 100,
         "longer_horizon_daily_close_return_pct": {},
     }
     daily = {
@@ -182,7 +185,10 @@ def test_raw_daily_jump_during_swing_horizon_is_excluded():
             _daily(date(2026, 4, 23), 10),
         )
     }
-    _daily_return_horizons([event], daily)
+    _daily_return_horizons(
+        [event], daily,
+        [DAY, date(2026, 4, 21), date(2026, 4, 22), date(2026, 4, 23)],
+    )
     assert event["longer_horizon_daily_close_return_pct"]["NEXT_SESSION_CLOSE"] is None
     assert event["longer_horizon_status"]["NEXT_SESSION_CLOSE"] == "SUSPICIOUS_RAW_PRICE_JUMP_DURING_HORIZON"
 
@@ -190,6 +196,7 @@ def test_raw_daily_jump_during_swing_horizon_is_excluded():
 def test_suspicious_opening_gap_is_excluded_from_swing_outcomes():
     event = {
         "symbol": "000001", "session": DAY.isoformat(), "current_open": 100,
+        "previous_close": 100,
         "suspicious_extreme_gap": True,
         "longer_horizon_daily_close_return_pct": {},
     }
@@ -202,9 +209,87 @@ def test_suspicious_opening_gap_is_excluded_from_swing_outcomes():
             _daily(date(2026, 4, 23), 103),
         )
     }
-    _daily_return_horizons([event], daily)
+    _daily_return_horizons(
+        [event], daily,
+        [DAY, date(2026, 4, 21), date(2026, 4, 22), date(2026, 4, 23)],
+    )
     assert event["longer_horizon_daily_close_return_pct"]["NEXT_SESSION_CLOSE"] is None
     assert event["longer_horizon_status"]["NEXT_SESSION_CLOSE"] == "SUSPICIOUS_OPENING_GAP_OR_CORPORATE_ACTION"
+
+
+def test_daily_horizons_do_not_skip_missing_trading_session_rows():
+    event = {
+        "symbol": "000001", "session": DAY.isoformat(), "current_open": 100,
+        "previous_close": 100, "suspicious_extreme_gap": False,
+        "longer_horizon_daily_close_return_pct": {},
+    }
+    daily = {"000001": (
+        _daily(DAY, 100),
+        _daily(date(2026, 4, 22), 102),
+        _daily(date(2026, 4, 24), 104),
+        _daily(date(2026, 4, 27), 105),
+    )}
+    calendar = [DAY, date(2026, 4, 21), date(2026, 4, 22), date(2026, 4, 23),
+                date(2026, 4, 24), date(2026, 4, 27)]
+
+    _daily_return_horizons([event], daily, calendar)
+
+    assert event["longer_horizon_daily_close_return_pct"]["NEXT_SESSION_CLOSE"] is None
+    assert event["longer_horizon_status"]["NEXT_SESSION_CLOSE"] == "SAFE_DAILY_HORIZON_UNAVAILABLE"
+    assert event["longer_horizon_daily_close_return_pct"]["THREE_SESSION_CLOSE"] is None
+    assert event["longer_horizon_status"]["THREE_SESSION_CLOSE"] == "SAFE_DAILY_HORIZON_UNAVAILABLE"
+
+
+def test_daily_horizons_use_exact_next_and_third_development_sessions():
+    event = {
+        "symbol": "000001", "session": DAY.isoformat(), "current_open": 100,
+        "previous_close": 100, "suspicious_extreme_gap": False,
+        "longer_horizon_daily_close_return_pct": {},
+    }
+    sessions = [DAY, date(2026, 4, 21), date(2026, 4, 22), date(2026, 4, 23)]
+    daily = {"000001": tuple(_daily(day, 100 + index) for index, day in enumerate(sessions))}
+
+    _daily_return_horizons([event], daily, sessions)
+
+    assert event["longer_horizon_daily_close_return_pct"]["NEXT_SESSION_CLOSE"] == pytest.approx(1.0)
+    assert event["longer_horizon_daily_close_return_pct"]["THREE_SESSION_CLOSE"] == pytest.approx(3.0)
+
+
+def test_phase6_reconciliation_records_unavailable_original_and_indexed_summary(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    phase6_dir = tmp_path / "runtime" / "research" / "phase6"
+    phase6_dir.mkdir(parents=True)
+    indexed_manifest = b"synthetic historical manifest bytes unavailable in this fixture\n"
+    current_manifest = b"current overwritten manifest\n"
+    summary_bytes = json.dumps({"verdicts": {"ALPHA": "UNPROVEN"}}).encode()
+    (phase6_dir / "phase6-acquisition-manifest.json").write_bytes(current_manifest)
+    (phase6_dir / "phase6-summary.json").write_bytes(summary_bytes)
+    index = {
+        "files": [
+            {"file": "phase6-acquisition-manifest.json",
+             "sha256": hashlib.sha256(indexed_manifest).hexdigest(), "bytes": len(indexed_manifest)},
+            {"file": "phase6-summary.json",
+             "sha256": hashlib.sha256(summary_bytes).hexdigest(), "bytes": len(summary_bytes)},
+        ]
+    }
+    index_path = phase6_dir / "phase6-artifact-index.json"
+    index_path.write_text(json.dumps(index), encoding="utf-8")
+    index_hash = hashlib.sha256(index_path.read_bytes()).hexdigest()
+    summary_hash = hashlib.sha256(summary_bytes).hexdigest()
+
+    record = _phase6_reconciliation(
+        phase6_dir=phase6_dir,
+        output_path=tmp_path / "runtime" / "research" / "phase8" / "phase6-integrity-reconciliation.json",
+    )
+
+    assert record["indexed_manifest"]["bytes"] == len(indexed_manifest)
+    assert record["current_manifest"]["bytes"] == len(current_manifest)
+    assert record["original_manifest_bytes_available"] is False
+    assert record["exact_restoration_claimed"] is False
+    assert record["phase6_summary"]["matches_artifact_index"] is True
+    assert record["phase6_summary"]["summary_and_verdict_unchanged"] is True
+    assert hashlib.sha256(index_path.read_bytes()).hexdigest() == index_hash
+    assert hashlib.sha256((phase6_dir / "phase6-summary.json").read_bytes()).hexdigest() == summary_hash
 
 
 def test_missing_safe_previous_close_excludes_first_development_session():
@@ -281,6 +366,50 @@ def test_phase8_acquisition_regression_keeps_phase5_6_7_manifests_unchanged(tmp_
     assert not (runtime / "phase6" / "phase6-acquisition-manifest.json.tmp").exists()
 
 
+def test_phase8_acquisition_uses_secure_loader_and_ephemeral_token_cache(tmp_path, monkeypatch):
+    captured = {}
+
+    class FakeSettings:
+        trading_mode = "shadow"
+        live_trading_enabled = False
+        kis_app_key = "test-key"
+        kis_app_secret = "test-secret"
+
+        @classmethod
+        def from_env(cls):
+            return cls()
+
+    class FakeTokenManager:
+        def __init__(self, app_key, app_secret, transport, *, cache_path):
+            captured["cache_path"] = cache_path
+            captured["key_seen_in_memory"] = app_key
+            captured["secret_seen_in_memory"] = app_secret
+
+    class FakeClient:
+        pass
+
+    def fake_backfill(**kwargs):
+        captured["status_output_path"] = kwargs["status_output_path"]
+        return {"artifact": "phase8-acquisition-manifest", "total_sessions": 67,
+                "symbol_results": {}, "status": "PARTIAL"}
+
+    monkeypatch.setattr(phase8, "Settings", FakeSettings)
+    monkeypatch.setattr(phase8, "TokenManager", FakeTokenManager)
+    monkeypatch.setattr(phase8, "UrllibTransport", lambda: object())
+    monkeypatch.setattr(phase8, "KisRestClient", lambda *args, **kwargs: FakeClient())
+    monkeypatch.setattr(phase8, "run_phase5_backfill", fake_backfill)
+    output = tmp_path / "runtime" / "research" / "phase8" / "phase8-acquisition-manifest.json"
+
+    phase8.run_phase8_acquisition(status_output_path=output, max_new_requests=0)
+
+    assert captured["cache_path"] is None
+    assert captured["status_output_path"] == output
+    assert not (tmp_path / "runtime" / "kis_token.json").exists()
+    persisted = output.read_text(encoding="utf-8")
+    assert "test-key" not in persisted
+    assert "test-secret" not in persisted
+
+
 def test_development_dataset_loader_never_reads_secondary_or_holdout_partitions(tmp_path):
     # Invalid dates in the Development split fail before any cache partition can be opened.
     cohort_path = tmp_path / "cohort.json"
@@ -292,3 +421,25 @@ def test_development_dataset_loader_never_reads_secondary_or_holdout_partitions(
             cohort_manifest_path=cohort_path, split_manifest_path=split_path,
             acquisition_manifest_path=tmp_path / "missing.json", cache_root=tmp_path / "data",
         )
+
+
+def test_secondary_dataset_loader_accepts_only_safe_secondary_sessions(tmp_path):
+    cohort_path = tmp_path / "cohort.json"
+    cohort_path.write_text(json.dumps({"cohort_60": {
+        "symbols": [f"{number:06d}" for number in range(60)],
+    }}))
+    split_path = tmp_path / "split.json"
+    split_path.write_text(json.dumps({"splits": {
+        "development": {"sessions": ["2026-06-30"]},
+        "validation": {"sessions": ["2026-07-01"]},
+    }}))
+
+    dataset, _ = phase8.load_phase8_period_dataset(
+        period_name="secondary", cohort_manifest_path=cohort_path,
+        split_manifest_path=split_path,
+        acquisition_manifest_path=tmp_path / "missing.json", cache_root=tmp_path / "data",
+    )
+
+    assert dataset.period_name == "secondary"
+    assert dataset.period_sessions == (date(2026, 7, 1),)
+    assert dataset.dq["analysis_secondary_partitions_opened"] == 0

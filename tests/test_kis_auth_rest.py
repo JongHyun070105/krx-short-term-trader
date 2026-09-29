@@ -40,6 +40,18 @@ def test_token_cached_until_near_expiration_and_file_is_private(tmp_path):
     assert "app-secret-value" not in (tmp_path / "runtime" / "token.json").read_text()
 
 
+def test_token_can_be_cached_in_memory_without_persisting_it(tmp_path, monkeypatch):
+    monkeypatch.chdir(tmp_path)
+    transport = FakeTransport([response({"access_token": "ephemeral-token", "expires_in": 3600})])
+    now = datetime(2026, 1, 1, 12, 0, tzinfo=KST)
+    manager = TokenManager("app", "secret", transport, cache_path=None, now=lambda: now)
+
+    assert manager.get_token() == "ephemeral-token"
+    assert manager.get_token() == "ephemeral-token"
+    assert len(transport.calls) == 1
+    assert not (tmp_path / "runtime" / "kis_token.json").exists()
+
+
 def test_expiring_token_is_refreshed_once(tmp_path):
     transport = FakeTransport([response({"access_token": "new", "access_token_token_expired": "2026-01-02 12:00:00"})])
     path = tmp_path / "runtime" / "token.json"
