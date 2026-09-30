@@ -132,14 +132,18 @@ def test_index_history_is_fetched_in_bounded_date_chunks(tmp_path):
 
 
 def test_daily_history_adjustment_convention_is_explicit_and_configurable(tmp_path):
-    row = {
+    raw_row = {
+        "stck_bsop_date": "20260630", "stck_oprc": "1000", "stck_hgpr": "1010",
+        "stck_lwpr": "990", "stck_clpr": "1000", "acml_vol": "10",
+    }
+    adjusted_row = {
         "stck_bsop_date": "20260630", "stck_oprc": "100", "stck_hgpr": "101",
-        "stck_lwpr": "99", "stck_clpr": "100", "acml_vol": "10",
+        "stck_lwpr": "99", "stck_clpr": "100", "acml_vol": "100",
     }
     transport = FakeTransport([
         response({"access_token": "tok", "expires_in": 3600}),
-        response({"rt_cd": "0", "output2": [row]}),
-        response({"rt_cd": "0", "output2": [row]}),
+        response({"rt_cd": "0", "output2": [raw_row]}),
+        response({"rt_cd": "0", "output2": [adjusted_row]}),
     ])
     manager = TokenManager("app", "secret", transport, tmp_path / "token.json")
     client = KisRestClient(
@@ -147,11 +151,67 @@ def test_daily_history_adjustment_convention_is_explicit_and_configurable(tmp_pa
         rate_limit_path=tmp_path / "rate.json",
     )
 
-    client.get_daily_bars("005930", date(2026, 6, 30), date(2026, 6, 30))
-    client.get_daily_bars("005930", date(2026, 6, 30), date(2026, 6, 30), adjusted=True)
+    raw = client.get_daily_bars("005930", date(2026, 6, 30), date(2026, 6, 30))
+    adjusted = client.get_daily_bars("005930", date(2026, 6, 30), date(2026, 6, 30), adjusted=True)
+    assert raw[0].close == 1000
+    assert adjusted[0].close == 100
+    assert raw[0].volume == 10
+    assert adjusted[0].volume == 100
 
     calls = [call for call in transport.calls if call[1].endswith("inquire-daily-itemchartprice")]
     assert [call[2]["params"]["FID_ORG_ADJ_PRC"] for call in calls] == ["1", "0"]
+
+
+def test_multi_year_adjusted_daily_history_paginates_without_losing_turnover(tmp_path):
+    from datetime import timedelta
+
+    start, end = date(2023, 1, 2), date(2025, 12, 30)
+    weekdays = []
+    current = start
+    while current <= end:
+        if current.weekday() < 5:
+            weekdays.append(current)
+        current += timedelta(days=1)
+    sessions = [
+        session for index, session in enumerate(weekdays)
+        if index % 15 != 4 or session in {start, end}
+    ]
+    while len(sessions) > 731:
+        sessions.pop(-2)
+    if len(sessions) < 731:
+        available = [session for session in weekdays if session not in set(sessions)]
+        sessions = sorted([*sessions, *available[:731 - len(sessions)]])
+    assert len(sessions) == 731 and sessions[0] == start and sessions[-1] == end
+
+    rows = [
+        {
+            "stck_bsop_date": session.strftime("%Y%m%d"),
+            "stck_oprc": "100", "stck_hgpr": "101", "stck_lwpr": "99",
+            "stck_clpr": "100", "acml_vol": "1000", "acml_tr_pbmn": "100000",
+        }
+        for session in sessions
+    ]
+    descending_rows = list(reversed(rows))
+    pages = [descending_rows[index:index + 100] for index in range(0, len(rows), 100)]
+    transport = FakeTransport([
+        response({"access_token": "tok", "expires_in": 3600}),
+        *[response({"rt_cd": "0", "output2": page}) for page in pages],
+    ])
+    manager = TokenManager("app", "secret", transport, tmp_path / "token.json")
+    client = KisRestClient(
+        "app", "secret", manager, transport, min_request_interval=0,
+        rate_limit_path=tmp_path / "rate.json",
+    )
+
+    bars = client.get_daily_bars("005930", start, end, adjusted=True)
+
+    assert len(bars) == 731
+    assert bars[0].time.date() == start
+    assert bars[-1].time.date() == end
+    assert bars[0].turnover_krw == 100000
+    calls = [call for call in transport.calls if call[1].endswith("inquire-daily-itemchartprice")]
+    assert len(calls) == 8
+    assert {call[2]["params"]["FID_ORG_ADJ_PRC"] for call in calls} == {"0"}
 
 
 def test_invalid_symbol_fails_before_network(tmp_path):

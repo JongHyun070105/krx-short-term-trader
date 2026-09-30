@@ -37,6 +37,18 @@ PHASE10_OPPORTUNITY_MAP: FAIL (no broad state achieved 1% gross mean or positive
 DAILY_A: NOT_CREATED (no qualifying family; best state gross -0.32%, payoff 0.83)
 PHASE10_SECONDARY: NOT_RUN
 PHASE10_EXTERNAL: NOT_RUN
+MULTIYEAR_DATA: COMPLETE (2023-01-02..2025-12-30; 731 common sessions; 90/100 dense multi-year symbols; CURRENT-LISTING SURVIVORSHIP BIAS)
+PHASE11_ACQUISITION: PARTIAL (99/100 symbols returned rows; KIS returned no daily rows for 282620; both market indexes complete)
+FLOW_DATA: NOT_AVAILABLE (no reproducible multi-year point-in-time per-symbol panel)
+PHASE11_FACTOR_MAP: PARTIAL (price/liquidity/market context complete; flow unavailable)
+PHASE11_CANDIDATE: REJECTED (one frozen 3-session market-context mean-reversion research candidate failed Validation)
+PHASE11_VALIDATION: FAIL
+PHASE11_CONFIRMATION: NOT_RUN
+PHASE11_PREVIOUS_PHASE_MANIFEST_INTEGRITY: PASS (20 Phase 5–10 manifests/indexes unchanged)
+PHASE11_ARTIFACT_INTEGRITY: PASS
+PHASE11_EXTERNAL_2026: NOT_READ
+PHASE11_HOLDOUT_2026: NOT_READ
+PHASE11_REPORT_EXECUTION_WINDOW: NOT_REPRODUCED_IN_REPOSITORY (report generator path unavailable)
 VWAP_RECLAIM_ANATOMY: FAIL (15m Development gate passed 2/5; no variants created)
 VWAP_A: NOT_CREATED
 VWAP_B: NOT_CREATED
@@ -71,11 +83,21 @@ Phase 2, Phase 2.5, Phase 3, Phase 4, and Phase 5 evidence is summarized in [RES
 
 ## Phase 10 current decision
 
+- Phase 10 was a **49-session Development study**. It found no cost-sized edge in that short window; this is not universal evidence against daily strategies.
 - Phase 10 mapped daily-level trailing return states, volatility, range position, price, and liquidity against 2/3/5-session forward outcomes on Development data only (2026-04-17–06-30, 60 symbols, 2,940 observations, 11,100 outcomes). Source: Phase 9 adjusted daily cache (`FID_ORG_ADJ_PRC=0`). Entry: next-session open after completed signal day. Exit: fixed horizon close. No parameter search or ML.
 - The best broad state was 3-day trailing return bucket "-2% to 0%" at 2-day horizon (n=344/275 non-overlapping): gross mean −0.32%, win rate 36.4%, payoff ratio 0.83. No state achieved the 1.0% gross promotion threshold. Monthly: April +0.65%, May −1.66%, June +0.55%. Market: KOSPI −0.14%, KOSDAQ −0.69%. All cost multipliers (1×, 1.5×, 2×) were net-negative.
 - No qualifying family was found. The 0.53% round-trip cost exceeds every observed positive gross effect. Momentum vs. reversal: neither produced a cost-sized edge. Daily-level opportunity mapping did not uncover a repeatable low-turnover directional edge in the KRX Development window.
 - `PHASE10_OPPORTUNITY_MAP=FAIL`; `DAILY_A=NOT_CREATED`; Secondary, preregistration, external validation, 100K, and Shadow were not run.
 - Artifacts: ignored `runtime/research/phase10/` (features, outcomes, map JSON, summary, report, index, integrity). Artifact integrity PASS.
+
+## Phase 11 current decision
+
+- Phase 11 acquired adjusted daily history (`FID_ORG_ADJ_PRC=0`) and KOSPI/KOSDAQ indexes for 2023-01-02–2025-12-30. The fixed 100-symbol cohort returned daily rows for 99 symbols; 90 meet the dense multi-year span gate. KIS returned no daily rows for `282620`; it remains missing. Current-listing survivorship bias applies.
+- The investor-flow source audit did not find a reproducible multi-year point-in-time per-symbol panel. Price, volume, traded value, index context and coarse price×liquidity maps are available; flow and price×flow are `NOT_AVAILABLE`. Phase 11 factor map is `PARTIAL` for that reason.
+- Best price-only 5d state: stock 20-session return <=−4%, gross +0.429%, net −0.101% at 1× cost. A broad matched-index 20-session decline state (<=−4%) produced +1.046% gross at 3d in Development and was frozen as one exploratory map-derived research candidate.
+- The candidate used next-session open entry and third-session close exit. Development passed (+1.046% gross; +0.516% net at 1×; +0.251% at 1.5×; 4,624 raw events, 1,927 non-overlap, 35 date clusters). The untouched one-shot Validation failed (+0.479% gross; −0.051% net at 1×). It is `REJECTED`; Confirmation is `NOT_RUN`, Alpha remains `UNPROVEN`, and Live remains `DISABLED`.
+- 2026 external and protected Holdout data were not read. Phase 5–10 manifest integrity and Phase 11 artifact integrity are PASS. Full report and machine-readable artifacts are documented in [Phase 11 research](docs/research/phase11-multi-year-factor-map.md) and ignored `runtime/research/phase11/`.
+- The overnight report-generator execution-window issue was not reproducible because that generator is not in this repository; no report code was changed.
 
 ## Phase 8 current decision
 

@@ -64,6 +64,7 @@ class ParquetBarCache:
                 "timestamp": bar.time.astimezone(KST).isoformat(),
                 "open": float(bar.open), "high": float(bar.high), "low": float(bar.low),
                 "close": float(bar.close), "volume": int(bar.volume),
+                "turnover_krw": bar.turnover_krw,
             }
             for bar in ordered
         ]
@@ -123,6 +124,7 @@ class ParquetBarCache:
                 low=float(row["low"]),
                 close=float(row["close"]),
                 volume=int(row["volume"]),
+                turnover_krw=(int(row["turnover_krw"]) if row.get("turnover_krw") is not None else None),
             )
             for row in rows
         ]

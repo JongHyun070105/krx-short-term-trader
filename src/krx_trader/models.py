@@ -21,6 +21,7 @@ class Bar:
     low: float
     close: float
     volume: int
+    turnover_krw: int | None = None
 
 
 @dataclass(frozen=True, slots=True)

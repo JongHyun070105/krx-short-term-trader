@@ -301,6 +301,13 @@ class KisRestClient:
 
     @staticmethod
     def _daily_bar(row: dict[str, Any]) -> Bar:
+        raw_turnover = row.get("acml_tr_pbmn")
+        try:
+            turnover = int(raw_turnover) if raw_turnover not in (None, "") else None
+        except (TypeError, ValueError):
+            turnover = None
+        if turnover is not None and turnover < 0:
+            turnover = None
         return Bar(
             time=datetime.strptime(row["stck_bsop_date"], "%Y%m%d").replace(tzinfo=KST),
             open=float(row["stck_oprc"]),
@@ -308,6 +315,7 @@ class KisRestClient:
             low=float(row["stck_lwpr"]),
             close=float(row["stck_clpr"]),
             volume=int(row["acml_vol"]),
+            turnover_krw=turnover,
         )
 
     def get_daily_bars(
@@ -320,6 +328,7 @@ class KisRestClient:
             raise ValueError("start date must not be after end date")
         all_rows: dict[str, dict[str, Any]] = {}
         current_end = end
+        pagination_complete = False
         for _ in range(20):
             payload = self._get(
                 DAILY_PATH,
@@ -334,15 +343,23 @@ class KisRestClient:
                 },
             )
             rows = payload.get("output2", [])
-            if not isinstance(rows, list) or not rows:
+            if not isinstance(rows, list):
+                raise KisApiError("KIS daily-bar response was invalid")
+            if not rows:
+                pagination_complete = True
                 break
             valid_rows = [r for r in rows if isinstance(r, dict) and r.get("stck_bsop_date")]
+            if not valid_rows:
+                raise KisApiError("KIS daily-bar response contained no dated rows")
             for row in valid_rows:
                 all_rows[row["stck_bsop_date"]] = row
             oldest = min(row["stck_bsop_date"] for row in valid_rows) if valid_rows else ""
             if not oldest or oldest <= start.strftime("%Y%m%d") or len(valid_rows) < 100:
+                pagination_complete = True
                 break
             current_end = date.fromisoformat(oldest[:4] + "-" + oldest[4:6] + "-" + oldest[6:]) - timedelta(days=1)
+        if not pagination_complete:
+            raise KisApiError("KIS daily-bar pagination exceeded the safe 20-page limit")
         bars = []
         for key, row in all_rows.items():
             if start.strftime("%Y%m%d") <= key <= end.strftime("%Y%m%d"):

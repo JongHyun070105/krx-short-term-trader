@@ -1012,8 +1012,89 @@ No candidate passed all required gates:
 | `ALPHA` | `UNPROVEN` |
 | `LIVE` | `DISABLED` |
 
-No daily-level family qualified for Secondary evaluation. The 0.53% round-trip cost exceeds every observed positive gross effect in the Development window. The overnight research scope (Phase 9 + Phase 10) is complete.
+Phase 10 was a **49-session Development study**. No cost-sized edge was found in that short window; this is not universal evidence against daily strategies. No daily-level family qualified for Secondary evaluation. The 0.53% round-trip cost exceeds every observed positive gross effect in the Development window. The overnight research scope (Phase 9 + Phase 10) is complete.
 
 ### Artifacts
 
 Ignored `runtime/research/phase10/`: `daily-features.csv`, `daily-outcomes.csv`, `phase10-opportunity-map.json`, `phase10-summary.json`, `phase10-report.md`, `phase10-artifact-index.json`, `artifact-integrity.json`. Artifact integrity: PASS.
+
+---
+
+## Phase 11 — Multi-year Daily Evidence and Flow / Liquidity / Market-Context Map
+
+### Scope and data
+
+Phase 11 began from `7e867d9e7fb014e1c10d5bf83926817ffb3578da` on `main`; `origin/main` matched at start. The historical pool is 2023-01-02 through 2025-12-30, with Development 2023-01-02–2024-06-28, Validation 2024-07-01–2025-06-30, and Confirmation 2025-07-01–2025-12-30. 2026-01-05–2026-04-16 and 2026-07-28–2026-08-28 were not read. Warmup begins 2022-11-01 and contributes only trailing features.
+
+The frozen Phase 4 cohort has 100 current listings (50 KOSPI, 50 KOSDAQ; order hash `5bcad330613b94bda148401cddcba8e62262a96e3e38acd4b70e4ed013e78f95`). This entails **CURRENT-LISTING SURVIVORSHIP BIAS**: point-in-time membership, delisted companies, and past index constituents were not reconstructed.
+
+- 731 common index sessions; 68,236 daily stock rows and feature rows.
+- 99/100 symbols returned KIS daily rows. KIS returned no daily rows for `282620` on the original acquisition and resumable retry. It remains missing; it was not replaced or filled.
+- 90 symbols meet the >=500-row, multi-year-span, zero internal index-session-gap criterion. No synthetic bars were created. Dataset is `MULTIYEAR_DATA=COMPLETE` under the explicit 60-symbol minimum, while acquisition remains `PARTIAL` for the one no-row symbol.
+- KOSPI and KOSDAQ index caches each contain 774 rows including warmup. All stock prices use only KIS adjusted daily bars, `FID_ORG_ADJ_PRC=0`; raw and adjusted conventions are not mixed. KIS adjusted history lacks a point-in-time revision vintage.
+- KIS `acml_tr_pbmn` traded value and `acml_vol` volume were present in all 68,236 feature rows. Missing values, if returned, remain null rather than filled.
+- Development outcomes contain 131,356 rows for 2/3/5/10-session horizons. Entry is next-session open after the completed signal day. Raw events, per-symbol non-overlap events, and unique session clusters are reported separately.
+- Phase 5–10 protected manifest/index hashes: PASS, 20/20 unchanged. Phase 11 artifact index/integrity: PASS, 226 indexed files at the final analysis snapshot.
+
+### KIS non-price source audit
+
+The detailed source audit is retained at `runtime/research/phase11/phase11-source-audit.json`, including endpoints/adapters, available historical dates, timestamp semantics, revisions, point-in-time safety, rate limits, and reproducibility.
+
+- Adjusted daily prices: `/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice`, TR `FHKST03010100`; date-ranged and reproducible with `FID_ORG_ADJ_PRC=0`.
+- Daily turnover/volume: same response, fields `acml_tr_pbmn` and `acml_vol`; completed-session values, but no historical correction vintage or exact publication timestamp is documented.
+- Latest per-stock investor endpoint `inquire-investor` (`FHKST01010900`) has no historical date parameter in the inspected sample and only a rolling 30-row example. It cannot reproduce this multi-year panel.
+- Dated per-stock endpoint `investor-trade-by-stock-daily` (`FHPTJ04160001`) accepts one date per symbol. A full 100 × ~731 panel would require ~73,100 requests before retries, and exact publication/revision semantics remain undocumented. Excluded.
+- Market investor flow `inquire-investor-daily-by-market` (`FHPTJ04040000`) can be queried by date, but is not per-stock flow; exact release time and revision policy are not established. Not used as a substitute.
+- Historical KOSPI/KOSDAQ daily indexes use `/uapi/domestic-stock/v1/quotations/inquire-daily-indexchartprice`, TR `FHKUP03500100`.
+- Historical market cap, EPS, PER, PBR, financial statements, and sector membership were excluded because safe historical as-of/publication semantics were not established. Program-trading samples did not provide a suitable dated multi-year panel.
+
+`FLOW_DATA=NOT_AVAILABLE`. Foreign, institutional, and individual flow factors are missing, not zero; price×flow interactions are unavailable. Price, liquidity, market-relative, and coarse price×liquidity maps are present, so `PHASE11_FACTOR_MAP=PARTIAL`.
+
+### Development results
+
+All states below are fixed coarse states from the Development map. Break-even friction equals gross mean.
+
+| Family / state | Horizon | Gross mean | Net at 1× / 1.5× / 2× | Raw / non-overlap / unique signal sessions |
+|---|---:|---:|---|---|
+| Best price-only: stock 20d return DOWN (≤−4%) | 5d | +0.429% | −0.101% / −0.366% / −0.631% | 11,282 / 2,824 / 361 |
+| Best liquidity: volume ratio 5d NORMAL (0.75–1.5) | 5d | +0.325% | −0.205% / −0.470% / −0.735% | 15,089 / 5,110 / 361 |
+| Best price×liquidity: stock 5d return DOWN + no turnover expansion | 5d | +0.281% | −0.249% / −0.514% / −0.779% | 14,267 / 4,198 / 361 |
+| Best standalone market context: matched index 20d return DOWN (≤−4%) | 3d | +1.046% | +0.516% / +0.251% / −0.014% | 4,624 / 1,927 / 76 raw dates, 35 non-overlap date clusters |
+| Same market-down state | 5d | +1.601% | +1.071% / +0.806% / +0.541% | 4,624 / 1,300 / 76 raw dates, 28 non-overlap date clusters |
+| Same market-down state | 10d | +2.935% | +2.405% / +2.140% / +1.875% | 4,624 / 903 / 76 raw dates, 20 non-overlap date clusters |
+
+The market-down condition's 400-resample date-cluster lower 90% bounds were +0.213%, +0.338%, and +1.069% at 3/5/10d. The higher-horizon estimates have fewer independent non-overlap date clusters. At 3d, KOSPI gross was +1.423% (1,925 raw / 888 non-overlap / 39 sessions); KOSDAQ gross was +0.724% (2,699 / 1,039 / 65). At 5d the split was +2.342% / +0.982%, and at 10d +3.272% / +2.610%. These are shared market-state observations, not thousands of independent market events.
+
+No flow state or price×flow interaction can be ranked. The 49-session Phase 10 study remains a short Development window and is not universal evidence against daily strategies.
+
+### Frozen research candidate and Validation
+
+The two initial 5-session rules—market-relative continuation and turnover expansion—failed their Development gates. After the maps were complete, one coarse market-context extension was frozen as the only `RESEARCH_CANDIDATE`:
+
+> Matched KOSPI/KOSDAQ index 20-session return <=−4%; enter next-session open and exit at the close of the third session beginning with entry; per-symbol events do not overlap.
+
+The 3-session horizon is the shortest primary horizon and retained 35 distinct signal-date clusters, compared with 28 at 5d and 20 at 10d; selection did not maximize gross return. The index state boundary was frozen in the factor map. The family/horizon were not in the initial candidate-eligible 5-session list, so this is explicitly a map-derived exploratory extension, not a claim of preregistered confirmation. See `candidate-map-extension.json` and `candidate-preregistration.json`.
+
+- Development PASS: gross +1.046%, net +0.516% at 1× and +0.251% at 1.5×; payoff 1.328; 4,624 raw events, 1,927 non-overlap events, 76 raw signal dates and 35 non-overlap date clusters. All 6 Development quarters and all 3 half-years were positive. Cluster lower 90% bound: +0.213%. KOSPI and KOSDAQ gross means were both positive; KOSDAQ was below cost at 1.5×.
+- Validation FAIL, one-shot and unchanged: gross +0.479% (<1%); net −0.051% at 1× and −0.316% at 1.5×; 5,239 raw, 2,114 non-overlap, 83 raw dates, and 41 non-overlap date clusters. Cluster lower 90% bound was −0.236%; the gross/cost gates failed. Validation split: KOSPI +0.997% gross, KOSDAQ +0.194% gross.
+- Candidate `REJECTED`. Confirmation `NOT_RUN` because Validation failed. No post-Validation tuning occurred. Cost break-even was 1.046% in Development and 0.479% in Validation; at 2× cost the candidate was −0.014% and −0.581%, respectively.
+
+### Other task item and final state
+
+The cited overnight `execution-window` timestamps and report generator are absent from this repository and the supplied STATUS/RESULTS snapshots. The cause is `NOT_REPRODUCED_IN_REPOSITORY`; no report code was changed because its source path was unavailable.
+
+| Status | Phase 11 result |
+|---|---|
+| `MULTIYEAR_DATA` | `COMPLETE` (90 dense multi-year symbols; acquisition 99/100 plus both indexes) |
+| `FLOW_DATA` | `NOT_AVAILABLE` |
+| `PHASE11_FACTOR_MAP` | `PARTIAL` (flow unavailable) |
+| `PHASE11_CANDIDATE` | `REJECTED` |
+| `VALIDATION` | `FAIL` |
+| `CONFIRMATION` | `NOT_RUN` |
+| `ALPHA` | `UNPROVEN` |
+| `LIVE` | `DISABLED` |
+| 2026 External / protected Holdout | `NOT_READ` / `NOT_READ` |
+
+Next step: do not retune this rejected rule. Any new family should begin with a new frozen Development protocol; keep the untouched 2026 external and Holdout periods closed. The overnight report-generation bug needs the generator's source path for a separate fix.
+
+Artifacts are under ignored `runtime/research/phase11/`: resumable adjusted cache, source/cohort/acquisition/data-quality manifests, features and Development outcomes, price/flow/liquidity/market-context maps, interactions, candidate extension/preregistration, Validation/Confirmation, cost stress, summary/report, artifact index, and integrity reports.
