@@ -49,6 +49,16 @@ PHASE11_ARTIFACT_INTEGRITY: PASS
 PHASE11_EXTERNAL_2026: NOT_READ
 PHASE11_HOLDOUT_2026: NOT_READ
 PHASE11_REPORT_EXECUTION_WINDOW: NOT_REPRODUCED_IN_REPOSITORY (report generator path unavailable)
+PHASE12_FAILURE_ANATOMY: COMPLETE (Phase 11 decay is predominantly matched-market rebound; no stable new mechanism passed)
+MARKET_BETA_EXPLANATION: STRONG
+STRESS_COMPOSITION_SHIFT: STRONG (20d volatility SMD +0.909; dispersion SMD +0.662)
+MARKET_STRESS_MECHANISM: NOT_SUPPORTED
+PHASE12_CANDIDATE: NOT_CREATED
+PHASE12_CONFIRMATION: NOT_RUN
+PHASE12_EXTERNAL_2026: NOT_READ
+PHASE12_HOLDOUT_2026: NOT_READ
+PHASE12_ARTIFACT_INTEGRITY: PASS (23 indexed artifacts; Phase 5–11 manifest/index snapshot 23/23 unchanged)
+PHASE12_TESTS: PASS (268 total; baseline 252 plus 16 Phase 12 tests)
 VWAP_RECLAIM_ANATOMY: FAIL (15m Development gate passed 2/5; no variants created)
 VWAP_A: NOT_CREATED
 VWAP_B: NOT_CREATED
@@ -89,6 +99,14 @@ Phase 2, Phase 2.5, Phase 3, Phase 4, and Phase 5 evidence is summarized in [RES
 - No qualifying family was found. The 0.53% round-trip cost exceeds every observed positive gross effect. Momentum vs. reversal: neither produced a cost-sized edge. Daily-level opportunity mapping did not uncover a repeatable low-turnover directional edge in the KRX Development window.
 - `PHASE10_OPPORTUNITY_MAP=FAIL`; `DAILY_A=NOT_CREATED`; Secondary, preregistration, external validation, 100K, and Shadow were not run.
 - Artifacts: ignored `runtime/research/phase10/` (features, outcomes, map JSON, summary, report, index, integrity). Artifact integrity PASS.
+
+## Phase 12 current decision
+
+- Phase 12 analyzed only Development (2023-01-02–2024-06-28) and touched Validation (2024-07-01–2025-06-30) to explain the Phase 11 decline. The matched index averaged +0.893% vs. +1.046% stock gross in Development and +0.366% vs. +0.479% in Validation; the 0.527-point market-component decline explains 92.9% of the gross decay.
+- Stock-minus-index means were +0.153% / +0.113%; simple rolling-beta residual means were +0.319% / +0.162%, below the unchanged 0.53% round-trip cost. No stable single-feature mechanism passed the minimum cluster, date, market-adjusted, and concentration gates.
+- Volatility and dispersion shifted (SMD +0.909 and +0.662); breadth shifted modestly (SMD −0.211). Fast-shock composition rose from 20.0% to 91.7%, but its rebound direction did not replicate. The evidence supports market beta and changed stress composition as the anatomy, not an independently tradable mechanism.
+- Verdicts: `PHASE12_FAILURE_ANATOMY=COMPLETE`; `MARKET_BETA_EXPLANATION=STRONG`; `STRESS_COMPOSITION_SHIFT=STRONG`; `MARKET_STRESS_MECHANISM=NOT_SUPPORTED`; `PHASE12_CANDIDATE=NOT_CREATED`; `PHASE12_CONFIRMATION=NOT_RUN`; `EXTERNAL_2026=NOT_READ`; `HOLDOUT_2026=NOT_READ`; `SHADOW_NEXT_SESSION=NO`; `ALPHA=UNPROVEN`; `LIVE=DISABLED`.
+- The historical Phase 11 candidate remains `REJECTED` and its Validation remains `FAIL`. Current-listing survivorship bias applies. Phase 5–11 artifacts remain unchanged; Phase 12 machine-readable artifacts are under ignored `runtime/research/phase12/`. Details and explicit Q1–Q15 answers are in [Phase 12 research](docs/research/phase12-market-stress-failure-anatomy.md).
 
 ## Phase 11 current decision
 

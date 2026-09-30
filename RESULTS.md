@@ -1098,3 +1098,80 @@ The cited overnight `execution-window` timestamps and report generator are absen
 Next step: do not retune this rejected rule. Any new family should begin with a new frozen Development protocol; keep the untouched 2026 external and Holdout periods closed. The overnight report-generation bug needs the generator's source path for a separate fix.
 
 Artifacts are under ignored `runtime/research/phase11/`: resumable adjusted cache, source/cohort/acquisition/data-quality manifests, features and Development outcomes, price/flow/liquidity/market-context maps, interactions, candidate extension/preregistration, Validation/Confirmation, cost stress, summary/report, artifact index, and integrity reports.
+
+---
+
+## Phase 12 — Market Stress Rebound Failure Anatomy and Regime Robustness
+
+### Decision and boundary
+
+Phase 12 explains, but does not retune, the Phase 11 candidate. Only Development (2023-01-02–2024-06-28) and touched Validation (2024-07-01–2025-06-30) were analyzed. These periods are mechanism-research evidence, not independent validation. Confirmation (2025-07-01–2025-12-30), external 2026, and protected Holdout were not read. The Phase 11 candidate remains `REJECTED`, its Validation remains `FAIL`, and all historical Phase 11 results were preserved.
+
+**Verdict:** `PHASE12_FAILURE_ANATOMY=COMPLETE`; `MARKET_BETA_EXPLANATION=STRONG`; `STRESS_COMPOSITION_SHIFT=STRONG`; `MARKET_STRESS_MECHANISM=NOT_SUPPORTED`; `PHASE12_CANDIDATE=NOT_CREATED`; `CONFIRMATION=NOT_RUN`; `EXTERNAL_2026=NOT_READ`; `HOLDOUT_2026=NOT_READ`; `SHADOW_NEXT_SESSION=NO`; `ALPHA=UNPROVEN`; `LIVE=DISABLED`.
+
+### Data, episode construction, and reproducibility
+
+The analysis used the frozen 100-current-listing Phase 4 cohort (50 KOSPI / 50 KOSDAQ), KIS adjusted daily data (`FID_ORG_ADJ_PRC=0`), and the matched KOSPI/KOSDAQ indexes. The bounded loader produced touched-window bars for 96 symbols; 90 meet Phase 11's dense multi-year criterion. No delisted or point-in-time historical universe is reconstructed: **CURRENT-LISTING SURVIVORSHIP BIAS** applies. Investor flow remains `NOT_AVAILABLE`; no synthetic rows or forward-fill were used.
+
+Market stress signal dates remain the Phase 11 matched-index 20-session return `<= -4%` rule. Entry is next-session open and exit is the third session close; per-symbol executions do not overlap. For episode anatomy, dates are grouped market-by-market when separated by at most two intervening non-signal market sessions; grouping resets at the Development/Validation boundary. Overlapping KOSPI/KOSDAQ episodes share joint macro clusters. The rule is independent of forward returns. Breadth requires at least 80% coverage of the eligible cohort on a market-date; all 104 Development and 114 Validation market-date observations passed.
+
+The daily state dataset records index return horizons, realized volatility, drawdown/high-distance/age, ranges, cohort turnover/volume, breadth counts/coverage, and cross-sectional dispersion using information available through the completed signal date. Beta uses a fixed 60-session trailing window with at least 40 paired completed daily returns. Volatility, dispersion, and liquidity terciles are defined on Development and carried into Validation. Bootstrap resampling is by joint stress episode, never individual stock rows.
+
+Phase 12 dataset SHA-256: `38734f06adb539ed5959b03cf4d22da139773429103bc3c2a588737c59f996cf`; cohort SHA-256: `5bcad330613b94bda148401cddcba8e62262a96e3e38acd4b70e4ed013e78f95`; config SHA-256: `e05dae8fe6bea8b10525a4c1f49274a86a3770bd2ad4cd404ccd5a4de0e3d2cf`. Bounded row hashes exclude later rows. Previous Phase 5–11 manifests/indexes: 23/23 unchanged, snapshot SHA-256 `acd09332adfb9603ebd4ea647389c8757958361519436c95ba3f16154e1201ea`.
+
+Baseline verification passed 252 tests. Final regression passed 268 tests, including 16 new Phase 12 tests; full Ruff and `git diff --check` passed. A scoped credential-pattern scan over changed source, tests, and docs found 0 matches.
+
+### Episode counts and chronological blocks
+
+| Block | Episodes | Non-overlap events | Unique dates | Mean stress 20d | Stock 3d gross | Matched index | Stock excess |
+|---|---:|---:|---:|---:|---:|---:|
+| 2023 H1 | 4 | 350 | 14 | −7.123% | +1.900% | +1.543% | +0.357% |
+| 2023 H2 | 6 | 936 | 35 | −8.282% | +0.359% | +0.330% | +0.029% |
+| 2024 H1 | 5 | 641 | 27 | −5.961% | +1.583% | +1.361% | +0.222% |
+| 2024 H2 | 10 | 1,544 | 57 | −7.366% | +0.410% | +0.404% | +0.007% |
+| 2025 H1 | 2 | 570 | 26 | −6.902% | +0.665% | +0.265% | +0.400% |
+
+Development had 15 market-specific episodes (KOSPI 7 / KOSDAQ 8) and 10 joint macro clusters. Validation had 12 (5 / 7) and 7 joint clusters. Performance alternated between stronger and weaker halves rather than fading gradually; the 2025 H1 excess recovery is based on only two market-specific episodes.
+
+### Market-beta decomposition
+
+| Period | Raw / non-overlap events | Raw dates / date clusters | Stock gross | Matched index | Stock excess | Beta residual | Net at 1× / 1.5× / 2× |
+|---|---:|---:|---:|---:|---:|---:|---|
+| Development | 4,624 / 1,927 | 76 / 35 | +1.046% | +0.893% | +0.153% | +0.319% | +0.516% / +0.251% / −0.014% |
+| Validation | 5,239 / 2,114 | 83 / 41 | +0.479% | +0.366% | +0.113% | +0.162% | −0.051% / −0.316% / −0.581% |
+
+The matched market mean fell 0.527 percentage points, 92.9% of the 0.567-point gross decay; it was 85.4% of Development gross. Arithmetic stock excess was small, had 90% cluster-bootstrap bands crossing zero in both periods, and was below the 0.53% cost. The beta residual is a descriptive diagnostic, not formal factor alpha.
+
+KOSPI Development/Validation gross was +1.423%/+0.997%, versus matched indexes +1.228%/+0.953%. KOSDAQ gross was +0.724%/+0.194%, versus +0.607%/+0.044%. The Validation KOSPI result is market-led and remains a diagnostic split, not a retroactive market restriction.
+
+### Stress regime, breadth, and beta findings
+
+| Measure | Development | Validation |
+|---|---:|---:|
+| Mean signal-date index 20d return | −7.323% | −7.228% |
+| Mean episode minimum index 20d return | −7.112% | −9.281% |
+| Episode depth (MILD / MODERATE / DEEP / EXTREME) | 9 / 5 / 1 / 0 | 6 / 3 / 3 / 0 |
+| FAST_SHOCK episodes | 3/15 (20.0%) | 11/12 (91.7%) |
+| Mean signal-date 20d realized volatility | 1.327% | 1.859% |
+| Mean 5d negative breadth | 0.636 | 0.582 |
+| Mean 20d cross-sectional dispersion | 10.267% | 12.827% |
+
+Signal-date 20d stress depth barely differed (SMD +0.035), although Validation had more deep episode minima. Volatility and dispersion rose substantially (SMD +0.909 and +0.662); breadth changed less (SMD −0.211). FAST_SHOCK outcome direction did not replicate: −0.040% gross / −0.220% excess in Development versus +1.529% / +0.224% in Validation. Neither speed nor another single state provides a stable mechanism.
+
+Rolling-beta tercile diagnostics do not show a high-beta-only effect. LOW/MID/HIGH beta gross means were +0.725%/+1.471%/+1.300% in Development and +0.196%/+0.978%/+0.375% in Validation. HIGH_BETA residual was −0.267% in Development and +0.175% in Validation; MID_BETA residual was +0.573% / +0.255%. All Validation residual means are below the 0.53% cost scale.
+
+The broad-selloff diagnostic (at least 70% of observed cohort members negative over 5 sessions) averaged +0.573% gross / +0.261% beta residual in Development and +1.994% / +0.672% in Validation. However Development had only 19 unique dates and residual below costs; Validation had only seven joint clusters. Narrow selloffs averaged +1.489% / −0.675% gross across Development / Validation. This failed the predeclared mechanism gate and was not promoted.
+
+Recent-loser/winner, liquidity, and stock-volatility maps are descriptive. The lowest recent 20d stock-return tercile averaged +1.701% gross / +0.924% beta residual in Development and +0.657% / +0.140% in Validation; the highest-return tercile averaged +0.632% / −0.116% and +0.343% / +0.181%. Low/high stock-turnover terciles averaged +1.163%/+0.824% gross in Development and +0.497%/+0.469% in Validation. Low/high stock-volatility terciles averaged +0.897%/+1.031% in Development and +0.042%/+0.825% in Validation. None provides a stable after-cost separation. “Cheap” versus “expensive” was not assessed because point-in-time-safe valuation features are unavailable.
+
+### Concentration, uncertainty, cost, and root cause
+
+Top one / three / five market-episode shares of positive trade contribution were 9.64% / 31.86% / 44.64% in Development and 12.50% / 25.78% / 37.51% in Validation. Neither period depended on a single episode by this measure.
+
+The 2,000-resample joint episode-cluster bootstrap 90% bands were: Development stock-minus-index excess [−0.041%, +0.488%], median +0.153%, and beta residual [+0.051%, +0.795%], median +0.333%; Validation excess [−0.194%, +0.280%], median +0.118%, and residual [−0.161%, +0.408%], median +0.163%. The Validation estimate has only seven joint clusters; no p-values were computed.
+
+Cost assumptions remain fee 0.015% per side (`ASSUMED`), sell tax 0.20% (`VERIFIED_CURRENT` from the [KIS fee/tax schedule](https://securities.koreainvestment.com/main/customer/guide/_static/TF04ae010000.jsp?tab=3)), and slippage 0.15% per side (`CONSERVATIVE`, not empirically calibrated). Total round-trip remains 0.53%. No historical outcome or cost was changed.
+
+Ranked conclusion: (1) **market-beta effect — STRONG**: index component explains 92.9% of gross decay; (2) **stress composition — STRONG descriptive shift**: volatility and dispersion increased, without a stable conditional rule; (3) **depth — WEAK**: signal-date depth almost unchanged; (4) **speed — weak causal support** despite a large composition shift; (5) **breadth — MODERATE shift**, not enough to pass the mechanism gate; (6) **dispersion — large shift but unsupported as a stable rule**; (7) **episode concentration — WEAK**; (8) **survivorship/data limitations — MODERATE limitation**, with no evidence attributing the decay specifically to it.
+
+No hypothesis met the minimum of eight joint episodes in both periods, at least 20 market dates, at least three market-specific episodes per market, positive after-cost beta residual, both-period directional support, and the concentration gate. No candidate or candidate rule was created. Preregistration is `NOT_CREATED` with no freeze SHA; Confirmation is `NOT_RUN`. External 2026 and Holdout remain closed. Full definitions, distributions, integrity details, and explicit Q1–Q15 answers are in [the Phase 12 report](docs/research/phase12-market-stress-failure-anatomy.md). Machine-readable outputs are under ignored `runtime/research/phase12/`; artifact integrity checked 23 indexed artifacts and passed, with prior Phase 5–11 manifests/indexes unchanged.
