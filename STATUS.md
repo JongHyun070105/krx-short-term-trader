@@ -81,6 +81,32 @@ PHASE14_EXTERNAL_2026: NOT_READ
 PHASE14_HOLDOUT_2026: NOT_READ (outcomes unread; metadata previously exposed)
 PHASE14_ARTIFACT_INTEGRITY: PASS (25 indexed payloads; Phase 5–13 snapshot 38/38 unchanged)
 PHASE14_TESTS: PASS (323 total; baseline 297 plus 26 Phase 14)
+PHASE15_SOURCE_AUDIT: PARTIAL (60 bounded KIS request records; all successful; no source passed full qualification)
+PHASE15_PER_STOCK_FLOW: PARTIAL (31 rows/date anchor; earliest returned 2018-04-18; 7/7 repeat payloads revised)
+PHASE15_MARKET_FLOW: PARTIAL (300 rows/date anchor; selected repeat identical; market aggregate only)
+PHASE15_PROGRAM_TRADING: PARTIAL (30 rows/date anchor; selected repeat identical)
+PHASE15_SECTOR_CONTEXT: PARTIAL
+PHASE15_SECTOR_PIT_MEMBERSHIP: NOT_AVAILABLE
+PHASE15_CORPORATE_EVENTS: PARTIAL (receipt date day-resolution; original/correction chain incomplete)
+PHASE15_HISTORICAL_MICROSTRUCTURE: NOT_AVAILABLE
+PHASE15_PROSPECTIVE_MICROSTRUCTURE: AVAILABLE
+PHASE15_POINT_IN_TIME_UNIVERSE: PARTIAL
+PHASE15_DELISTED_PRICE_HISTORY: PARTIAL (two documented symbols returned tested 2023 rows)
+PHASE15_SYMBOL_LINEAGE: PARTIAL
+PHASE15_FRESH_HISTORICAL_EVIDENCE: PARTIAL (2019–2022 plan conditional on prior-phase manifest reconciliation)
+PHASE15_PRIMARY_SOURCE: NONE
+PHASE15_SECONDARY_SOURCE: NONE
+PHASE15_NEXT_RESEARCH_MODE: PROSPECTIVE_DATA_COLLECTION
+PHASE15_EXTERNAL_2026: NOT_READ
+PHASE15_HOLDOUT_2026: NOT_READ
+PHASE15_ARTIFACT_INTEGRITY: PASS (28 indexed payloads; Phase 5–14 snapshot 48/48 unchanged)
+PHASE15_TESTS: PASS (366 total; baseline 323 plus 43 Phase 15 tests)
+PHASE15_RUFF: PASS
+PHASE15_DIFF_CHECK: PASS
+PHASE15_CREDENTIAL_SCAN: PASS (0 credential-pattern findings in changed source/docs)
+PHASE15_ALPHA: UNPROVEN
+PHASE15_SHADOW_NEXT_SESSION: NO
+PHASE15_LIVE: DISABLED
 VWAP_RECLAIM_ANATOMY: FAIL (15m Development gate passed 2/5; no variants created)
 VWAP_A: NOT_CREATED
 VWAP_B: NOT_CREATED
@@ -102,6 +128,14 @@ PHASE8_SHADOW_NEXT_SESSION: NO
 ```
 
 Phase 2, Phase 2.5, Phase 3, Phase 4, and Phase 5 evidence is summarized in [RESULTS.md](RESULTS.md). Manifests, event rows, and Phase 5 diagnostics are retained in ignored `runtime/research/phase5/`. Phase 6 research artifacts are in ignored `runtime/research/phase6/`.
+
+## Phase 15 current decision
+
+Phase 15 source qualification is `PARTIAL`. The official KIS per-stock investor-flow endpoint returned historical rolling windows for the bounded 2018–2025 samples, but all seven same-request repeat pairs produced different canonical response hashes. KIS market-flow and program-trading repeats were identical in one sample each; both also returned rolling dated windows. Publication timestamps, historical vintages, complete coverage, and provider rate limits remain unresolved. No source qualifies for Phase 14 factor research, so the primary and secondary sources are `NONE`; the recommended next mode is prospective collection with locally frozen, timestamped vintages after terms are confirmed. No alpha study or strategy candidate was run.
+
+`FRESH_HISTORICAL_EVIDENCE=PARTIAL`: sampled KIS flow reaches 2018-04-18. The proposed 2019–2020 discovery, 2021 replication, and 2022-01–10 confirmation periods are conditional on complete source acquisition and reconciliation of earlier Phase 3–9 usage. Phase 11's 2022-11–12 warmup stays disclosed. `EXTERNAL_2026=NOT_READ`; the 2026 Holdout remains outcome-unread and excluded; `ALPHA=UNPROVEN`, `SHADOW_NEXT_SESSION=NO`, and `LIVE=DISABLED`.
+
+See the [Phase 15 report](docs/research/phase15-new-information-source-qualification.md) and ignored machine-readable artifacts under `runtime/research/phase15/`. All 48 snapshotted Phase 5–14 artifacts remain unchanged.
 
 ## Phase 14 current decision
 

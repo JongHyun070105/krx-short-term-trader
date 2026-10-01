@@ -23,6 +23,9 @@ DAILY_PATH = "/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice"
 MINUTE_PATH = "/uapi/domestic-stock/v1/quotations/inquire-time-dailychartprice"
 INDEX_DAILY_PATH = "/uapi/domestic-stock/v1/quotations/inquire-daily-indexchartprice"
 VOLUME_RANK_PATH = "/uapi/domestic-stock/v1/quotations/volume-rank"
+INVESTOR_FLOW_DAILY_PATH = "/uapi/domestic-stock/v1/quotations/investor-trade-by-stock-daily"
+MARKET_INVESTOR_FLOW_DAILY_PATH = "/uapi/domestic-stock/v1/quotations/inquire-investor-daily-by-market"
+PROGRAM_FLOW_DAILY_PATH = "/uapi/domestic-stock/v1/quotations/program-trade-by-stock-daily"
 
 
 class KisApiError(RuntimeError):
@@ -136,24 +139,34 @@ class KisRestClient:
                     now = self._monotonic()
             self._last_request_at = now
 
-    def _get(self, path: str, tr_id: str, params: dict[str, str]) -> dict[str, Any]:
+    def _get_page(
+        self,
+        path: str,
+        tr_id: str,
+        params: dict[str, str],
+        *,
+        continuation: str = "",
+    ) -> tuple[dict[str, Any], dict[str, str]]:
         refreshed = False
         attempt = 0
         while True:
             token = self._tokens.get_token()
             self._wait_for_request_slot()
+            headers = {
+                "Content-Type": "application/json; charset=utf-8",
+                "authorization": f"Bearer {token}",
+                "appkey": self._app_key,
+                "appsecret": self._app_secret,
+                "tr_id": tr_id,
+                "custtype": "P",
+            }
+            if continuation:
+                headers["tr_cont"] = continuation
             try:
                 response = self._transport.request(
                     "GET",
                     f"{PRODUCTION_BASE_URL}{path}",
-                    headers={
-                        "Content-Type": "application/json; charset=utf-8",
-                        "authorization": f"Bearer {token}",
-                        "appkey": self._app_key,
-                        "appsecret": self._app_secret,
-                        "tr_id": tr_id,
-                        "custtype": "P",
-                    },
+                    headers=headers,
                     params=params,
                 )
                 if response.status_code == 401 and not refreshed:
@@ -184,7 +197,124 @@ class KisRestClient:
                 code = payload.get("msg_cd")
                 suffix = f" code={code}" if isinstance(code, str) else ""
                 raise KisApiError(f"KIS read request failed (HTTP {response.status_code}){suffix}")
-            return payload
+            response_headers = {
+                str(key).lower(): str(value)
+                for key, value in (response.headers or {}).items()
+            }
+            return payload, response_headers
+
+    def _get(self, path: str, tr_id: str, params: dict[str, str]) -> dict[str, Any]:
+        payload, _ = self._get_page(path, tr_id, params)
+        return payload
+
+    @staticmethod
+    def _page_rows(payloads: list[dict[str, Any]], output_key: str) -> list[dict[str, Any]]:
+        rows: list[dict[str, Any]] = []
+        for payload in payloads:
+            output = payload.get(output_key)
+            if output is None:
+                continue
+            if isinstance(output, dict):
+                rows.append(output)
+            elif isinstance(output, list) and all(isinstance(row, dict) for row in output):
+                rows.extend(output)
+            else:
+                raise KisApiError("KIS paginated response contained an invalid output block")
+        return rows
+
+    def _get_dated_pages(
+        self,
+        path: str,
+        tr_id: str,
+        params: dict[str, str],
+        *,
+        max_pages: int = 10,
+    ) -> dict[str, Any]:
+        if not 1 <= max_pages <= 20:
+            raise ValueError("max_pages must be between 1 and 20")
+        payloads: list[dict[str, Any]] = []
+        continuation = ""
+        for page_number in range(max_pages):
+            payload, headers = self._get_page(
+                path, tr_id, params, continuation=continuation
+            )
+            payloads.append(payload)
+            next_page = headers.get("tr_cont", "").upper()
+            if next_page not in {"M", "F"}:
+                break
+            if page_number + 1 == max_pages:
+                raise KisApiError("KIS dated-flow pagination exceeded its safe page limit")
+            continuation = "N"
+        result = {
+            key: payloads[0].get(key)
+            for key in ("rt_cd", "msg_cd", "msg1")
+            if key in payloads[0]
+        }
+        for output_key in ("output1", "output2", "output"):
+            rows = self._page_rows(payloads, output_key)
+            if rows or any(output_key in payload for payload in payloads):
+                result[output_key] = rows
+        result["_phase15_pages"] = len(payloads)
+        return result
+
+    def get_investor_flow_by_date(
+        self, symbol: str, session_date: date, *, max_pages: int = 10
+    ) -> dict[str, Any]:
+        if len(symbol) != 6 or not symbol.isdigit():
+            raise ValueError("symbol must be a six-digit KRX code")
+        return self._get_dated_pages(
+            INVESTOR_FLOW_DAILY_PATH,
+            "FHPTJ04160001",
+            {
+                "FID_COND_MRKT_DIV_CODE": "J",
+                "FID_INPUT_ISCD": symbol,
+                "FID_INPUT_DATE_1": session_date.strftime("%Y%m%d"),
+                "FID_ORG_ADJ_PRC": "",
+                "FID_ETC_CLS_CODE": "",
+            },
+            max_pages=max_pages,
+        )
+
+    def get_market_investor_flow_by_date(
+        self,
+        market_code: str,
+        session_date: date,
+        *,
+        max_pages: int = 10,
+    ) -> dict[str, Any]:
+        if market_code not in {"KSP", "KSQ"}:
+            raise ValueError("market_code must be KSP (KOSPI) or KSQ (KOSDAQ)")
+        index_code = "0001" if market_code == "KSP" else "1001"
+        day = session_date.strftime("%Y%m%d")
+        return self._get_dated_pages(
+            MARKET_INVESTOR_FLOW_DAILY_PATH,
+            "FHPTJ04040000",
+            {
+                "FID_COND_MRKT_DIV_CODE": "U",
+                "FID_INPUT_ISCD": "0001",
+                "FID_INPUT_DATE_1": day,
+                "FID_INPUT_ISCD_1": market_code,
+                "FID_INPUT_DATE_2": day,
+                "FID_INPUT_ISCD_2": index_code,
+            },
+            max_pages=max_pages,
+        )
+
+    def get_program_flow_by_date(
+        self, symbol: str, session_date: date, *, max_pages: int = 10
+    ) -> dict[str, Any]:
+        if len(symbol) != 6 or not symbol.isdigit():
+            raise ValueError("symbol must be a six-digit KRX code")
+        return self._get_dated_pages(
+            PROGRAM_FLOW_DAILY_PATH,
+            "FHPPG04650201",
+            {
+                "FID_COND_MRKT_DIV_CODE": "J",
+                "FID_INPUT_ISCD": symbol,
+                "FID_INPUT_DATE_1": session_date.strftime("%Y%m%d"),
+            },
+            max_pages=max_pages,
+        )
 
     def get_quote(self, symbol: str) -> Quote:
         if len(symbol) != 6 or not symbol.isdigit():

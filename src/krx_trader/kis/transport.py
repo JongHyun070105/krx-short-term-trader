@@ -17,6 +17,7 @@ class TransportError(RuntimeError):
 class HttpResponse:
     status_code: int
     body: bytes
+    headers: dict[str, str] | None = None
 
     def json(self) -> dict[str, Any]:
         value = json.loads(self.body.decode("utf-8"))
@@ -55,10 +56,10 @@ class UrllibTransport:
         request = Request(url, data=body, headers=headers or {}, method=method.upper())
         try:
             with urlopen(request, timeout=timeout) as response:
-                return HttpResponse(response.status, response.read())
+                return HttpResponse(response.status, response.read(), dict(response.headers.items()))
         except HTTPError as exc:
             try:
-                return HttpResponse(exc.code, exc.read())
+                return HttpResponse(exc.code, exc.read(), dict(exc.headers.items()) if exc.headers else {})
             except HTTPException as read_error:
                 raise TransportError(f"network response failed ({type(read_error).__name__})") from None
         except URLError as exc:
