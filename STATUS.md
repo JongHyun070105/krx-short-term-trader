@@ -63,9 +63,10 @@ PHASE13_POINT_IN_TIME_UNIVERSE: PARTIAL (official lifecycle references found; co
 PHASE13_PIT_PRICE_HISTORY: NOT_AVAILABLE (delisted adjusted-price source not verified)
 PHASE13_SURVIVORSHIP_SENSITIVITY: NOT_TESTABLE (current-listing cohort only)
 PHASE13_FACTOR_MAP: PARTIAL (96/100 frozen cohort symbols have usable safe-window prices)
-PHASE13_RESIDUAL_MECHANISM: WEAK (candidate date-cluster residual intervals cross zero)
-PHASE13_CANDIDATE: RESEARCH_CANDIDATE (one KOSPI excess-reversal × expanded-turnover rule preregistered)
-PHASE13_CONFIRMATION: NOT_RUN (guarded one-shot requires pushed preregistration freeze)
+PHASE13_RESIDUAL_MECHANISM: WEAK (Discovery/Touched residual intervals cross zero; Confirmation reversed)
+PHASE13_CANDIDATE: REJECTED (one preregistered KOSPI excess-reversal × expanded-turnover rule failed Confirmation)
+PHASE13_CONFIRMATION: FAIL (105 non-overlap trades; gross, net, excess, residual, and date-concentration gates failed)
+PHASE13_PRE_CONFIRMATION_FREEZE_SHA: 8a828629f0b81e9b1e4e46aeb2398c127afed263
 PHASE13_EXTERNAL_2026: NOT_READ
 PHASE13_HOLDOUT_2026: NOT_READ
 PHASE13_ARTIFACT_INTEGRITY: PASS (28 indexed artifacts; Phase 5–12 snapshot unchanged)
