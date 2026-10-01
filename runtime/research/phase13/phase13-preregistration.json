@@ -1,0 +1,435 @@
+{
+  "candidate": {
+    "beta_specification": {
+      "clip": false,
+      "known_through": "T close",
+      "minimum_pairs": 60,
+      "window": 120
+    },
+    "candidate_gate": {
+      "checks": {
+        "at_least_three_chronological_blocks_same_direction": true,
+        "concentration_within_fixed_limits": true,
+        "date_cluster_bootstrap_available": true,
+        "discovery_non_overlap_min_50": true,
+        "discovery_unique_dates_min_40": true,
+        "market_component_not_dominant": true,
+        "payoff_ratio_over_one_both_periods": true,
+        "positive_absolute_gross_both_periods": true,
+        "positive_absolute_net_1x_both_periods": true,
+        "positive_beta_residual_both_periods": true,
+        "positive_excess_both_periods": true,
+        "same_market_and_factor_states": true,
+        "touched_non_overlap_min_50": true,
+        "touched_unique_dates_min_40": true
+      },
+      "failed_checks": [],
+      "pass": true
+    },
+    "chronological_blocks": [
+      {
+        "block": "2023_H1",
+        "metrics": {
+          "beta_adjusted_residual_return_pct": 0.108276,
+          "break_even_friction_pct": 1.395296,
+          "market_component_share_pct": 79.982514,
+          "matched_market_return_pct": 1.115993,
+          "mean_mae_pct": -3.3242475192624945,
+          "mean_mfe_pct": 5.36623267917154,
+          "net_return_pct": {
+            "1.5x": 0.600296,
+            "1x": 0.865296,
+            "2x": 0.335296
+          },
+          "non_overlapping_executions": 77,
+          "payoff_ratio": 1.411376,
+          "raw_observations": 187,
+          "raw_unique_market_state_dates": 92,
+          "raw_unique_signal_dates": 92,
+          "simple_excess_return_pct": 0.279303,
+          "stock_gross_return_pct": 1.395296,
+          "unique_market_state_dates": 47,
+          "unique_signal_dates": 47,
+          "unique_symbols": 43
+        }
+      },
+      {
+        "block": "2023_H2",
+        "metrics": {
+          "beta_adjusted_residual_return_pct": 0.849085,
+          "break_even_friction_pct": 0.697242,
+          "market_component_share_pct": -15.719382,
+          "matched_market_return_pct": -0.109602,
+          "mean_mae_pct": -3.579512650634261,
+          "mean_mfe_pct": 6.662514458262866,
+          "net_return_pct": {
+            "1.5x": -0.097758,
+            "1x": 0.167242,
+            "2x": -0.362758
+          },
+          "non_overlapping_executions": 83,
+          "payoff_ratio": 1.264145,
+          "raw_observations": 180,
+          "raw_unique_market_state_dates": 88,
+          "raw_unique_signal_dates": 88,
+          "simple_excess_return_pct": 0.806844,
+          "stock_gross_return_pct": 0.697242,
+          "unique_market_state_dates": 53,
+          "unique_signal_dates": 53,
+          "unique_symbols": 42
+        }
+      },
+      {
+        "block": "2024_H1",
+        "metrics": {
+          "beta_adjusted_residual_return_pct": 0.481082,
+          "break_even_friction_pct": 1.118932,
+          "market_component_share_pct": 33.516118,
+          "matched_market_return_pct": 0.375023,
+          "mean_mae_pct": -3.1166182685862953,
+          "mean_mfe_pct": 5.269433363170225,
+          "net_return_pct": {
+            "1.5x": 0.323932,
+            "1x": 0.588932,
+            "2x": 0.058932
+          },
+          "non_overlapping_executions": 92,
+          "payoff_ratio": 1.551869,
+          "raw_observations": 213,
+          "raw_unique_market_state_dates": 93,
+          "raw_unique_signal_dates": 93,
+          "simple_excess_return_pct": 0.74391,
+          "stock_gross_return_pct": 1.118932,
+          "unique_market_state_dates": 60,
+          "unique_signal_dates": 60,
+          "unique_symbols": 45
+        }
+      },
+      {
+        "block": "2024_H2",
+        "metrics": {
+          "beta_adjusted_residual_return_pct": 0.440819,
+          "break_even_friction_pct": 0.301305,
+          "market_component_share_pct": 13.805704,
+          "matched_market_return_pct": 0.041597,
+          "mean_mae_pct": -3.7693642644121566,
+          "mean_mfe_pct": 4.671429914015529,
+          "net_return_pct": {
+            "1.5x": -0.493695,
+            "1x": -0.228695,
+            "2x": -0.758695
+          },
+          "non_overlapping_executions": 84,
+          "payoff_ratio": 1.37508,
+          "raw_observations": 200,
+          "raw_unique_market_state_dates": 86,
+          "raw_unique_signal_dates": 86,
+          "simple_excess_return_pct": 0.259707,
+          "stock_gross_return_pct": 0.301305,
+          "unique_market_state_dates": 54,
+          "unique_signal_dates": 54,
+          "unique_symbols": 44
+        }
+      },
+      {
+        "block": "2025_H1",
+        "metrics": {
+          "beta_adjusted_residual_return_pct": 1.324803,
+          "break_even_friction_pct": 2.348191,
+          "market_component_share_pct": 58.94952,
+          "matched_market_return_pct": 1.384247,
+          "mean_mae_pct": -3.970604125906819,
+          "mean_mfe_pct": 6.5312882550946325,
+          "net_return_pct": {
+            "1.5x": 1.553191,
+            "1x": 1.818191,
+            "2x": 1.288191
+          },
+          "non_overlapping_executions": 108,
+          "payoff_ratio": 2.144783,
+          "raw_observations": 257,
+          "raw_unique_market_state_dates": 95,
+          "raw_unique_signal_dates": 95,
+          "simple_excess_return_pct": 0.963944,
+          "stock_gross_return_pct": 2.348191,
+          "unique_market_state_dates": 67,
+          "unique_signal_dates": 67,
+          "unique_symbols": 46
+        }
+      }
+    ],
+    "concentration": {
+      "discovery": {
+        "market_event_clustering": {
+          "unique_market_state_dates": 159,
+          "unique_signal_dates": 159
+        },
+        "non_overlapping_executions": 249,
+        "positive_contribution_total_pct_points": 671.39569,
+        "top_3_symbol_share_pct": 29.794095,
+        "top_5_signal_date_share_pct": 37.502542,
+        "top_5_trade_contribution": {
+          "gross_pct_points": 176.721161,
+          "share_of_positive_contribution_pct": 26.321462
+        },
+        "top_signal_dates": [
+          {
+            "key": "2023-07-27",
+            "positive_contribution_pct": 90.70929,
+            "share_of_positive_contribution_pct": 13.510556
+          },
+          {
+            "key": "2023-01-02",
+            "positive_contribution_pct": 54.090243,
+            "share_of_positive_contribution_pct": 8.056388
+          },
+          {
+            "key": "2024-02-06",
+            "positive_contribution_pct": 50.246123,
+            "share_of_positive_contribution_pct": 7.483832
+          },
+          {
+            "key": "2023-05-31",
+            "positive_contribution_pct": 30.9188,
+            "share_of_positive_contribution_pct": 4.605153
+          },
+          {
+            "key": "2023-10-31",
+            "positive_contribution_pct": 25.825991,
+            "share_of_positive_contribution_pct": 3.846613
+          }
+        ],
+        "top_symbols": [
+          {
+            "key": "002240",
+            "positive_contribution_pct": 112.002175,
+            "share_of_positive_contribution_pct": 16.681992
+          },
+          {
+            "key": "022100",
+            "positive_contribution_pct": 48.601543,
+            "share_of_positive_contribution_pct": 7.238882
+          },
+          {
+            "key": "030210",
+            "positive_contribution_pct": 39.43255,
+            "share_of_positive_contribution_pct": 5.873221
+          },
+          {
+            "key": "001440",
+            "positive_contribution_pct": 37.907369,
+            "share_of_positive_contribution_pct": 5.646055
+          },
+          {
+            "key": "111380",
+            "positive_contribution_pct": 32.481128,
+            "share_of_positive_contribution_pct": 4.837852
+          }
+        ],
+        "top_trade_contribution": {
+          "gross_pct": 52.287621,
+          "share_of_positive_contribution_pct": 7.787899
+        }
+      },
+      "touched_replication": {
+        "market_event_clustering": {
+          "unique_market_state_dates": 120,
+          "unique_signal_dates": 120
+        },
+        "non_overlapping_executions": 191,
+        "positive_contribution_total_pct_points": 605.583215,
+        "top_3_symbol_share_pct": 40.82366,
+        "top_5_signal_date_share_pct": 39.963833,
+        "top_5_trade_contribution": {
+          "gross_pct_points": 219.131083,
+          "share_of_positive_contribution_pct": 36.185132
+        },
+        "top_signal_dates": [
+          {
+            "key": "2025-04-30",
+            "positive_contribution_pct": 99.482759,
+            "share_of_positive_contribution_pct": 16.427595
+          },
+          {
+            "key": "2025-06-05",
+            "positive_contribution_pct": 49.277857,
+            "share_of_positive_contribution_pct": 8.137256
+          },
+          {
+            "key": "2024-11-12",
+            "positive_contribution_pct": 33.251808,
+            "share_of_positive_contribution_pct": 5.490873
+          },
+          {
+            "key": "2025-05-16",
+            "positive_contribution_pct": 30.252506,
+            "share_of_positive_contribution_pct": 4.995599
+          },
+          {
+            "key": "2025-06-18",
+            "positive_contribution_pct": 29.749334,
+            "share_of_positive_contribution_pct": 4.91251
+          }
+        ],
+        "top_symbols": [
+          {
+            "key": "010770",
+            "positive_contribution_pct": 140.416515,
+            "share_of_positive_contribution_pct": 23.186989
+          },
+          {
+            "key": "377300",
+            "positive_contribution_pct": 63.657699,
+            "share_of_positive_contribution_pct": 10.5118
+          },
+          {
+            "key": "011390",
+            "positive_contribution_pct": 43.147024,
+            "share_of_positive_contribution_pct": 7.124871
+          },
+          {
+            "key": "000400",
+            "positive_contribution_pct": 37.367605,
+            "share_of_positive_contribution_pct": 6.170515
+          },
+          {
+            "key": "323410",
+            "positive_contribution_pct": 35.931768,
+            "share_of_positive_contribution_pct": 5.933415
+          }
+        ],
+        "top_trade_contribution": {
+          "gross_pct": 99.482759,
+          "share_of_positive_contribution_pct": 16.427595
+        }
+      }
+    },
+    "cost_assumptions": {
+      "multipliers": [
+        1.0,
+        1.5,
+        2.0
+      ],
+      "round_trip_pct_1x": 0.53
+    },
+    "discovery_cluster_bootstrap": {
+      "cluster_unit": "signal_date (both market cohorts on the same date remain together)",
+      "date_clusters": 159,
+      "interval_pct_5_95": {
+        "beta_adjusted_residual_return_pct": [
+          -0.451188,
+          1.179382
+        ],
+        "simple_excess_return_pct": [
+          -0.265596,
+          1.379085
+        ],
+        "stock_gross_return_pct": [
+          0.028952,
+          1.790641
+        ]
+      },
+      "iterations": 2000,
+      "seed": 1313,
+      "status": "PASS"
+    },
+    "discovery_metrics": {
+      "beta_adjusted_residual_return_pct": 0.590251,
+      "break_even_friction_pct": 1.160338,
+      "market_component_share_pct": 41.308952,
+      "matched_market_return_pct": 0.479324,
+      "mean_mae_pct": -3.2369802499837936,
+      "mean_mfe_pct": 5.780771874646347,
+      "net_return_pct": {
+        "1.5x": 0.365338,
+        "1x": 0.630338,
+        "2x": 0.100338
+      },
+      "non_overlapping_executions": 249,
+      "payoff_ratio": 1.491442,
+      "raw_observations": 580,
+      "raw_unique_market_state_dates": 273,
+      "raw_unique_signal_dates": 273,
+      "simple_excess_return_pct": 0.681015,
+      "stock_gross_return_pct": 1.160338,
+      "unique_market_state_dates": 159,
+      "unique_signal_dates": 159,
+      "unique_symbols": 50
+    },
+    "entry": "T+1 open",
+    "exit": "5th session close including entry session",
+    "features": {
+      "excess_return_5d_pct": {
+        "boundary": "<= -4%",
+        "state": "LE_−4"
+      },
+      "turnover_ratio_5d_vs_prior20_median": {
+        "boundary": ">= 1.5",
+        "state": "EXPANDED"
+      }
+    },
+    "holding_horizon_sessions": 5,
+    "interaction": "EXCESS_5D_X_TURNOVER",
+    "market": "KOSPI",
+    "mechanism_uncertainty": "Date-cluster 90% residual intervals cross zero in both periods; one-shot Confirmation is required.",
+    "missing_data_rule": "exclude the corresponding observation; no fill",
+    "name": "KOSPI_EXCESS_REVERSAL_WITH_EXPANDED_TURNOVER",
+    "non_overlap_rule": "one active execution per symbol; next entry must occur after prior exit",
+    "point_in_time_status": "PARTIAL; no PIT universe mixed into result",
+    "residual_formula": "forward stock gross return - beta_T * matched index gross return",
+    "touched_cluster_bootstrap": {
+      "cluster_unit": "signal_date (both market cohorts on the same date remain together)",
+      "date_clusters": 120,
+      "interval_pct_5_95": {
+        "beta_adjusted_residual_return_pct": [
+          -0.099165,
+          3.035946
+        ],
+        "simple_excess_return_pct": [
+          -0.277869,
+          2.768698
+        ],
+        "stock_gross_return_pct": [
+          0.401055,
+          3.494053
+        ]
+      },
+      "iterations": 2000,
+      "seed": 1313,
+      "status": "PASS"
+    },
+    "touched_replication_metrics": {
+      "beta_adjusted_residual_return_pct": 0.968416,
+      "break_even_friction_pct": 1.461328,
+      "market_component_share_pct": 52.632254,
+      "matched_market_return_pct": 0.76913,
+      "mean_mae_pct": -3.8957845553487207,
+      "mean_mfe_pct": 5.748656068278921,
+      "net_return_pct": {
+        "1.5x": 0.666328,
+        "1x": 0.931328,
+        "2x": 0.401328
+      },
+      "non_overlapping_executions": 191,
+      "payoff_ratio": 1.815894,
+      "raw_observations": 457,
+      "raw_unique_market_state_dates": 181,
+      "raw_unique_signal_dates": 181,
+      "simple_excess_return_pct": 0.692198,
+      "stock_gross_return_pct": 1.461328,
+      "unique_market_state_dates": 120,
+      "unique_signal_dates": 120,
+      "unique_symbols": 47
+    },
+    "universe": "CURRENT_COHORT; frozen 100 symbols with current-listing survivorship bias retained; KOSPI only using frozen cohort classification"
+  },
+  "config_sha256": "c2172600cfeca70e20da8effe1f23c93ca197452abb36cd424ace823dc0857e7",
+  "confirmation_period": [
+    "2025-07-01",
+    "2025-12-30"
+  ],
+  "dataset_sha256": "a741a76f8b5519cd81125c289362b32da093b86b107ed7377eb89b0308623f10",
+  "reason": null,
+  "source_git_sha": "0de301a1139ee84faa81a82ab6f6b7ead39ef6a5",
+  "status": "PREREGISTERED"
+}

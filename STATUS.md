@@ -59,6 +59,17 @@ PHASE12_EXTERNAL_2026: NOT_READ
 PHASE12_HOLDOUT_2026: NOT_READ
 PHASE12_ARTIFACT_INTEGRITY: PASS (23 indexed artifacts; Phase 5–11 manifest/index snapshot 23/23 unchanged)
 PHASE12_TESTS: PASS (268 total; baseline 252 plus 16 Phase 12 tests)
+PHASE13_POINT_IN_TIME_UNIVERSE: PARTIAL (official lifecycle references found; complete dated membership/lineage not verified)
+PHASE13_PIT_PRICE_HISTORY: NOT_AVAILABLE (delisted adjusted-price source not verified)
+PHASE13_SURVIVORSHIP_SENSITIVITY: NOT_TESTABLE (current-listing cohort only)
+PHASE13_FACTOR_MAP: PARTIAL (96/100 frozen cohort symbols have usable safe-window prices)
+PHASE13_RESIDUAL_MECHANISM: WEAK (candidate date-cluster residual intervals cross zero)
+PHASE13_CANDIDATE: RESEARCH_CANDIDATE (one KOSPI excess-reversal × expanded-turnover rule preregistered)
+PHASE13_CONFIRMATION: NOT_RUN (guarded one-shot requires pushed preregistration freeze)
+PHASE13_EXTERNAL_2026: NOT_READ
+PHASE13_HOLDOUT_2026: NOT_READ
+PHASE13_ARTIFACT_INTEGRITY: PASS (28 indexed artifacts; Phase 5–12 snapshot unchanged)
+PHASE13_TESTS: PASS (297 total; 268 baseline + 29 Phase 13)
 VWAP_RECLAIM_ANATOMY: FAIL (15m Development gate passed 2/5; no variants created)
 VWAP_A: NOT_CREATED
 VWAP_B: NOT_CREATED
@@ -107,6 +118,15 @@ Phase 2, Phase 2.5, Phase 3, Phase 4, and Phase 5 evidence is summarized in [RES
 - Volatility and dispersion shifted (SMD +0.909 and +0.662); breadth shifted modestly (SMD −0.211). Fast-shock composition rose from 20.0% to 91.7%, but its rebound direction did not replicate. The evidence supports market beta and changed stress composition as the anatomy, not an independently tradable mechanism.
 - Verdicts: `PHASE12_FAILURE_ANATOMY=COMPLETE`; `MARKET_BETA_EXPLANATION=STRONG`; `STRESS_COMPOSITION_SHIFT=STRONG`; `MARKET_STRESS_MECHANISM=NOT_SUPPORTED`; `PHASE12_CANDIDATE=NOT_CREATED`; `PHASE12_CONFIRMATION=NOT_RUN`; `EXTERNAL_2026=NOT_READ`; `HOLDOUT_2026=NOT_READ`; `SHADOW_NEXT_SESSION=NO`; `ALPHA=UNPROVEN`; `LIVE=DISABLED`.
 - The historical Phase 11 candidate remains `REJECTED` and its Validation remains `FAIL`. Current-listing survivorship bias applies. Phase 5–11 artifacts remain unchanged; Phase 12 machine-readable artifacts are under ignored `runtime/research/phase12/`. Details and explicit Q1–Q15 answers are in [Phase 12 research](docs/research/phase12-market-stress-failure-anatomy.md).
+
+## Phase 13 current decision
+
+- Official KRX/KIND sources expose useful current listings and delisting references, and KRX describes dated trading/security data, but complete as-of membership, code lineage, delisted retention, and revision semantics were not verified. `POINT_IN_TIME_UNIVERSE=PARTIAL`; `PIT_PRICE_HISTORY=NOT_AVAILABLE`; `SURVIVORSHIP_SENSITIVITY=NOT_TESTABLE`. The study kept the frozen 100-current-listing cohort separate, with usable safe prices for 96 symbols.
+- KIS adjusted daily OHLCV (`FID_ORG_ADJ_PRC=0`) and matched KOSPI/KOSDAQ index returns covered only Discovery (2023-01-02–2024-06-28) and Touched Replication (2024-07-01–2025-06-30). No Confirmation or 2026 outcomes were evaluated before the preregistered freeze. Touched Replication is not independent.
+- The strongest standalone state was 20d beta-residual reversal (−4% to −2%), 5-session horizon: gross +0.224%/+0.347%, excess +0.282%/+0.492%, residual +0.231%/+0.444%, but net −0.306%/−0.183% at 1× in Discovery/Touched. It fails long-only cost economics.
+- Two adjacent 5d excess-return buckets × EXPANDED turnover passed the fixed KOSPI D/T gates; residual-first priority selected the ≤−4% state. It returned gross +1.160%/+1.461%, excess +0.681%/+0.692%, residual +0.590%/+0.968%, net +0.630%/+0.931% at 1× and positive net through 2×. One `RESEARCH_CANDIDATE` was preregistered, not proof of alpha.
+- Candidate date-cluster 90% residual intervals include zero in both periods. Accordingly `RESIDUAL_MECHANISM=WEAK`. Current-listing survivorship bias remains; the mechanism is KOSPI-specific under the frozen current cohort. Confirmation is the only next statistical gate and must run once after the exact pushed freeze check. External 2026 and Holdout remain unread; `SHADOW_NEXT_SESSION=NO`, `ALPHA=UNPROVEN`, `LIVE=DISABLED`.
+- Full methods, source audit, factor maps, market split, chronological stability, concentration, bootstrap, Q1–Q18, and artifact paths are in [Phase 13 research](docs/research/phase13-point-in-time-universe-and-residual-factor-map.md). Machine-readable outputs are generated under ignored `runtime/research/phase13/`.
 
 ## Phase 11 current decision
 
