@@ -1,0 +1,733 @@
+{
+  "artifact": "concentration-analysis",
+  "results": [
+    {
+      "contribution_basis": "positive absolute forward-return contribution within the selected broad factor quantile",
+      "date_clusters": 587,
+      "factor_id": "abnormal_traded_value_activity",
+      "family_id": "abnormal_traded_value_activity",
+      "horizon_sessions": 10,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 1048,
+      "orientation": "negative",
+      "positive_contribution_observations": 2162,
+      "stock_observations": 5062,
+      "target": "ABSOLUTE_RETURN",
+      "top_date": "2025-04-03",
+      "top_date_share_pct": 1.0682042925059765,
+      "top_five_dates": [
+        {
+          "date": "2025-04-03",
+          "share_pct": 1.0682042925059765
+        },
+        {
+          "date": "2025-04-04",
+          "share_pct": 1.0255937953940484
+        },
+        {
+          "date": "2025-04-02",
+          "share_pct": 0.9017576879823387
+        },
+        {
+          "date": "2025-04-08",
+          "share_pct": 0.8451955881166423
+        },
+        {
+          "date": "2025-03-31",
+          "share_pct": 0.7556399465260021
+        }
+      ],
+      "top_five_dates_share_pct": 4.596391310525008,
+      "top_five_observation_share_pct": 2.9830596989338356,
+      "top_observation_share_pct": 0.690514106972392,
+      "top_symbol": "377480",
+      "top_symbol_share_pct": 8.125928103346833,
+      "top_three_symbols": [
+        {
+          "share_pct": 8.125928103346833,
+          "symbol": "377480"
+        },
+        {
+          "share_pct": 5.726556380174907,
+          "symbol": "347700"
+        },
+        {
+          "share_pct": 5.0316171099837605,
+          "symbol": "241520"
+        }
+      ],
+      "top_three_symbols_share_pct": 18.884101593505502,
+      "unique_signal_dates": 587
+    },
+    {
+      "contribution_basis": "positive absolute forward-return contribution within the selected broad factor quantile",
+      "date_clusters": 584,
+      "factor_id": "beta_residual_return_5d",
+      "family_id": "beta_residual_return",
+      "horizon_sessions": 3,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 2435,
+      "orientation": "negative",
+      "positive_contribution_observations": 2285,
+      "stock_observations": 5127,
+      "target": "ABSOLUTE_RETURN",
+      "top_date": "2024-12-09",
+      "top_date_share_pct": 1.05913952179657,
+      "top_five_dates": [
+        {
+          "date": "2024-12-09",
+          "share_pct": 1.05913952179657
+        },
+        {
+          "date": "2025-04-08",
+          "share_pct": 0.9841426755805202
+        },
+        {
+          "date": "2025-04-10",
+          "share_pct": 0.9822469641942786
+        },
+        {
+          "date": "2024-12-30",
+          "share_pct": 0.8120978341556226
+        },
+        {
+          "date": "2023-07-26",
+          "share_pct": 0.8028801953893901
+        }
+      ],
+      "top_five_dates_share_pct": 4.640507191116382,
+      "top_five_observation_share_pct": 2.1182587182845634,
+      "top_observation_share_pct": 0.4898687612815996,
+      "top_symbol": "347700",
+      "top_symbol_share_pct": 8.000297111271406,
+      "top_three_symbols": [
+        {
+          "share_pct": 8.000297111271406,
+          "symbol": "347700"
+        },
+        {
+          "share_pct": 4.960662268295846,
+          "symbol": "258610"
+        },
+        {
+          "share_pct": 4.340093460223719,
+          "symbol": "377480"
+        }
+      ],
+      "top_three_symbols_share_pct": 17.30105283979097,
+      "unique_signal_dates": 584
+    },
+    {
+      "contribution_basis": "positive absolute forward-return contribution within the selected broad factor quantile",
+      "date_clusters": 587,
+      "factor_id": "idiosyncratic_volatility_20d",
+      "family_id": "idiosyncratic_volatility",
+      "horizon_sessions": 10,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 743,
+      "orientation": "negative",
+      "positive_contribution_observations": 2231,
+      "stock_observations": 5270,
+      "target": "ABSOLUTE_RETURN",
+      "top_date": "2024-08-05",
+      "top_date_share_pct": 1.1782037117062696,
+      "top_five_dates": [
+        {
+          "date": "2024-08-05",
+          "share_pct": 1.1782037117062696
+        },
+        {
+          "date": "2024-08-06",
+          "share_pct": 0.9020075073383399
+        },
+        {
+          "date": "2025-04-09",
+          "share_pct": 0.8085978313650967
+        },
+        {
+          "date": "2025-04-08",
+          "share_pct": 0.8016371707945117
+        },
+        {
+          "date": "2025-02-07",
+          "share_pct": 0.7791636353004604
+        }
+      ],
+      "top_five_dates_share_pct": 4.469609856504678,
+      "top_five_observation_share_pct": 2.4004053431572783,
+      "top_observation_share_pct": 0.5400132878326807,
+      "top_symbol": "241520",
+      "top_symbol_share_pct": 6.172907076602757,
+      "top_three_symbols": [
+        {
+          "share_pct": 6.172907076602757,
+          "symbol": "241520"
+        },
+        {
+          "share_pct": 5.516309137596361,
+          "symbol": "094840"
+        },
+        {
+          "share_pct": 4.811869670003767,
+          "symbol": "141000"
+        }
+      ],
+      "top_three_symbols_share_pct": 16.501085884202887,
+      "unique_signal_dates": 587
+    },
+    {
+      "contribution_basis": "positive absolute forward-return contribution within the selected broad factor quantile",
+      "date_clusters": 0,
+      "factor_id": "market_breadth_positive",
+      "family_id": "market_breadth",
+      "horizon_sessions": 3,
+      "market_scope": "ALL",
+      "non_overlap_observations": 0,
+      "orientation": "positive",
+      "positive_contribution_observations": 0,
+      "stock_observations": 0,
+      "target": "ABSOLUTE_RETURN",
+      "top_date": null,
+      "top_date_share_pct": null,
+      "top_five_dates": [],
+      "top_five_dates_share_pct": null,
+      "top_five_observation_share_pct": null,
+      "top_observation_share_pct": null,
+      "top_symbol": null,
+      "top_symbol_share_pct": null,
+      "top_three_symbols": [],
+      "top_three_symbols_share_pct": null,
+      "unique_signal_dates": 0
+    },
+    {
+      "contribution_basis": "positive absolute forward-return contribution within the selected broad factor quantile",
+      "date_clusters": 0,
+      "factor_id": "matched_market_return_5d",
+      "family_id": "market_context",
+      "horizon_sessions": 3,
+      "market_scope": "ALL",
+      "non_overlap_observations": 0,
+      "orientation": "positive",
+      "positive_contribution_observations": 0,
+      "stock_observations": 0,
+      "target": "ABSOLUTE_RETURN",
+      "top_date": null,
+      "top_date_share_pct": null,
+      "top_five_dates": [],
+      "top_five_dates_share_pct": null,
+      "top_five_observation_share_pct": null,
+      "top_observation_share_pct": null,
+      "top_symbol": null,
+      "top_symbol_share_pct": null,
+      "top_three_symbols": [],
+      "top_three_symbols_share_pct": null,
+      "unique_signal_dates": 0
+    },
+    {
+      "contribution_basis": "positive absolute forward-return contribution within the selected broad factor quantile",
+      "date_clusters": 0,
+      "factor_id": "market_excess_dispersion_1d",
+      "family_id": "market_excess_dispersion",
+      "horizon_sessions": 3,
+      "market_scope": "ALL",
+      "non_overlap_observations": 0,
+      "orientation": "positive",
+      "positive_contribution_observations": 0,
+      "stock_observations": 0,
+      "target": "ABSOLUTE_RETURN",
+      "top_date": null,
+      "top_date_share_pct": null,
+      "top_five_dates": [],
+      "top_five_dates_share_pct": null,
+      "top_five_observation_share_pct": null,
+      "top_observation_share_pct": null,
+      "top_symbol": null,
+      "top_symbol_share_pct": null,
+      "top_three_symbols": [],
+      "top_three_symbols_share_pct": null,
+      "unique_signal_dates": 0
+    },
+    {
+      "contribution_basis": "positive absolute forward-return contribution within the selected broad factor quantile",
+      "date_clusters": 587,
+      "factor_id": "market_excess_return_10d",
+      "family_id": "market_excess_return",
+      "horizon_sessions": 10,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 1050,
+      "orientation": "negative",
+      "positive_contribution_observations": 2275,
+      "stock_observations": 5290,
+      "target": "ABSOLUTE_RETURN",
+      "top_date": "2024-12-09",
+      "top_date_share_pct": 1.132833854464991,
+      "top_five_dates": [
+        {
+          "date": "2024-12-09",
+          "share_pct": 1.132833854464991
+        },
+        {
+          "date": "2025-03-31",
+          "share_pct": 1.0673421501876403
+        },
+        {
+          "date": "2024-12-05",
+          "share_pct": 0.9764714047126252
+        },
+        {
+          "date": "2025-05-22",
+          "share_pct": 0.8171495677268462
+        },
+        {
+          "date": "2024-08-05",
+          "share_pct": 0.7997256895823481
+        }
+      ],
+      "top_five_dates_share_pct": 4.793522666674451,
+      "top_five_observation_share_pct": 2.5913308575814216,
+      "top_observation_share_pct": 0.6192421834529819,
+      "top_symbol": "377480",
+      "top_symbol_share_pct": 7.996137763322096,
+      "top_three_symbols": [
+        {
+          "share_pct": 7.996137763322096,
+          "symbol": "377480"
+        },
+        {
+          "share_pct": 5.1738085584401965,
+          "symbol": "432720"
+        },
+        {
+          "share_pct": 5.1456279267114935,
+          "symbol": "241520"
+        }
+      ],
+      "top_three_symbols_share_pct": 18.315574248473787,
+      "unique_signal_dates": 587
+    },
+    {
+      "contribution_basis": "positive absolute forward-return contribution within the selected broad factor quantile",
+      "date_clusters": 601,
+      "factor_id": "negative_control_stable_hash_pseudorank",
+      "family_id": "negative_control",
+      "horizon_sessions": 3,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 3515,
+      "orientation": "positive",
+      "positive_contribution_observations": 2139,
+      "stock_observations": 4904,
+      "target": "ABSOLUTE_RETURN",
+      "top_date": "2024-12-13",
+      "top_date_share_pct": 1.1710259283877944,
+      "top_five_dates": [
+        {
+          "date": "2024-12-13",
+          "share_pct": 1.1710259283877944
+        },
+        {
+          "date": "2025-02-06",
+          "share_pct": 0.9511598710942945
+        },
+        {
+          "date": "2025-02-13",
+          "share_pct": 0.938607092804976
+        },
+        {
+          "date": "2024-12-30",
+          "share_pct": 0.8306178394614357
+        },
+        {
+          "date": "2024-12-09",
+          "share_pct": 0.8051274839704448
+        }
+      ],
+      "top_five_dates_share_pct": 4.696538215718945,
+      "top_five_observation_share_pct": 3.1002274856723266,
+      "top_observation_share_pct": 0.7279502196650275,
+      "top_symbol": "432720",
+      "top_symbol_share_pct": 4.220856294188621,
+      "top_three_symbols": [
+        {
+          "share_pct": 4.220856294188621,
+          "symbol": "432720"
+        },
+        {
+          "share_pct": 4.102037226450247,
+          "symbol": "347700"
+        },
+        {
+          "share_pct": 3.7286625696950524,
+          "symbol": "101680"
+        }
+      ],
+      "top_three_symbols_share_pct": 12.051556090333921,
+      "unique_signal_dates": 601
+    },
+    {
+      "contribution_basis": "positive absolute forward-return contribution within the selected broad factor quantile",
+      "date_clusters": 0,
+      "factor_id": "phase13_excess_turnover_interaction__GE_4__EXPANDED",
+      "family_id": "phase13_excess_turnover_interaction",
+      "horizon_sessions": 10,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 0,
+      "orientation": "negative",
+      "positive_contribution_observations": 0,
+      "stock_observations": 0,
+      "target": "ABSOLUTE_RETURN",
+      "top_date": null,
+      "top_date_share_pct": null,
+      "top_five_dates": [],
+      "top_five_dates_share_pct": null,
+      "top_five_observation_share_pct": null,
+      "top_observation_share_pct": null,
+      "top_symbol": null,
+      "top_symbol_share_pct": null,
+      "top_three_symbols": [],
+      "top_three_symbols_share_pct": null,
+      "unique_signal_dates": 0
+    },
+    {
+      "contribution_basis": "positive absolute forward-return contribution within the selected broad factor quantile",
+      "date_clusters": 26,
+      "factor_id": "phase13_residual_drawdown_idio_vol_interaction__DEEP_LE_-8__HIGH",
+      "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+      "horizon_sessions": 10,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 105,
+      "orientation": "negative",
+      "positive_contribution_observations": 138,
+      "stock_observations": 338,
+      "target": "ABSOLUTE_RETURN",
+      "top_date": "2024-12-05",
+      "top_date_share_pct": 12.636659302570333,
+      "top_five_dates": [
+        {
+          "date": "2024-12-05",
+          "share_pct": 12.636659302570333
+        },
+        {
+          "date": "2023-05-08",
+          "share_pct": 11.868054172475679
+        },
+        {
+          "date": "2023-04-28",
+          "share_pct": 8.74338971810076
+        },
+        {
+          "date": "2023-04-25",
+          "share_pct": 8.448420264827405
+        },
+        {
+          "date": "2023-08-18",
+          "share_pct": 8.158885858377802
+        }
+      ],
+      "top_five_dates_share_pct": 49.85540931635198,
+      "top_five_observation_share_pct": 15.08756246774699,
+      "top_observation_share_pct": 3.547909109756657,
+      "top_symbol": "086710",
+      "top_symbol_share_pct": 14.695292810269093,
+      "top_three_symbols": [
+        {
+          "share_pct": 14.695292810269093,
+          "symbol": "086710"
+        },
+        {
+          "share_pct": 10.432251106983049,
+          "symbol": "195500"
+        },
+        {
+          "share_pct": 10.285214226408444,
+          "symbol": "101930"
+        }
+      ],
+      "top_three_symbols_share_pct": 35.41275814366058,
+      "unique_signal_dates": 26
+    },
+    {
+      "contribution_basis": "positive absolute forward-return contribution within the selected broad factor quantile",
+      "date_clusters": 0,
+      "factor_id": "phase13_residual_rank_turnover_interaction__UPPER__EXPANDED",
+      "family_id": "phase13_residual_rank_turnover_interaction",
+      "horizon_sessions": 10,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 0,
+      "orientation": "negative",
+      "positive_contribution_observations": 0,
+      "stock_observations": 0,
+      "target": "ABSOLUTE_RETURN",
+      "top_date": null,
+      "top_date_share_pct": null,
+      "top_five_dates": [],
+      "top_five_dates_share_pct": null,
+      "top_five_observation_share_pct": null,
+      "top_observation_share_pct": null,
+      "top_symbol": null,
+      "top_symbol_share_pct": null,
+      "top_three_symbols": [],
+      "top_three_symbols_share_pct": null,
+      "unique_signal_dates": 0
+    },
+    {
+      "contribution_basis": "positive absolute forward-return contribution within the selected broad factor quantile",
+      "date_clusters": 601,
+      "factor_id": "range_position_20d",
+      "family_id": "range_position",
+      "horizon_sessions": 3,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 2356,
+      "orientation": "negative",
+      "positive_contribution_observations": 2231,
+      "stock_observations": 5189,
+      "target": "ABSOLUTE_RETURN",
+      "top_date": "2024-12-16",
+      "top_date_share_pct": 1.2343540519932437,
+      "top_five_dates": [
+        {
+          "date": "2024-12-16",
+          "share_pct": 1.2343540519932437
+        },
+        {
+          "date": "2025-04-10",
+          "share_pct": 1.1946771297021153
+        },
+        {
+          "date": "2024-12-09",
+          "share_pct": 1.0910087240338149
+        },
+        {
+          "date": "2024-12-13",
+          "share_pct": 1.0150377557098251
+        },
+        {
+          "date": "2025-04-08",
+          "share_pct": 0.9210774187667864
+        }
+      ],
+      "top_five_dates_share_pct": 5.456155080205785,
+      "top_five_observation_share_pct": 3.355858152065947,
+      "top_observation_share_pct": 1.1412084831966036,
+      "top_symbol": "347700",
+      "top_symbol_share_pct": 5.601007707539605,
+      "top_three_symbols": [
+        {
+          "share_pct": 5.601007707539605,
+          "symbol": "347700"
+        },
+        {
+          "share_pct": 5.220208918229092,
+          "symbol": "101680"
+        },
+        {
+          "share_pct": 4.211776735650494,
+          "symbol": "407400"
+        }
+      ],
+      "top_three_symbols_share_pct": 15.03299336141919,
+      "unique_signal_dates": 601
+    },
+    {
+      "contribution_basis": "positive absolute forward-return contribution within the selected broad factor quantile",
+      "date_clusters": 587,
+      "factor_id": "raw_trailing_return_5d",
+      "family_id": "raw_trailing_return",
+      "horizon_sessions": 10,
+      "market_scope": "KOSPI",
+      "non_overlap_observations": 1458,
+      "orientation": "positive",
+      "positive_contribution_observations": 2633,
+      "stock_observations": 5644,
+      "target": "ABSOLUTE_RETURN",
+      "top_date": "2025-06-10",
+      "top_date_share_pct": 0.9992048355264606,
+      "top_five_dates": [
+        {
+          "date": "2025-06-10",
+          "share_pct": 0.9992048355264606
+        },
+        {
+          "date": "2025-05-22",
+          "share_pct": 0.899000759265598
+        },
+        {
+          "date": "2025-05-26",
+          "share_pct": 0.8981106011385631
+        },
+        {
+          "date": "2025-05-27",
+          "share_pct": 0.8585261894017913
+        },
+        {
+          "date": "2025-06-11",
+          "share_pct": 0.7450373691518831
+        }
+      ],
+      "top_five_dates_share_pct": 4.399879754484296,
+      "top_five_observation_share_pct": 2.026897584766626,
+      "top_observation_share_pct": 0.4235362768297878,
+      "top_symbol": "022100",
+      "top_symbol_share_pct": 10.910234376616055,
+      "top_three_symbols": [
+        {
+          "share_pct": 10.910234376616055,
+          "symbol": "022100"
+        },
+        {
+          "share_pct": 5.612512728289671,
+          "symbol": "082740"
+        },
+        {
+          "share_pct": 4.752483591924064,
+          "symbol": "377300"
+        }
+      ],
+      "top_three_symbols_share_pct": 21.27523069682979,
+      "unique_signal_dates": 587
+    },
+    {
+      "contribution_basis": "positive absolute forward-return contribution within the selected broad factor quantile",
+      "date_clusters": 584,
+      "factor_id": "residual_cross_sectional_rank_5d",
+      "family_id": "residual_cross_sectional_rank",
+      "horizon_sessions": 3,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 2435,
+      "orientation": "negative",
+      "positive_contribution_observations": 2285,
+      "stock_observations": 5127,
+      "target": "ABSOLUTE_RETURN",
+      "top_date": "2024-12-09",
+      "top_date_share_pct": 1.05913952179657,
+      "top_five_dates": [
+        {
+          "date": "2024-12-09",
+          "share_pct": 1.05913952179657
+        },
+        {
+          "date": "2025-04-08",
+          "share_pct": 0.9841426755805202
+        },
+        {
+          "date": "2025-04-10",
+          "share_pct": 0.9822469641942786
+        },
+        {
+          "date": "2024-12-30",
+          "share_pct": 0.8120978341556226
+        },
+        {
+          "date": "2023-07-26",
+          "share_pct": 0.8028801953893901
+        }
+      ],
+      "top_five_dates_share_pct": 4.640507191116382,
+      "top_five_observation_share_pct": 2.1182587182845634,
+      "top_observation_share_pct": 0.4898687612815996,
+      "top_symbol": "347700",
+      "top_symbol_share_pct": 8.000297111271406,
+      "top_three_symbols": [
+        {
+          "share_pct": 8.000297111271406,
+          "symbol": "347700"
+        },
+        {
+          "share_pct": 4.960662268295846,
+          "symbol": "258610"
+        },
+        {
+          "share_pct": 4.340093460223719,
+          "symbol": "377480"
+        }
+      ],
+      "top_three_symbols_share_pct": 17.30105283979097,
+      "unique_signal_dates": 584
+    },
+    {
+      "contribution_basis": "positive absolute forward-return contribution within the selected broad factor quantile",
+      "date_clusters": 601,
+      "factor_id": "residual_drawdown_20d",
+      "family_id": "residual_drawdown",
+      "horizon_sessions": 3,
+      "market_scope": "KOSPI",
+      "non_overlap_observations": 2201,
+      "orientation": "negative",
+      "positive_contribution_observations": 2751,
+      "stock_observations": 6010,
+      "target": "ABSOLUTE_RETURN",
+      "top_date": "2025-04-02",
+      "top_date_share_pct": 1.1884893760490072,
+      "top_five_dates": [
+        {
+          "date": "2025-04-02",
+          "share_pct": 1.1884893760490072
+        },
+        {
+          "date": "2023-11-01",
+          "share_pct": 0.8685229971368639
+        },
+        {
+          "date": "2023-07-10",
+          "share_pct": 0.8506089225240268
+        },
+        {
+          "date": "2024-12-09",
+          "share_pct": 0.7581313227949678
+        },
+        {
+          "date": "2025-04-03",
+          "share_pct": 0.7481382943876715
+        }
+      ],
+      "top_five_dates_share_pct": 4.413890912892537,
+      "top_five_observation_share_pct": 3.320211163298239,
+      "top_observation_share_pct": 1.0070110177629872,
+      "top_symbol": "022100",
+      "top_symbol_share_pct": 12.239290989128738,
+      "top_three_symbols": [
+        {
+          "share_pct": 12.239290989128738,
+          "symbol": "022100"
+        },
+        {
+          "share_pct": 9.1620212866861,
+          "symbol": "010770"
+        },
+        {
+          "share_pct": 6.940786228017255,
+          "symbol": "092200"
+        }
+      ],
+      "top_three_symbols_share_pct": 28.342098503832094,
+      "unique_signal_dates": 601
+    }
+  ],
+  "run_metadata": {
+    "cluster_bootstrap_repetitions": 2000,
+    "cross_sectional_permutations": 1000,
+    "dataset_sha256": "b7b07f60352d4b8d52d3917f6af35bb3d377b313428db30867ce79d2c67fd3f5",
+    "date_range": [
+      "2023-01-02",
+      "2025-06-30"
+    ],
+    "factor_registry_sha256": "557bd10155caef63b696841d6893da3b07e1b6651b587c385cd79dbb3da128eb",
+    "generated_at_utc": "2026-10-01T08:09:19.242994+00:00",
+    "horizons_sessions": [
+      3,
+      5,
+      10
+    ],
+    "numpy_version": "2.5.3",
+    "pipeline_config_sha256": "88dcb008acee28dfdac087773a24d392049930e044c1cf88407cdb7f9d5bd4e7",
+    "random_generator": "numpy.Generator(PCG64)",
+    "random_seed": 20261001,
+    "round_trip_cost_pct": 0.53,
+    "source_git_sha": "ef7a79128bdc596d715f3ddbdcc29350c3795ce5",
+    "targets": [
+      "ABSOLUTE_RETURN",
+      "SIMPLE_EXCESS_RETURN",
+      "BETA_RESIDUAL_RETURN"
+    ],
+    "time_dislocation_permutations": 500
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "date_range": [
+    "2023-01-02",
+    "2025-06-23"
+  ],
+  "empirical_p_one_sided": 1.0,
+  "excluded_short_history_symbols": 2,
+  "factor_id": "raw_trailing_return_5d",
+  "horizon_sessions": 5,
+  "method": "WITHIN_SYMBOL_CIRCULAR_FACTOR_SHIFT",
+  "minimum_eligible_symbols": 20,
+  "minimum_shift_sessions": 60,
+  "null_distribution_sha256": "7f0da3ab1a4719bd8823bd2bcf444d918b8af23f9d8a5db1fc90830bc6c2c040",
+  "null_median": -0.00658628069200649,
+  "null_p90": 0.0029324654531981795,
+  "null_p95": 0.005507952895850326,
+  "null_p99": 0.012912536256214332,
+  "observed_mean_within_symbol_spearman": -0.05715818731848969,
+  "permutations": 500,
+  "protected_period_rows_used": 0,
+  "role": "secondary time-alignment diagnostic; cross-sectional family max null remains primary",
+  "run_metadata": {
+    "cluster_bootstrap_repetitions": 2000,
+    "cross_sectional_permutations": 1000,
+    "dataset_sha256": "b7b07f60352d4b8d52d3917f6af35bb3d377b313428db30867ce79d2c67fd3f5",
+    "date_range": [
+      "2023-01-02",
+      "2025-06-30"
+    ],
+    "factor_registry_sha256": "557bd10155caef63b696841d6893da3b07e1b6651b587c385cd79dbb3da128eb",
+    "generated_at_utc": "2026-10-01T08:09:19.242994+00:00",
+    "horizons_sessions": [
+      3,
+      5,
+      10
+    ],
+    "numpy_version": "2.5.3",
+    "pipeline_config_sha256": "88dcb008acee28dfdac087773a24d392049930e044c1cf88407cdb7f9d5bd4e7",
+    "random_generator": "numpy.Generator(PCG64)",
+    "random_seed": 20261001,
+    "round_trip_cost_pct": 0.53,
+    "source_git_sha": "ef7a79128bdc596d715f3ddbdcc29350c3795ce5",
+    "targets": [
+      "ABSOLUTE_RETURN",
+      "SIMPLE_EXCESS_RETURN",
+      "BETA_RESIDUAL_RETURN"
+    ],
+    "time_dislocation_permutations": 500
+  },
+  "seed": 20261001,
+  "status": "COMPUTED",
+  "symbols": 94,
+  "symbols_with_factor_data": 96,
+  "target": "ABSOLUTE_RETURN"
+}

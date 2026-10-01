@@ -1,0 +1,1716 @@
+{
+  "artifact": "walk-forward-stability",
+  "blocks": [
+    {
+      "end": "2023-06-30",
+      "name": "2023_H1",
+      "role": "DISCOVERY",
+      "start": "2023-01-02"
+    },
+    {
+      "end": "2023-12-31",
+      "name": "2023_H2",
+      "role": "DISCOVERY",
+      "start": "2023-07-01"
+    },
+    {
+      "end": "2024-06-28",
+      "name": "2024_H1",
+      "role": "DISCOVERY",
+      "start": "2024-01-01"
+    },
+    {
+      "end": "2024-12-31",
+      "name": "2024_H2",
+      "role": "TOUCHED_REPLICATION",
+      "start": "2024-07-01"
+    },
+    {
+      "end": "2025-06-30",
+      "name": "2025_H1",
+      "role": "TOUCHED_REPLICATION",
+      "start": "2025-01-01"
+    }
+  ],
+  "phase13_h2_challenge_in_core_blocks": false,
+  "results": [
+    {
+      "blocks": [
+        {
+          "block": "2023_H1",
+          "edge_to_friction_ratio": 1.2091041681958326,
+          "end": "2023-06-30",
+          "mean_ic": 0.001040366373803974,
+          "non_overlap_observations": 199,
+          "oriented_mean_ic": -0.001040366373803974,
+          "oriented_quantile_spread_pct": 0.20242732861179497,
+          "q5_minus_q1_pct": -0.20242732861179497,
+          "role": "DISCOVERY",
+          "sample_size": 10746,
+          "start": "2023-01-02",
+          "target_direction": "POSITIVE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2023_H2",
+          "edge_to_friction_ratio": 0.27752082338049505,
+          "end": "2023-12-31",
+          "mean_ic": -0.06812630185090011,
+          "non_overlap_observations": 214,
+          "oriented_mean_ic": 0.06812630185090011,
+          "oriented_quantile_spread_pct": 1.3350322683146703,
+          "q5_minus_q1_pct": -1.3350322683146703,
+          "role": "DISCOVERY",
+          "sample_size": 10875,
+          "start": "2023-07-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 122
+        },
+        {
+          "block": "2024_H1",
+          "edge_to_friction_ratio": 2.828627299135206,
+          "end": "2024-06-28",
+          "mean_ic": 0.03703691297537017,
+          "non_overlap_observations": 207,
+          "oriented_mean_ic": -0.03703691297537017,
+          "oriented_quantile_spread_pct": -2.0869155848603445,
+          "q5_minus_q1_pct": 2.0869155848603445,
+          "role": "DISCOVERY",
+          "sample_size": 10137,
+          "start": "2024-01-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 111
+        },
+        {
+          "block": "2024_H2",
+          "edge_to_friction_ratio": 2.013757514381419,
+          "end": "2024-12-31",
+          "mean_ic": -0.0405488095040022,
+          "non_overlap_observations": 235,
+          "oriented_mean_ic": 0.0405488095040022,
+          "oriented_quantile_spread_pct": 0.8097059800746989,
+          "q5_minus_q1_pct": -0.8097059800746989,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 11345,
+          "start": "2024-07-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2025_H1",
+          "edge_to_friction_ratio": 2.4441596392544347,
+          "end": "2025-06-30",
+          "mean_ic": -0.03951294110094368,
+          "non_overlap_observations": 208,
+          "oriented_mean_ic": 0.03951294110094368,
+          "oriented_quantile_spread_pct": -0.003498685390486367,
+          "q5_minus_q1_pct": 0.003498685390486367,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 10145,
+          "start": "2025-01-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 108
+        }
+      ],
+      "factor_id": "abnormal_traded_value_activity",
+      "family_id": "abnormal_traded_value_activity",
+      "horizon_sessions": 10,
+      "market_scope": "KOSDAQ",
+      "required_blocks": 5,
+      "semantic_direction": "negative",
+      "stability_components": {
+        "effect_size_decay_last_over_first": 0.017283661324187957,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.6,
+          "positive_blocks": 3
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.6,
+          "positive_blocks": 3
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.6,
+          "positive_blocks": 3
+        }
+      },
+      "stable_blocks": 3,
+      "target": "ABSOLUTE_RETURN"
+    },
+    {
+      "blocks": [
+        {
+          "block": "2023_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2023-06-30",
+          "mean_ic": -0.025849079345787347,
+          "non_overlap_observations": 411,
+          "oriented_mean_ic": 0.025849079345787347,
+          "oriented_quantile_spread_pct": 0.26799653070933566,
+          "q5_minus_q1_pct": -0.26799653070933566,
+          "role": "DISCOVERY",
+          "sample_size": 9434,
+          "start": "2023-01-02",
+          "target_direction": "POSITIVE",
+          "unique_dates": 106
+        },
+        {
+          "block": "2023_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2023-12-31",
+          "mean_ic": -0.06199877954365438,
+          "non_overlap_observations": 519,
+          "oriented_mean_ic": 0.06199877954365438,
+          "oriented_quantile_spread_pct": 0.7955809070569924,
+          "q5_minus_q1_pct": -0.7955809070569924,
+          "role": "DISCOVERY",
+          "sample_size": 10957,
+          "start": "2023-07-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 122
+        },
+        {
+          "block": "2024_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2024-06-28",
+          "mean_ic": -0.028022445506847092,
+          "non_overlap_observations": 499,
+          "oriented_mean_ic": 0.028022445506847092,
+          "oriented_quantile_spread_pct": 0.5266646518005926,
+          "q5_minus_q1_pct": -0.5266646518005926,
+          "role": "DISCOVERY",
+          "sample_size": 10687,
+          "start": "2024-01-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 118
+        },
+        {
+          "block": "2024_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2024-12-31",
+          "mean_ic": -0.03876412175735668,
+          "non_overlap_observations": 519,
+          "oriented_mean_ic": 0.03876412175735668,
+          "oriented_quantile_spread_pct": -0.11332001899560867,
+          "q5_minus_q1_pct": 0.11332001899560867,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 11396,
+          "start": "2024-07-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2025_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2025-06-30",
+          "mean_ic": -0.04767271151497643,
+          "non_overlap_observations": 497,
+          "oriented_mean_ic": 0.04767271151497643,
+          "oriented_quantile_spread_pct": 0.6083723456564717,
+          "q5_minus_q1_pct": -0.6083723456564717,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 10739,
+          "start": "2025-01-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 115
+        }
+      ],
+      "factor_id": "beta_residual_return_5d",
+      "family_id": "beta_residual_return",
+      "horizon_sessions": 3,
+      "market_scope": "KOSDAQ",
+      "required_blocks": 5,
+      "semantic_direction": "negative",
+      "stability_components": {
+        "effect_size_decay_last_over_first": 2.2700754522688267,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 1.0,
+          "positive_blocks": 5
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        }
+      },
+      "stable_blocks": 4,
+      "target": "BETA_RESIDUAL_RETURN"
+    },
+    {
+      "blocks": [
+        {
+          "block": "2023_H1",
+          "edge_to_friction_ratio": 1.87324736795413,
+          "end": "2023-06-30",
+          "mean_ic": -0.07726917103372605,
+          "non_overlap_observations": 148,
+          "oriented_mean_ic": 0.07726917103372605,
+          "oriented_quantile_spread_pct": 1.5355794637274123,
+          "q5_minus_q1_pct": -1.5355794637274123,
+          "role": "DISCOVERY",
+          "sample_size": 11024,
+          "start": "2023-01-02",
+          "target_direction": "POSITIVE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2023_H2",
+          "edge_to_friction_ratio": 1.085574343322366,
+          "end": "2023-12-31",
+          "mean_ic": -0.07702401984378768,
+          "non_overlap_observations": 161,
+          "oriented_mean_ic": 0.07702401984378768,
+          "oriented_quantile_spread_pct": -0.6073807709998318,
+          "q5_minus_q1_pct": 0.6073807709998318,
+          "role": "DISCOVERY",
+          "sample_size": 11011,
+          "start": "2023-07-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 122
+        },
+        {
+          "block": "2024_H1",
+          "edge_to_friction_ratio": 0.656825718369923,
+          "end": "2024-06-28",
+          "mean_ic": -0.13534358356836035,
+          "non_overlap_observations": 143,
+          "oriented_mean_ic": 0.13534358356836035,
+          "oriented_quantile_spread_pct": 3.351920637087965,
+          "q5_minus_q1_pct": -3.351920637087965,
+          "role": "DISCOVERY",
+          "sample_size": 10259,
+          "start": "2024-01-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 111
+        },
+        {
+          "block": "2024_H2",
+          "edge_to_friction_ratio": 1.1096981054992108,
+          "end": "2024-12-31",
+          "mean_ic": -0.12478464904061728,
+          "non_overlap_observations": 159,
+          "oriented_mean_ic": 0.12478464904061728,
+          "oriented_quantile_spread_pct": 0.9574910359335094,
+          "q5_minus_q1_pct": -0.9574910359335094,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 11468,
+          "start": "2024-07-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2025_H1",
+          "edge_to_friction_ratio": 3.228768913364315,
+          "end": "2025-06-30",
+          "mean_ic": -0.10750439706605218,
+          "non_overlap_observations": 146,
+          "oriented_mean_ic": 0.10750439706605218,
+          "oriented_quantile_spread_pct": 0.3837365086003528,
+          "q5_minus_q1_pct": -0.3837365086003528,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 10253,
+          "start": "2025-01-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 108
+        }
+      ],
+      "factor_id": "idiosyncratic_volatility_20d",
+      "family_id": "idiosyncratic_volatility",
+      "horizon_sessions": 10,
+      "market_scope": "KOSDAQ",
+      "required_blocks": 5,
+      "semantic_direction": "negative",
+      "stability_components": {
+        "effect_size_decay_last_over_first": 0.2498968745445997,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 1.0,
+          "positive_blocks": 5
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        }
+      },
+      "stable_blocks": 4,
+      "target": "ABSOLUTE_RETURN"
+    },
+    {
+      "blocks": [
+        {
+          "block": "2023_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2023-06-30",
+          "mean_ic": null,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": null,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "DISCOVERY",
+          "sample_size": 11044,
+          "start": "2023-01-02",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2023_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2023-12-31",
+          "mean_ic": null,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": null,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "DISCOVERY",
+          "sample_size": 11051,
+          "start": "2023-07-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 122
+        },
+        {
+          "block": "2024_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2024-06-28",
+          "mean_ic": null,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": null,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "DISCOVERY",
+          "sample_size": 10930,
+          "start": "2024-01-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 118
+        },
+        {
+          "block": "2024_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2024-12-31",
+          "mean_ic": null,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": null,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 11488,
+          "start": "2024-07-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2025_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2025-06-30",
+          "mean_ic": null,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": null,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 10965,
+          "start": "2025-01-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 115
+        }
+      ],
+      "factor_id": "market_breadth_positive",
+      "family_id": "market_breadth",
+      "horizon_sessions": 3,
+      "market_scope": "ALL",
+      "required_blocks": 5,
+      "semantic_direction": "positive",
+      "stability_components": {
+        "effect_size_decay_last_over_first": null,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        }
+      },
+      "stable_blocks": 0,
+      "target": "ABSOLUTE_RETURN"
+    },
+    {
+      "blocks": [
+        {
+          "block": "2023_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2023-06-30",
+          "mean_ic": null,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": null,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "DISCOVERY",
+          "sample_size": 11044,
+          "start": "2023-01-02",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2023_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2023-12-31",
+          "mean_ic": null,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": null,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "DISCOVERY",
+          "sample_size": 11051,
+          "start": "2023-07-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 122
+        },
+        {
+          "block": "2024_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2024-06-28",
+          "mean_ic": null,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": null,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "DISCOVERY",
+          "sample_size": 10930,
+          "start": "2024-01-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 118
+        },
+        {
+          "block": "2024_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2024-12-31",
+          "mean_ic": null,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": null,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 11488,
+          "start": "2024-07-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2025_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2025-06-30",
+          "mean_ic": null,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": null,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 10965,
+          "start": "2025-01-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 115
+        }
+      ],
+      "factor_id": "matched_market_return_5d",
+      "family_id": "market_context",
+      "horizon_sessions": 3,
+      "market_scope": "ALL",
+      "required_blocks": 5,
+      "semantic_direction": "positive",
+      "stability_components": {
+        "effect_size_decay_last_over_first": null,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        }
+      },
+      "stable_blocks": 0,
+      "target": "ABSOLUTE_RETURN"
+    },
+    {
+      "blocks": [
+        {
+          "block": "2023_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2023-06-30",
+          "mean_ic": null,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": null,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "DISCOVERY",
+          "sample_size": 11044,
+          "start": "2023-01-02",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2023_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2023-12-31",
+          "mean_ic": null,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": null,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "DISCOVERY",
+          "sample_size": 11051,
+          "start": "2023-07-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 122
+        },
+        {
+          "block": "2024_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2024-06-28",
+          "mean_ic": null,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": null,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "DISCOVERY",
+          "sample_size": 10930,
+          "start": "2024-01-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 118
+        },
+        {
+          "block": "2024_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2024-12-31",
+          "mean_ic": null,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": null,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 11488,
+          "start": "2024-07-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2025_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2025-06-30",
+          "mean_ic": null,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": null,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 10965,
+          "start": "2025-01-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 115
+        }
+      ],
+      "factor_id": "market_excess_dispersion_1d",
+      "family_id": "market_excess_dispersion",
+      "horizon_sessions": 3,
+      "market_scope": "ALL",
+      "required_blocks": 5,
+      "semantic_direction": "positive",
+      "stability_components": {
+        "effect_size_decay_last_over_first": null,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        }
+      },
+      "stable_blocks": 0,
+      "target": "ABSOLUTE_RETURN"
+    },
+    {
+      "blocks": [
+        {
+          "block": "2023_H1",
+          "edge_to_friction_ratio": 1.3272446734126184,
+          "end": "2023-06-30",
+          "mean_ic": 0.03353467768459835,
+          "non_overlap_observations": 208,
+          "oriented_mean_ic": -0.03353467768459835,
+          "oriented_quantile_spread_pct": 0.04439621645143821,
+          "q5_minus_q1_pct": -0.04439621645143821,
+          "role": "DISCOVERY",
+          "sample_size": 11034,
+          "start": "2023-01-02",
+          "target_direction": "POSITIVE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2023_H2",
+          "edge_to_friction_ratio": 0.5246792016093994,
+          "end": "2023-12-31",
+          "mean_ic": -0.06621424053768321,
+          "non_overlap_observations": 221,
+          "oriented_mean_ic": 0.06621424053768321,
+          "oriented_quantile_spread_pct": 1.9273407024605058,
+          "q5_minus_q1_pct": -1.9273407024605058,
+          "role": "DISCOVERY",
+          "sample_size": 11031,
+          "start": "2023-07-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 122
+        },
+        {
+          "block": "2024_H1",
+          "edge_to_friction_ratio": 1.9878684206619945,
+          "end": "2024-06-28",
+          "mean_ic": -0.01517420615652387,
+          "non_overlap_observations": 207,
+          "oriented_mean_ic": 0.01517420615652387,
+          "oriented_quantile_spread_pct": -0.733599279392902,
+          "q5_minus_q1_pct": 0.733599279392902,
+          "role": "DISCOVERY",
+          "sample_size": 10269,
+          "start": "2024-01-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 111
+        },
+        {
+          "block": "2024_H2",
+          "edge_to_friction_ratio": 2.9266106784439465,
+          "end": "2024-12-31",
+          "mean_ic": -0.03817235658613846,
+          "non_overlap_observations": 215,
+          "oriented_mean_ic": 0.03817235658613846,
+          "oriented_quantile_spread_pct": 0.9187833907703564,
+          "q5_minus_q1_pct": -0.9187833907703564,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 11478,
+          "start": "2024-07-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2025_H1",
+          "edge_to_friction_ratio": 4.452289725898933,
+          "end": "2025-06-30",
+          "mean_ic": -0.08830734260597184,
+          "non_overlap_observations": 217,
+          "oriented_mean_ic": 0.08830734260597184,
+          "oriented_quantile_spread_pct": 2.6956594286073776,
+          "q5_minus_q1_pct": -2.6956594286073776,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 10273,
+          "start": "2025-01-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 108
+        }
+      ],
+      "factor_id": "market_excess_return_10d",
+      "family_id": "market_excess_return",
+      "horizon_sessions": 10,
+      "market_scope": "KOSDAQ",
+      "required_blocks": 5,
+      "semantic_direction": "negative",
+      "stability_components": {
+        "effect_size_decay_last_over_first": 60.71822430084698,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        }
+      },
+      "stable_blocks": 4,
+      "target": "ABSOLUTE_RETURN"
+    },
+    {
+      "blocks": [
+        {
+          "block": "2023_H1",
+          "edge_to_friction_ratio": 0.9459070847014402,
+          "end": "2023-06-30",
+          "mean_ic": 0.009194012958874015,
+          "non_overlap_observations": 697,
+          "oriented_mean_ic": 0.009194012958874015,
+          "oriented_quantile_spread_pct": -0.14979095270456655,
+          "q5_minus_q1_pct": -0.14979095270456655,
+          "role": "DISCOVERY",
+          "sample_size": 11044,
+          "start": "2023-01-02",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2023_H2",
+          "edge_to_friction_ratio": 0.059954019796285854,
+          "end": "2023-12-31",
+          "mean_ic": 0.022579404051845477,
+          "non_overlap_observations": 717,
+          "oriented_mean_ic": 0.022579404051845477,
+          "oriented_quantile_spread_pct": 0.3042118377174538,
+          "q5_minus_q1_pct": 0.3042118377174538,
+          "role": "DISCOVERY",
+          "sample_size": 11051,
+          "start": "2023-07-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 122
+        },
+        {
+          "block": "2024_H1",
+          "edge_to_friction_ratio": 0.20775147045827624,
+          "end": "2024-06-28",
+          "mean_ic": 0.01115085016405511,
+          "non_overlap_observations": 685,
+          "oriented_mean_ic": 0.01115085016405511,
+          "oriented_quantile_spread_pct": -0.14504414169986846,
+          "q5_minus_q1_pct": -0.14504414169986846,
+          "role": "DISCOVERY",
+          "sample_size": 10930,
+          "start": "2024-01-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 118
+        },
+        {
+          "block": "2024_H2",
+          "edge_to_friction_ratio": 0.08479911860889816,
+          "end": "2024-12-31",
+          "mean_ic": 0.0131061508609552,
+          "non_overlap_observations": 705,
+          "oriented_mean_ic": 0.0131061508609552,
+          "oriented_quantile_spread_pct": 0.2341496447442628,
+          "q5_minus_q1_pct": 0.2341496447442628,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 11488,
+          "start": "2024-07-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2025_H1",
+          "edge_to_friction_ratio": 1.0584857143904083,
+          "end": "2025-06-30",
+          "mean_ic": 0.016432988227448937,
+          "non_overlap_observations": 718,
+          "oriented_mean_ic": 0.016432988227448937,
+          "oriented_quantile_spread_pct": 0.39625430607091416,
+          "q5_minus_q1_pct": 0.39625430607091416,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 10965,
+          "start": "2025-01-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 115
+        }
+      ],
+      "factor_id": "negative_control_stable_hash_pseudorank",
+      "family_id": "negative_control",
+      "horizon_sessions": 3,
+      "market_scope": "KOSDAQ",
+      "required_blocks": 5,
+      "semantic_direction": "positive",
+      "stability_components": {
+        "effect_size_decay_last_over_first": 2.6453821069717645,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 1.0,
+          "positive_blocks": 5
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.6,
+          "positive_blocks": 3
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.6,
+          "positive_blocks": 3
+        }
+      },
+      "stable_blocks": 3,
+      "target": "ABSOLUTE_RETURN"
+    },
+    {
+      "blocks": [
+        {
+          "block": "2023_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2023-06-30",
+          "mean_ic": -0.04383178561573602,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": 0.04383178561573602,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "DISCOVERY",
+          "sample_size": 10746,
+          "start": "2023-01-02",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2023_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2023-12-31",
+          "mean_ic": -0.11074805963439426,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": 0.11074805963439426,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "DISCOVERY",
+          "sample_size": 10875,
+          "start": "2023-07-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 122
+        },
+        {
+          "block": "2024_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2024-06-28",
+          "mean_ic": -0.013553243747073403,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": 0.013553243747073403,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "DISCOVERY",
+          "sample_size": 10137,
+          "start": "2024-01-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 111
+        },
+        {
+          "block": "2024_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2024-12-31",
+          "mean_ic": -0.08151359606525767,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": 0.08151359606525767,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 11345,
+          "start": "2024-07-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2025_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2025-06-30",
+          "mean_ic": -0.06916127541424792,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": 0.06916127541424792,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 10145,
+          "start": "2025-01-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 108
+        }
+      ],
+      "factor_id": "phase13_excess_turnover_interaction__GE_4__EXPANDED",
+      "family_id": "phase13_excess_turnover_interaction",
+      "horizon_sessions": 10,
+      "market_scope": "KOSDAQ",
+      "required_blocks": 5,
+      "semantic_direction": "negative",
+      "stability_components": {
+        "effect_size_decay_last_over_first": null,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 1.0,
+          "positive_blocks": 5
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        }
+      },
+      "stable_blocks": 0,
+      "target": "ABSOLUTE_RETURN"
+    },
+    {
+      "blocks": [
+        {
+          "block": "2023_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2023-06-30",
+          "mean_ic": -0.08404623441078583,
+          "non_overlap_observations": 16,
+          "oriented_mean_ic": 0.08404623441078583,
+          "oriented_quantile_spread_pct": 5.810921536129626,
+          "q5_minus_q1_pct": -5.810921536129626,
+          "role": "DISCOVERY",
+          "sample_size": 9434,
+          "start": "2023-01-02",
+          "target_direction": "POSITIVE",
+          "unique_dates": 106
+        },
+        {
+          "block": "2023_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2023-12-31",
+          "mean_ic": -0.024063264660886187,
+          "non_overlap_observations": 32,
+          "oriented_mean_ic": 0.024063264660886187,
+          "oriented_quantile_spread_pct": -1.1409876684530358,
+          "q5_minus_q1_pct": 1.1409876684530358,
+          "role": "DISCOVERY",
+          "sample_size": 10957,
+          "start": "2023-07-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 122
+        },
+        {
+          "block": "2024_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2024-06-28",
+          "mean_ic": -0.11371248599122144,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": 0.11371248599122144,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "DISCOVERY",
+          "sample_size": 10043,
+          "start": "2024-01-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 111
+        },
+        {
+          "block": "2024_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2024-12-31",
+          "mean_ic": -0.034906764292962564,
+          "non_overlap_observations": 18,
+          "oriented_mean_ic": 0.034906764292962564,
+          "oriented_quantile_spread_pct": 4.364603625408211,
+          "q5_minus_q1_pct": -4.364603625408211,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 11396,
+          "start": "2024-07-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2025_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2025-06-30",
+          "mean_ic": -0.08667615196011272,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": 0.08667615196011272,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 10081,
+          "start": "2025-01-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 108
+        }
+      ],
+      "factor_id": "phase13_residual_drawdown_idio_vol_interaction__DEEP_LE_-8__HIGH",
+      "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+      "horizon_sessions": 10,
+      "market_scope": "KOSDAQ",
+      "required_blocks": 5,
+      "semantic_direction": "negative",
+      "stability_components": {
+        "effect_size_decay_last_over_first": 0.7511035208909848,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 1.0,
+          "positive_blocks": 5
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.4,
+          "positive_blocks": 2
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.4,
+          "positive_blocks": 2
+        }
+      },
+      "stable_blocks": 2,
+      "target": "BETA_RESIDUAL_RETURN"
+    },
+    {
+      "blocks": [
+        {
+          "block": "2023_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2023-06-30",
+          "mean_ic": -0.04119874375762402,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": 0.04119874375762402,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "DISCOVERY",
+          "sample_size": 9190,
+          "start": "2023-01-02",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 106
+        },
+        {
+          "block": "2023_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2023-12-31",
+          "mean_ic": -0.13600387672857564,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": 0.13600387672857564,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "DISCOVERY",
+          "sample_size": 10821,
+          "start": "2023-07-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 122
+        },
+        {
+          "block": "2024_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2024-06-28",
+          "mean_ic": 0.016680675800673672,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": -0.016680675800673672,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "DISCOVERY",
+          "sample_size": 9921,
+          "start": "2024-01-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 111
+        },
+        {
+          "block": "2024_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2024-12-31",
+          "mean_ic": -0.08105410532657435,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": 0.08105410532657435,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 11273,
+          "start": "2024-07-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2025_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2025-06-30",
+          "mean_ic": -0.05323132927361718,
+          "non_overlap_observations": 0,
+          "oriented_mean_ic": 0.05323132927361718,
+          "oriented_quantile_spread_pct": null,
+          "q5_minus_q1_pct": null,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 9973,
+          "start": "2025-01-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 108
+        }
+      ],
+      "factor_id": "phase13_residual_rank_turnover_interaction__UPPER__EXPANDED",
+      "family_id": "phase13_residual_rank_turnover_interaction",
+      "horizon_sessions": 10,
+      "market_scope": "KOSDAQ",
+      "required_blocks": 5,
+      "semantic_direction": "negative",
+      "stability_components": {
+        "effect_size_decay_last_over_first": null,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        }
+      },
+      "stable_blocks": 0,
+      "target": "BETA_RESIDUAL_RETURN"
+    },
+    {
+      "blocks": [
+        {
+          "block": "2023_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2023-06-30",
+          "mean_ic": -0.008858210520876183,
+          "non_overlap_observations": 383,
+          "oriented_mean_ic": 0.008858210520876183,
+          "oriented_quantile_spread_pct": -0.05282460016200652,
+          "q5_minus_q1_pct": 0.05282460016200652,
+          "role": "DISCOVERY",
+          "sample_size": 9261,
+          "start": "2023-01-02",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 106
+        },
+        {
+          "block": "2023_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2023-12-31",
+          "mean_ic": -0.065500450094233,
+          "non_overlap_observations": 453,
+          "oriented_mean_ic": 0.065500450094233,
+          "oriented_quantile_spread_pct": 0.9019420754447202,
+          "q5_minus_q1_pct": -0.9019420754447202,
+          "role": "DISCOVERY",
+          "sample_size": 10835,
+          "start": "2023-07-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 122
+        },
+        {
+          "block": "2024_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2024-06-28",
+          "mean_ic": -0.02663580068526081,
+          "non_overlap_observations": 449,
+          "oriented_mean_ic": 0.02663580068526081,
+          "oriented_quantile_spread_pct": 0.22949350314751243,
+          "q5_minus_q1_pct": -0.22949350314751243,
+          "role": "DISCOVERY",
+          "sample_size": 10569,
+          "start": "2024-01-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 118
+        },
+        {
+          "block": "2024_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2024-12-31",
+          "mean_ic": -0.047516104980661465,
+          "non_overlap_observations": 507,
+          "oriented_mean_ic": 0.047516104980661465,
+          "oriented_quantile_spread_pct": 0.6642149510141373,
+          "q5_minus_q1_pct": -0.6642149510141373,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 11273,
+          "start": "2024-07-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2025_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2025-06-30",
+          "mean_ic": -0.012395531452206445,
+          "non_overlap_observations": 470,
+          "oriented_mean_ic": 0.012395531452206445,
+          "oriented_quantile_spread_pct": 0.24083766344785346,
+          "q5_minus_q1_pct": -0.24083766344785346,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 10624,
+          "start": "2025-01-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 115
+        }
+      ],
+      "factor_id": "range_position_20d",
+      "family_id": "range_position",
+      "horizon_sessions": 3,
+      "market_scope": "KOSDAQ",
+      "required_blocks": 5,
+      "semantic_direction": "negative",
+      "stability_components": {
+        "effect_size_decay_last_over_first": 4.559195199002626,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 1.0,
+          "positive_blocks": 5
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        }
+      },
+      "stable_blocks": 4,
+      "target": "BETA_RESIDUAL_RETURN"
+    },
+    {
+      "blocks": [
+        {
+          "block": "2023_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2023-06-30",
+          "mean_ic": -0.008831490601692084,
+          "non_overlap_observations": 263,
+          "oriented_mean_ic": -0.008831490601692084,
+          "oriented_quantile_spread_pct": 1.0647988189228248,
+          "q5_minus_q1_pct": 1.0647988189228248,
+          "role": "DISCOVERY",
+          "sample_size": 9434,
+          "start": "2023-01-02",
+          "target_direction": "POSITIVE",
+          "unique_dates": 106
+        },
+        {
+          "block": "2023_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2023-12-31",
+          "mean_ic": 0.0002851233504775599,
+          "non_overlap_observations": 282,
+          "oriented_mean_ic": 0.0002851233504775599,
+          "oriented_quantile_spread_pct": 0.24035219572926964,
+          "q5_minus_q1_pct": 0.24035219572926964,
+          "role": "DISCOVERY",
+          "sample_size": 10957,
+          "start": "2023-07-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 122
+        },
+        {
+          "block": "2024_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2024-06-28",
+          "mean_ic": -0.0017016705208925914,
+          "non_overlap_observations": 269,
+          "oriented_mean_ic": -0.0017016705208925914,
+          "oriented_quantile_spread_pct": 0.02214691412475045,
+          "q5_minus_q1_pct": 0.02214691412475045,
+          "role": "DISCOVERY",
+          "sample_size": 10043,
+          "start": "2024-01-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 111
+        },
+        {
+          "block": "2024_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2024-12-31",
+          "mean_ic": -0.01741130062645711,
+          "non_overlap_observations": 329,
+          "oriented_mean_ic": -0.01741130062645711,
+          "oriented_quantile_spread_pct": -0.4124406791726761,
+          "q5_minus_q1_pct": -0.4124406791726761,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 11396,
+          "start": "2024-07-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2025_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2025-06-30",
+          "mean_ic": -0.044207043405067724,
+          "non_overlap_observations": 278,
+          "oriented_mean_ic": -0.044207043405067724,
+          "oriented_quantile_spread_pct": -1.019791585678972,
+          "q5_minus_q1_pct": -1.019791585678972,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 10081,
+          "start": "2025-01-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 108
+        }
+      ],
+      "factor_id": "raw_trailing_return_5d",
+      "family_id": "raw_trailing_return",
+      "horizon_sessions": 10,
+      "market_scope": "KOSPI",
+      "required_blocks": 5,
+      "semantic_direction": "positive",
+      "stability_components": {
+        "effect_size_decay_last_over_first": 0.957731702511294,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.2,
+          "positive_blocks": 1
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.6,
+          "positive_blocks": 3
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.6,
+          "positive_blocks": 3
+        }
+      },
+      "stable_blocks": 3,
+      "target": "BETA_RESIDUAL_RETURN"
+    },
+    {
+      "blocks": [
+        {
+          "block": "2023_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2023-06-30",
+          "mean_ic": -0.025849079345787347,
+          "non_overlap_observations": 411,
+          "oriented_mean_ic": 0.025849079345787347,
+          "oriented_quantile_spread_pct": 0.26799653070933566,
+          "q5_minus_q1_pct": -0.26799653070933566,
+          "role": "DISCOVERY",
+          "sample_size": 9434,
+          "start": "2023-01-02",
+          "target_direction": "POSITIVE",
+          "unique_dates": 106
+        },
+        {
+          "block": "2023_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2023-12-31",
+          "mean_ic": -0.06199877954365438,
+          "non_overlap_observations": 519,
+          "oriented_mean_ic": 0.06199877954365438,
+          "oriented_quantile_spread_pct": 0.7955809070569924,
+          "q5_minus_q1_pct": -0.7955809070569924,
+          "role": "DISCOVERY",
+          "sample_size": 10957,
+          "start": "2023-07-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 122
+        },
+        {
+          "block": "2024_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2024-06-28",
+          "mean_ic": -0.028022445506847092,
+          "non_overlap_observations": 499,
+          "oriented_mean_ic": 0.028022445506847092,
+          "oriented_quantile_spread_pct": 0.5266646518005926,
+          "q5_minus_q1_pct": -0.5266646518005926,
+          "role": "DISCOVERY",
+          "sample_size": 10687,
+          "start": "2024-01-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 118
+        },
+        {
+          "block": "2024_H2",
+          "edge_to_friction_ratio": null,
+          "end": "2024-12-31",
+          "mean_ic": -0.03876412175735668,
+          "non_overlap_observations": 519,
+          "oriented_mean_ic": 0.03876412175735668,
+          "oriented_quantile_spread_pct": -0.11332001899560867,
+          "q5_minus_q1_pct": 0.11332001899560867,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 11396,
+          "start": "2024-07-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2025_H1",
+          "edge_to_friction_ratio": null,
+          "end": "2025-06-30",
+          "mean_ic": -0.04767271151497643,
+          "non_overlap_observations": 497,
+          "oriented_mean_ic": 0.04767271151497643,
+          "oriented_quantile_spread_pct": 0.6083723456564717,
+          "q5_minus_q1_pct": -0.6083723456564717,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 10739,
+          "start": "2025-01-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 115
+        }
+      ],
+      "factor_id": "residual_cross_sectional_rank_5d",
+      "family_id": "residual_cross_sectional_rank",
+      "horizon_sessions": 3,
+      "market_scope": "KOSDAQ",
+      "required_blocks": 5,
+      "semantic_direction": "negative",
+      "stability_components": {
+        "effect_size_decay_last_over_first": 2.2700754522688267,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 1.0,
+          "positive_blocks": 5
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        }
+      },
+      "stable_blocks": 4,
+      "target": "BETA_RESIDUAL_RETURN"
+    },
+    {
+      "blocks": [
+        {
+          "block": "2023_H1",
+          "edge_to_friction_ratio": 0.10150948013470652,
+          "end": "2023-06-30",
+          "mean_ic": 0.02969249651801462,
+          "non_overlap_observations": 452,
+          "oriented_mean_ic": -0.02969249651801462,
+          "oriented_quantile_spread_pct": -0.3225522958701205,
+          "q5_minus_q1_pct": 0.3225522958701205,
+          "role": "DISCOVERY",
+          "sample_size": 11024,
+          "start": "2023-01-02",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2023_H2",
+          "edge_to_friction_ratio": 0.8666443108342057,
+          "end": "2023-12-31",
+          "mean_ic": 0.017482983235020757,
+          "non_overlap_observations": 452,
+          "oriented_mean_ic": -0.017482983235020757,
+          "oriented_quantile_spread_pct": 0.43943213221154187,
+          "q5_minus_q1_pct": -0.43943213221154187,
+          "role": "DISCOVERY",
+          "sample_size": 11011,
+          "start": "2023-07-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 122
+        },
+        {
+          "block": "2024_H1",
+          "edge_to_friction_ratio": 0.18928917459688516,
+          "end": "2024-06-28",
+          "mean_ic": 0.022859454395742086,
+          "non_overlap_observations": 438,
+          "oriented_mean_ic": -0.022859454395742086,
+          "oriented_quantile_spread_pct": 0.02823556971025816,
+          "q5_minus_q1_pct": -0.02823556971025816,
+          "role": "DISCOVERY",
+          "sample_size": 10910,
+          "start": "2024-01-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 118
+        },
+        {
+          "block": "2024_H2",
+          "edge_to_friction_ratio": 0.4703303652956533,
+          "end": "2024-12-31",
+          "mean_ic": 0.027419133944689117,
+          "non_overlap_observations": 444,
+          "oriented_mean_ic": -0.027419133944689117,
+          "oriented_quantile_spread_pct": -0.1469449483447342,
+          "q5_minus_q1_pct": 0.1469449483447342,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 11468,
+          "start": "2024-07-01",
+          "target_direction": "NON_POSITIVE_OR_UNAVAILABLE",
+          "unique_dates": 123
+        },
+        {
+          "block": "2025_H1",
+          "edge_to_friction_ratio": 1.5992414350098578,
+          "end": "2025-06-30",
+          "mean_ic": 0.032563729334183354,
+          "non_overlap_observations": 425,
+          "oriented_mean_ic": -0.032563729334183354,
+          "oriented_quantile_spread_pct": 0.1491864438648992,
+          "q5_minus_q1_pct": -0.1491864438648992,
+          "role": "TOUCHED_REPLICATION",
+          "sample_size": 10925,
+          "start": "2025-01-01",
+          "target_direction": "POSITIVE",
+          "unique_dates": 115
+        }
+      ],
+      "factor_id": "residual_drawdown_20d",
+      "family_id": "residual_drawdown",
+      "horizon_sessions": 3,
+      "market_scope": "KOSPI",
+      "required_blocks": 5,
+      "semantic_direction": "negative",
+      "stability_components": {
+        "effect_size_decay_last_over_first": 0.46251862341408007,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.6,
+          "positive_blocks": 3
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.6,
+          "positive_blocks": 3
+        }
+      },
+      "stable_blocks": 3,
+      "target": "ABSOLUTE_RETURN"
+    }
+  ],
+  "run_metadata": {
+    "cluster_bootstrap_repetitions": 2000,
+    "cross_sectional_permutations": 1000,
+    "dataset_sha256": "b7b07f60352d4b8d52d3917f6af35bb3d377b313428db30867ce79d2c67fd3f5",
+    "date_range": [
+      "2023-01-02",
+      "2025-06-30"
+    ],
+    "factor_registry_sha256": "557bd10155caef63b696841d6893da3b07e1b6651b587c385cd79dbb3da128eb",
+    "generated_at_utc": "2026-10-01T08:09:19.242994+00:00",
+    "horizons_sessions": [
+      3,
+      5,
+      10
+    ],
+    "numpy_version": "2.5.3",
+    "pipeline_config_sha256": "88dcb008acee28dfdac087773a24d392049930e044c1cf88407cdb7f9d5bd4e7",
+    "random_generator": "numpy.Generator(PCG64)",
+    "random_seed": 20261001,
+    "round_trip_cost_pct": 0.53,
+    "source_git_sha": "ef7a79128bdc596d715f3ddbdcc29350c3795ce5",
+    "targets": [
+      "ABSOLUTE_RETURN",
+      "SIMPLE_EXCESS_RETURN",
+      "BETA_RESIDUAL_RETURN"
+    ],
+    "time_dislocation_permutations": 500
+  }
+}

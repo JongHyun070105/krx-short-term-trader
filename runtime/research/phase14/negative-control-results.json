@@ -1,0 +1,45 @@
+{
+  "artifact": "negative-control-results",
+  "calibration": "PASS",
+  "control_count": 1,
+  "empirical_p": 0.27472527472527475,
+  "factor_id": "negative_control_stable_hash_pseudorank",
+  "family_max_observed": 0.012823381913535012,
+  "method": "stable SHA-256 pseudo-rank(symbol,date,seed)",
+  "null_median": 0.010695282598153416,
+  "null_p95": 0.017050901941196284,
+  "pass_count": 0,
+  "passed_pipeline": false,
+  "pipeline_final_state": "FAIL",
+  "randomized_surface_max_at_least_minimum_ic_rate": 0.016,
+  "run_metadata": {
+    "cluster_bootstrap_repetitions": 2000,
+    "cross_sectional_permutations": 1000,
+    "dataset_sha256": "b7b07f60352d4b8d52d3917f6af35bb3d377b313428db30867ce79d2c67fd3f5",
+    "date_range": [
+      "2023-01-02",
+      "2025-06-30"
+    ],
+    "factor_registry_sha256": "557bd10155caef63b696841d6893da3b07e1b6651b587c385cd79dbb3da128eb",
+    "generated_at_utc": "2026-10-01T08:09:19.242994+00:00",
+    "horizons_sessions": [
+      3,
+      5,
+      10
+    ],
+    "numpy_version": "2.5.3",
+    "pipeline_config_sha256": "88dcb008acee28dfdac087773a24d392049930e044c1cf88407cdb7f9d5bd4e7",
+    "random_generator": "numpy.Generator(PCG64)",
+    "random_seed": 20261001,
+    "round_trip_cost_pct": 0.53,
+    "source_git_sha": "ef7a79128bdc596d715f3ddbdcc29350c3795ce5",
+    "targets": [
+      "ABSOLUTE_RETURN",
+      "SIMPLE_EXCESS_RETURN",
+      "BETA_RESIDUAL_RETURN"
+    ],
+    "time_dislocation_permutations": 500
+  },
+  "seed": 20261001,
+  "warning": "A 0/1 control count is a sanity check, not a precise empirical false-promotion rate."
+}

@@ -1,0 +1,500 @@
+{
+  "artifact": "market-adjusted-edge",
+  "market_component_share_warning_pct": 80.0,
+  "minimum_market_adjusted_effect_pct": 0.1,
+  "results": [
+    {
+      "absolute_long_only_mean_pct": -0.16508397672030917,
+      "beta_residual_nontrivial": true,
+      "beta_residual_q5_minus_q1_pct": -0.3785450508350793,
+      "both_markets_same_oriented_direction": true,
+      "expected_friction_pct": 0.53,
+      "factor_id": "abnormal_traded_value_activity",
+      "family_id": "abnormal_traded_value_activity",
+      "horizon_sessions": 10,
+      "market_adjusted_edge_grade": "FAIL",
+      "market_beta_dominated": "NO",
+      "market_component_share_definition": "mean matched-index return / selected-quantile mean absolute stock return",
+      "market_component_share_pct": -127.94690641222186,
+      "market_scope": "KOSDAQ",
+      "market_split_directions": {
+        "KOSDAQ": {
+          "oriented_beta_residual_spread_pct": 0.3785450508350793,
+          "oriented_simple_excess_spread_pct": 0.0942774203767594
+        },
+        "KOSPI": {
+          "oriented_beta_residual_spread_pct": 0.20365036250714721,
+          "oriented_simple_excess_spread_pct": 0.14548868056292955
+        }
+      },
+      "matched_market_component_pct": 0.2112198411959081,
+      "orientation": "negative",
+      "oriented_beta_residual_spread_pct": 0.3785450508350793,
+      "oriented_simple_excess_spread_pct": 0.0942774203767594,
+      "simple_excess_nontrivial": false,
+      "simple_excess_q5_minus_q1_pct": -0.0942774203767594
+    },
+    {
+      "absolute_long_only_mean_pct": 0.04008219907319667,
+      "beta_residual_nontrivial": true,
+      "beta_residual_q5_minus_q1_pct": -0.4171907350045324,
+      "both_markets_same_oriented_direction": true,
+      "expected_friction_pct": 0.53,
+      "factor_id": "beta_residual_return_5d",
+      "family_id": "beta_residual_return",
+      "horizon_sessions": 3,
+      "market_adjusted_edge_grade": "FAIL",
+      "market_beta_dominated": "UNCERTAIN",
+      "market_component_share_definition": "mean matched-index return / selected-quantile mean absolute stock return",
+      "market_component_share_pct": null,
+      "market_scope": "KOSDAQ",
+      "market_split_directions": {
+        "KOSDAQ": {
+          "oriented_beta_residual_spread_pct": 0.4171907350045324,
+          "oriented_simple_excess_spread_pct": 0.38229705803926706
+        },
+        "KOSPI": {
+          "oriented_beta_residual_spread_pct": 0.1525846957685943,
+          "oriented_simple_excess_spread_pct": 0.16565249941991764
+        }
+      },
+      "matched_market_component_pct": -0.0409846716304506,
+      "orientation": "negative",
+      "oriented_beta_residual_spread_pct": 0.4171907350045324,
+      "oriented_simple_excess_spread_pct": 0.38229705803926706,
+      "simple_excess_nontrivial": true,
+      "simple_excess_q5_minus_q1_pct": -0.38229705803926706
+    },
+    {
+      "absolute_long_only_mean_pct": 0.5923692810696338,
+      "beta_residual_nontrivial": true,
+      "beta_residual_q5_minus_q1_pct": -0.9768429538806775,
+      "both_markets_same_oriented_direction": true,
+      "expected_friction_pct": 0.53,
+      "factor_id": "idiosyncratic_volatility_20d",
+      "family_id": "idiosyncratic_volatility",
+      "horizon_sessions": 10,
+      "market_adjusted_edge_grade": "PASS",
+      "market_beta_dominated": "NO",
+      "market_component_share_definition": "mean matched-index return / selected-quantile mean absolute stock return",
+      "market_component_share_pct": 35.656785040323335,
+      "market_scope": "KOSDAQ",
+      "market_split_directions": {
+        "KOSDAQ": {
+          "oriented_beta_residual_spread_pct": 0.9768429538806775,
+          "oriented_simple_excess_spread_pct": 1.1006029830356323
+        },
+        "KOSPI": {
+          "oriented_beta_residual_spread_pct": 0.025925459357287017,
+          "oriented_simple_excess_spread_pct": 0.15320605712804392
+        }
+      },
+      "matched_market_component_pct": 0.2112198411959081,
+      "orientation": "negative",
+      "oriented_beta_residual_spread_pct": 0.9768429538806775,
+      "oriented_simple_excess_spread_pct": 1.1006029830356323,
+      "simple_excess_nontrivial": true,
+      "simple_excess_q5_minus_q1_pct": -1.1006029830356323
+    },
+    {
+      "absolute_long_only_mean_pct": null,
+      "beta_residual_nontrivial": false,
+      "beta_residual_q5_minus_q1_pct": null,
+      "both_markets_same_oriented_direction": false,
+      "expected_friction_pct": 0.53,
+      "factor_id": "market_breadth_positive",
+      "family_id": "market_breadth",
+      "horizon_sessions": 3,
+      "market_adjusted_edge_grade": "UNKNOWN",
+      "market_beta_dominated": "UNCERTAIN",
+      "market_component_share_definition": "mean matched-index return / selected-quantile mean absolute stock return",
+      "market_component_share_pct": null,
+      "market_scope": "ALL",
+      "market_split_directions": {
+        "KOSDAQ": {
+          "oriented_beta_residual_spread_pct": null,
+          "oriented_simple_excess_spread_pct": null
+        },
+        "KOSPI": {
+          "oriented_beta_residual_spread_pct": null,
+          "oriented_simple_excess_spread_pct": null
+        }
+      },
+      "matched_market_component_pct": null,
+      "orientation": "positive",
+      "oriented_beta_residual_spread_pct": null,
+      "oriented_simple_excess_spread_pct": null,
+      "simple_excess_nontrivial": false,
+      "simple_excess_q5_minus_q1_pct": null
+    },
+    {
+      "absolute_long_only_mean_pct": null,
+      "beta_residual_nontrivial": false,
+      "beta_residual_q5_minus_q1_pct": null,
+      "both_markets_same_oriented_direction": false,
+      "expected_friction_pct": 0.53,
+      "factor_id": "matched_market_return_5d",
+      "family_id": "market_context",
+      "horizon_sessions": 3,
+      "market_adjusted_edge_grade": "UNKNOWN",
+      "market_beta_dominated": "UNCERTAIN",
+      "market_component_share_definition": "mean matched-index return / selected-quantile mean absolute stock return",
+      "market_component_share_pct": null,
+      "market_scope": "ALL",
+      "market_split_directions": {
+        "KOSDAQ": {
+          "oriented_beta_residual_spread_pct": null,
+          "oriented_simple_excess_spread_pct": null
+        },
+        "KOSPI": {
+          "oriented_beta_residual_spread_pct": null,
+          "oriented_simple_excess_spread_pct": null
+        }
+      },
+      "matched_market_component_pct": null,
+      "orientation": "positive",
+      "oriented_beta_residual_spread_pct": null,
+      "oriented_simple_excess_spread_pct": null,
+      "simple_excess_nontrivial": false,
+      "simple_excess_q5_minus_q1_pct": null
+    },
+    {
+      "absolute_long_only_mean_pct": null,
+      "beta_residual_nontrivial": false,
+      "beta_residual_q5_minus_q1_pct": null,
+      "both_markets_same_oriented_direction": false,
+      "expected_friction_pct": 0.53,
+      "factor_id": "market_excess_dispersion_1d",
+      "family_id": "market_excess_dispersion",
+      "horizon_sessions": 3,
+      "market_adjusted_edge_grade": "UNKNOWN",
+      "market_beta_dominated": "UNCERTAIN",
+      "market_component_share_definition": "mean matched-index return / selected-quantile mean absolute stock return",
+      "market_component_share_pct": null,
+      "market_scope": "ALL",
+      "market_split_directions": {
+        "KOSDAQ": {
+          "oriented_beta_residual_spread_pct": null,
+          "oriented_simple_excess_spread_pct": null
+        },
+        "KOSPI": {
+          "oriented_beta_residual_spread_pct": null,
+          "oriented_simple_excess_spread_pct": null
+        }
+      },
+      "matched_market_component_pct": null,
+      "orientation": "positive",
+      "oriented_beta_residual_spread_pct": null,
+      "oriented_simple_excess_spread_pct": null,
+      "simple_excess_nontrivial": false,
+      "simple_excess_q5_minus_q1_pct": null
+    },
+    {
+      "absolute_long_only_mean_pct": 0.11510366615158656,
+      "beta_residual_nontrivial": true,
+      "beta_residual_q5_minus_q1_pct": -1.1904181871317012,
+      "both_markets_same_oriented_direction": true,
+      "expected_friction_pct": 0.53,
+      "factor_id": "market_excess_return_10d",
+      "family_id": "market_excess_return",
+      "horizon_sessions": 10,
+      "market_adjusted_edge_grade": "FAIL",
+      "market_beta_dominated": "YES",
+      "market_component_share_definition": "mean matched-index return / selected-quantile mean absolute stock return",
+      "market_component_share_pct": 183.50400839339093,
+      "market_scope": "KOSDAQ",
+      "market_split_directions": {
+        "KOSDAQ": {
+          "oriented_beta_residual_spread_pct": 1.1904181871317012,
+          "oriented_simple_excess_spread_pct": 0.9596394474709491
+        },
+        "KOSPI": {
+          "oriented_beta_residual_spread_pct": 0.2130999627885941,
+          "oriented_simple_excess_spread_pct": 0.4484216529626919
+        }
+      },
+      "matched_market_component_pct": 0.2112198411959081,
+      "orientation": "negative",
+      "oriented_beta_residual_spread_pct": 1.1904181871317012,
+      "oriented_simple_excess_spread_pct": 0.9596394474709491,
+      "simple_excess_nontrivial": true,
+      "simple_excess_q5_minus_q1_pct": -0.9596394474709491
+    },
+    {
+      "absolute_long_only_mean_pct": 0.1726804138422292,
+      "beta_residual_nontrivial": true,
+      "beta_residual_q5_minus_q1_pct": 0.1000140983128706,
+      "both_markets_same_oriented_direction": true,
+      "expected_friction_pct": 0.53,
+      "factor_id": "negative_control_stable_hash_pseudorank",
+      "family_id": "negative_control",
+      "horizon_sessions": 3,
+      "market_adjusted_edge_grade": "PASS",
+      "market_beta_dominated": "NO",
+      "market_component_share_definition": "mean matched-index return / selected-quantile mean absolute stock return",
+      "market_component_share_pct": 0.22183870535230835,
+      "market_scope": "KOSDAQ",
+      "market_split_directions": {
+        "KOSDAQ": {
+          "oriented_beta_residual_spread_pct": 0.1000140983128706,
+          "oriented_simple_excess_spread_pct": 0.12636272845255017
+        },
+        "KOSPI": {
+          "oriented_beta_residual_spread_pct": 0.02417424268176077,
+          "oriented_simple_excess_spread_pct": 0.039695857695408746
+        }
+      },
+      "matched_market_component_pct": 0.0003830719944646096,
+      "orientation": "positive",
+      "oriented_beta_residual_spread_pct": 0.1000140983128706,
+      "oriented_simple_excess_spread_pct": 0.12636272845255017,
+      "simple_excess_nontrivial": true,
+      "simple_excess_q5_minus_q1_pct": 0.12636272845255017
+    },
+    {
+      "absolute_long_only_mean_pct": null,
+      "beta_residual_nontrivial": false,
+      "beta_residual_q5_minus_q1_pct": null,
+      "both_markets_same_oriented_direction": false,
+      "expected_friction_pct": 0.53,
+      "factor_id": "phase13_excess_turnover_interaction__GE_4__EXPANDED",
+      "family_id": "phase13_excess_turnover_interaction",
+      "horizon_sessions": 10,
+      "market_adjusted_edge_grade": "UNKNOWN",
+      "market_beta_dominated": "UNCERTAIN",
+      "market_component_share_definition": "mean matched-index return / selected-quantile mean absolute stock return",
+      "market_component_share_pct": null,
+      "market_scope": "KOSDAQ",
+      "market_split_directions": {
+        "KOSDAQ": {
+          "oriented_beta_residual_spread_pct": null,
+          "oriented_simple_excess_spread_pct": null
+        },
+        "KOSPI": {
+          "oriented_beta_residual_spread_pct": null,
+          "oriented_simple_excess_spread_pct": null
+        }
+      },
+      "matched_market_component_pct": null,
+      "orientation": "negative",
+      "oriented_beta_residual_spread_pct": null,
+      "oriented_simple_excess_spread_pct": null,
+      "simple_excess_nontrivial": false,
+      "simple_excess_q5_minus_q1_pct": null
+    },
+    {
+      "absolute_long_only_mean_pct": -0.8868025303841525,
+      "beta_residual_nontrivial": false,
+      "beta_residual_q5_minus_q1_pct": 0.8098769079242478,
+      "both_markets_same_oriented_direction": false,
+      "expected_friction_pct": 0.53,
+      "factor_id": "phase13_residual_drawdown_idio_vol_interaction__DEEP_LE_-8__HIGH",
+      "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+      "horizon_sessions": 10,
+      "market_adjusted_edge_grade": "FAIL",
+      "market_beta_dominated": "YES",
+      "market_component_share_definition": "mean matched-index return / selected-quantile mean absolute stock return",
+      "market_component_share_pct": 102.55656774387802,
+      "market_scope": "KOSDAQ",
+      "market_split_directions": {
+        "KOSDAQ": {
+          "oriented_beta_residual_spread_pct": -0.8098769079242478,
+          "oriented_simple_excess_spread_pct": 0.5815139079442891
+        },
+        "KOSPI": {
+          "oriented_beta_residual_spread_pct": null,
+          "oriented_simple_excess_spread_pct": null
+        }
+      },
+      "matched_market_component_pct": -0.9094742378278479,
+      "orientation": "negative",
+      "oriented_beta_residual_spread_pct": -0.8098769079242478,
+      "oriented_simple_excess_spread_pct": 0.5815139079442891,
+      "simple_excess_nontrivial": true,
+      "simple_excess_q5_minus_q1_pct": -0.5815139079442891
+    },
+    {
+      "absolute_long_only_mean_pct": null,
+      "beta_residual_nontrivial": false,
+      "beta_residual_q5_minus_q1_pct": null,
+      "both_markets_same_oriented_direction": false,
+      "expected_friction_pct": 0.53,
+      "factor_id": "phase13_residual_rank_turnover_interaction__UPPER__EXPANDED",
+      "family_id": "phase13_residual_rank_turnover_interaction",
+      "horizon_sessions": 10,
+      "market_adjusted_edge_grade": "UNKNOWN",
+      "market_beta_dominated": "UNCERTAIN",
+      "market_component_share_definition": "mean matched-index return / selected-quantile mean absolute stock return",
+      "market_component_share_pct": null,
+      "market_scope": "KOSDAQ",
+      "market_split_directions": {
+        "KOSDAQ": {
+          "oriented_beta_residual_spread_pct": null,
+          "oriented_simple_excess_spread_pct": null
+        },
+        "KOSPI": {
+          "oriented_beta_residual_spread_pct": null,
+          "oriented_simple_excess_spread_pct": null
+        }
+      },
+      "matched_market_component_pct": null,
+      "orientation": "negative",
+      "oriented_beta_residual_spread_pct": null,
+      "oriented_simple_excess_spread_pct": null,
+      "simple_excess_nontrivial": false,
+      "simple_excess_q5_minus_q1_pct": null
+    },
+    {
+      "absolute_long_only_mean_pct": 0.013627716948182619,
+      "beta_residual_nontrivial": true,
+      "beta_residual_q5_minus_q1_pct": -0.4125214541604994,
+      "both_markets_same_oriented_direction": false,
+      "expected_friction_pct": 0.53,
+      "factor_id": "range_position_20d",
+      "family_id": "range_position",
+      "horizon_sessions": 3,
+      "market_adjusted_edge_grade": "FAIL",
+      "market_beta_dominated": "UNCERTAIN",
+      "market_component_share_definition": "mean matched-index return / selected-quantile mean absolute stock return",
+      "market_component_share_pct": null,
+      "market_scope": "KOSDAQ",
+      "market_split_directions": {
+        "KOSDAQ": {
+          "oriented_beta_residual_spread_pct": 0.4125214541604994,
+          "oriented_simple_excess_spread_pct": 0.3632157484650235
+        },
+        "KOSPI": {
+          "oriented_beta_residual_spread_pct": -0.016305045886145397,
+          "oriented_simple_excess_spread_pct": 0.018483310293464505
+        }
+      },
+      "matched_market_component_pct": 0.0003830719944646096,
+      "orientation": "negative",
+      "oriented_beta_residual_spread_pct": 0.4125214541604994,
+      "oriented_simple_excess_spread_pct": 0.3632157484650235,
+      "simple_excess_nontrivial": true,
+      "simple_excess_q5_minus_q1_pct": -0.3632157484650235
+    },
+    {
+      "absolute_long_only_mean_pct": 0.5139003129746472,
+      "beta_residual_nontrivial": false,
+      "beta_residual_q5_minus_q1_pct": -0.028452183577071105,
+      "both_markets_same_oriented_direction": false,
+      "expected_friction_pct": 0.53,
+      "factor_id": "raw_trailing_return_5d",
+      "family_id": "raw_trailing_return",
+      "horizon_sessions": 10,
+      "market_adjusted_edge_grade": "FAIL",
+      "market_beta_dominated": "NO",
+      "market_component_share_definition": "mean matched-index return / selected-quantile mean absolute stock return",
+      "market_component_share_pct": 75.44044454028469,
+      "market_scope": "KOSPI",
+      "market_split_directions": {
+        "KOSDAQ": {
+          "oriented_beta_residual_spread_pct": -0.7455102172535919,
+          "oriented_simple_excess_spread_pct": -0.7446248123702034
+        },
+        "KOSPI": {
+          "oriented_beta_residual_spread_pct": -0.028452183577071105,
+          "oriented_simple_excess_spread_pct": -0.11428803967583132
+        }
+      },
+      "matched_market_component_pct": 0.3876886806019882,
+      "orientation": "positive",
+      "oriented_beta_residual_spread_pct": -0.028452183577071105,
+      "oriented_simple_excess_spread_pct": -0.11428803967583132,
+      "simple_excess_nontrivial": false,
+      "simple_excess_q5_minus_q1_pct": -0.11428803967583132
+    },
+    {
+      "absolute_long_only_mean_pct": 0.04008219907319667,
+      "beta_residual_nontrivial": true,
+      "beta_residual_q5_minus_q1_pct": -0.4171907350045324,
+      "both_markets_same_oriented_direction": true,
+      "expected_friction_pct": 0.53,
+      "factor_id": "residual_cross_sectional_rank_5d",
+      "family_id": "residual_cross_sectional_rank",
+      "horizon_sessions": 3,
+      "market_adjusted_edge_grade": "FAIL",
+      "market_beta_dominated": "UNCERTAIN",
+      "market_component_share_definition": "mean matched-index return / selected-quantile mean absolute stock return",
+      "market_component_share_pct": null,
+      "market_scope": "KOSDAQ",
+      "market_split_directions": {
+        "KOSDAQ": {
+          "oriented_beta_residual_spread_pct": 0.4171907350045324,
+          "oriented_simple_excess_spread_pct": 0.38229705803926706
+        },
+        "KOSPI": {
+          "oriented_beta_residual_spread_pct": 0.1525846957685943,
+          "oriented_simple_excess_spread_pct": 0.16565249941991764
+        }
+      },
+      "matched_market_component_pct": -0.0409846716304506,
+      "orientation": "negative",
+      "oriented_beta_residual_spread_pct": 0.4171907350045324,
+      "oriented_simple_excess_spread_pct": 0.38229705803926706,
+      "simple_excess_nontrivial": true,
+      "simple_excess_q5_minus_q1_pct": -0.38229705803926706
+    },
+    {
+      "absolute_long_only_mean_pct": 0.1737015009974979,
+      "beta_residual_nontrivial": false,
+      "beta_residual_q5_minus_q1_pct": -0.008334727541772384,
+      "both_markets_same_oriented_direction": false,
+      "expected_friction_pct": 0.53,
+      "factor_id": "residual_drawdown_20d",
+      "family_id": "residual_drawdown",
+      "horizon_sessions": 3,
+      "market_adjusted_edge_grade": "FAIL",
+      "market_beta_dominated": "NO",
+      "market_component_share_definition": "mean matched-index return / selected-quantile mean absolute stock return",
+      "market_component_share_pct": 39.68721164390009,
+      "market_scope": "KOSPI",
+      "market_split_directions": {
+        "KOSDAQ": {
+          "oriented_beta_residual_spread_pct": -0.1766834142716192,
+          "oriented_simple_excess_spread_pct": -0.2815949423645703
+        },
+        "KOSPI": {
+          "oriented_beta_residual_spread_pct": 0.008334727541772384,
+          "oriented_simple_excess_spread_pct": 0.027205985626713572
+        }
+      },
+      "matched_market_component_pct": 0.06893728232950821,
+      "orientation": "negative",
+      "oriented_beta_residual_spread_pct": 0.008334727541772384,
+      "oriented_simple_excess_spread_pct": 0.027205985626713572,
+      "simple_excess_nontrivial": false,
+      "simple_excess_q5_minus_q1_pct": -0.027205985626713572
+    }
+  ],
+  "run_metadata": {
+    "cluster_bootstrap_repetitions": 2000,
+    "cross_sectional_permutations": 1000,
+    "dataset_sha256": "b7b07f60352d4b8d52d3917f6af35bb3d377b313428db30867ce79d2c67fd3f5",
+    "date_range": [
+      "2023-01-02",
+      "2025-06-30"
+    ],
+    "factor_registry_sha256": "557bd10155caef63b696841d6893da3b07e1b6651b587c385cd79dbb3da128eb",
+    "generated_at_utc": "2026-10-01T08:09:19.242994+00:00",
+    "horizons_sessions": [
+      3,
+      5,
+      10
+    ],
+    "numpy_version": "2.5.3",
+    "pipeline_config_sha256": "88dcb008acee28dfdac087773a24d392049930e044c1cf88407cdb7f9d5bd4e7",
+    "random_generator": "numpy.Generator(PCG64)",
+    "random_seed": 20261001,
+    "round_trip_cost_pct": 0.53,
+    "source_git_sha": "ef7a79128bdc596d715f3ddbdcc29350c3795ce5",
+    "targets": [
+      "ABSOLUTE_RETURN",
+      "SIMPLE_EXCESS_RETURN",
+      "BETA_RESIDUAL_RETURN"
+    ],
+    "time_dislocation_permutations": 500
+  }
+}

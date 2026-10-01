@@ -1,0 +1,419 @@
+{
+  "after": [
+    {
+      "path": "runtime/research/phase5/data-acquisition-manifest.json",
+      "sha256": "e46559a252da35a5746a2b64e0ce6c096692fbb14c3ab34777e39510cb6f675d",
+      "size_bytes": 16148
+    },
+    {
+      "path": "runtime/research/phase5/phase5-artifact-index-final.json",
+      "sha256": "56c4571cdabff27edea075ec2d9fb4ff29f619f9af689c6c7c41ca29e96156cd",
+      "size_bytes": 7698
+    },
+    {
+      "path": "runtime/research/phase5/phase5-artifact-index.json",
+      "sha256": "c1fa5b8cf7156d0269126167784feb2091d8b57914d59b0e29c426acfbe90894",
+      "size_bytes": 2889
+    },
+    {
+      "path": "runtime/research/phase5/phase5-summary.json",
+      "sha256": "2ae03924699a5dc83936ea101f944ceae0ad7c46cbdec54164b05d34f99d2faf",
+      "size_bytes": 1500
+    },
+    {
+      "path": "runtime/research/phase6/phase6-acquisition-manifest.json",
+      "sha256": "2591c05a59f20a8b90d2adff09a581fd552de9fa8e44de265afb1a788c5d0440",
+      "size_bytes": 11098
+    },
+    {
+      "path": "runtime/research/phase6/phase6-artifact-index.json",
+      "sha256": "f24db330d05475abbb2000966bcc6b5874ddf3c3aeddc90e1b8ea8b600ecc679",
+      "size_bytes": 4856
+    },
+    {
+      "path": "runtime/research/phase6/phase6-summary.json",
+      "sha256": "91339542969317a9226df145614d4250a4471d7d894fbb870ba44d40b32c3474",
+      "size_bytes": 9642
+    },
+    {
+      "path": "runtime/research/phase7/phase7-acquisition-manifest.json",
+      "sha256": "fe116a37f33628e03d4659cf9977aeff8f0cbcaefbf3ad6a1c4a11fdb04215c7",
+      "size_bytes": 3499
+    },
+    {
+      "path": "runtime/research/phase7/phase7-artifact-index.json",
+      "sha256": "ca7bb12f0920ac24356e72bbb0e5c648c1ad2aa2d7cc8ee60cf28e1b75961cce",
+      "size_bytes": 4473
+    },
+    {
+      "path": "runtime/research/phase7/phase7-dataset-manifest.json",
+      "sha256": "2a68706dda98eb2adfc660a137d09662592a3cc7671b2cf2f8ea423748d92c74",
+      "size_bytes": 299147
+    },
+    {
+      "path": "runtime/research/phase7/phase7-summary.json",
+      "sha256": "e450846321cfc3b4bee5cdb5a3f7488ea778e895ea4e430c4b0da9365663923d",
+      "size_bytes": 130846
+    },
+    {
+      "path": "runtime/research/phase8/phase8-acquisition-manifest.json",
+      "sha256": "8306f4f33243560bb08279a8b7d074e880637ae437280aac90bbf37b293c8d4f",
+      "size_bytes": 37659
+    },
+    {
+      "path": "runtime/research/phase8/phase8-artifact-index.json",
+      "sha256": "6356575bbbf4a4baf4c5eb2554a0fef9c5f7f5433403d7909fc0f46e52ced502",
+      "size_bytes": 4112
+    },
+    {
+      "path": "runtime/research/phase8/phase8-dataset-manifest.json",
+      "sha256": "8b50ae4fe5358e342b724dc3d85e2b1979d102c73b2fb8c8ef77dc2db6278b15",
+      "size_bytes": 2522
+    },
+    {
+      "path": "runtime/research/phase8/phase8-summary.json",
+      "sha256": "dbf80656647c841cf989e9fa15a763e252cca7defdead9842fd83607ca18b4af",
+      "size_bytes": 4386
+    },
+    {
+      "path": "runtime/research/phase9/artifact-integrity.json",
+      "sha256": "e9eecf7bf671a23e5cbb7f91f7e1d105bb1e8a2ce1cbd87d0abfe6304c4f9b0e",
+      "size_bytes": 59
+    },
+    {
+      "path": "runtime/research/phase9/phase9-artifact-index.json",
+      "sha256": "7ac462cabc3081b940f21f5d1909923701fab2324aea82963eca3d32d097a2de",
+      "size_bytes": 53227
+    },
+    {
+      "path": "runtime/research/phase9/phase9-summary.json",
+      "sha256": "7d5d2a6bebe7c177a9564936155f69707d93899507055e8e310454b246269865",
+      "size_bytes": 3500
+    },
+    {
+      "path": "runtime/research/phase9/previous-manifest-baseline.sha256",
+      "sha256": "d86340d0a245de376511c4b9b5f2c534a95e62e6bafe445557bf984038372db0",
+      "size_bytes": 1563
+    },
+    {
+      "path": "runtime/research/phase9/previous-manifest-immutability.json",
+      "sha256": "eaaf6bac08f4cc64f055e631ad852c4c29249445c1c2c86d03734dc11ef7a32a",
+      "size_bytes": 3583
+    },
+    {
+      "path": "runtime/research/phase10/artifact-integrity.json",
+      "sha256": "8e777b9850ba741586765abe94671f62b3296cd66c70e5d651db7e712c22c600",
+      "size_bytes": 57
+    },
+    {
+      "path": "runtime/research/phase10/phase10-artifact-index.json",
+      "sha256": "a351cfffd6c29560b33eaa4bfadd3446b69f192f4e54deb7e6b73ea614dfa78f",
+      "size_bytes": 891
+    },
+    {
+      "path": "runtime/research/phase10/phase10-summary.json",
+      "sha256": "10d21e8a58f3d33e6650468bf569320af8b48a0fd156ccf44d6f9c6ecd2c653e",
+      "size_bytes": 5521
+    },
+    {
+      "path": "runtime/research/phase11/artifact-integrity.json",
+      "sha256": "64f3942f6131d5990262beec0d94142e5ef700fd68b5edef2aeea972fc72814a",
+      "size_bytes": 60
+    },
+    {
+      "path": "runtime/research/phase11/phase11-acquisition-manifest.json",
+      "sha256": "1d7574349db9cc894639a3b1cac477bb45b98bb74298851268cf590a147e351d",
+      "size_bytes": 35946
+    },
+    {
+      "path": "runtime/research/phase11/phase11-artifact-index.json",
+      "sha256": "a78698d93ec5b1fa98cd23d738d8f3ebdfdff1cb03d41b39c7b4431ce89de5e2",
+      "size_bytes": 41837
+    },
+    {
+      "path": "runtime/research/phase11/phase11-prior-phase-manifest-hashes.json",
+      "sha256": "36fd8ced0514fde2dc3736c4bd0880d0d236eeca4f6ba6e9e93d2b83f79816b5",
+      "size_bytes": 2534
+    },
+    {
+      "path": "runtime/research/phase11/phase11-summary.json",
+      "sha256": "d784c8a9ef2501f703dfc2c2a261b03bfe77e139d3407e4031f8ad116168fd26",
+      "size_bytes": 20965
+    },
+    {
+      "path": "runtime/research/phase11/previous-phase-manifest-integrity.json",
+      "sha256": "1bc8d3867ba31f9996b98d6fc7109d5ec541cf6e8dd00940378fc6a8128aeace",
+      "size_bytes": 117
+    },
+    {
+      "path": "runtime/research/phase12/artifact-integrity.json",
+      "sha256": "748a0b510d299bc1b2a5d0d306cad3201f319140e7f96bb670dcc68f62a71d2a",
+      "size_bytes": 1572
+    },
+    {
+      "path": "runtime/research/phase12/phase12-artifact-index.json",
+      "sha256": "590f97f3db23532b94f145686979cbfe96b782397a01ee28c4a7ba28037d7307",
+      "size_bytes": 5517
+    },
+    {
+      "path": "runtime/research/phase12/phase12-dataset-manifest.json",
+      "sha256": "9db44078e824cdb4b4d275e9a5adbe682d51456a55f4e893214230586997baab",
+      "size_bytes": 29118
+    },
+    {
+      "path": "runtime/research/phase12/phase12-summary.json",
+      "sha256": "eb3cf4cb6e1c2ba2baa77f746722c0c4d5912e8c41bc396bcba42e082a5c7c07",
+      "size_bytes": 18723
+    },
+    {
+      "path": "runtime/research/phase13/artifact-integrity.json",
+      "sha256": "45a7d8dfb5f4546ebe1d5da3ecb7bc5c11cb66f1b55d3c6382a03c2d08b9e205",
+      "size_bytes": 59
+    },
+    {
+      "path": "runtime/research/phase13/phase13-artifact-index.json",
+      "sha256": "4dbd4b5b1871e78312aaef9cbc086c00bf0786ec8aaadd8530772fb958a0c01f",
+      "size_bytes": 4782
+    },
+    {
+      "path": "runtime/research/phase13/phase13-cohort-manifest.json",
+      "sha256": "8f989c48723ed76c6afd9cf6cd9ece2a5ca316f41d5fbdbce1cfd00b4813fcbf",
+      "size_bytes": 593
+    },
+    {
+      "path": "runtime/research/phase13/phase13-dataset-manifest.json",
+      "sha256": "1230701b0c5a2dde635c5e155edf948b4f91557bf3bd04696735e1100c6a5401",
+      "size_bytes": 16608
+    },
+    {
+      "path": "runtime/research/phase13/phase13-summary.json",
+      "sha256": "286622ff2cca773dabfd48f341b48ec1fc4dcb52d7e5cdcc1717936ef88d93e7",
+      "size_bytes": 5846
+    }
+  ],
+  "artifact": "previous-phase-artifact-snapshot",
+  "before": [
+    {
+      "path": "runtime/research/phase5/data-acquisition-manifest.json",
+      "sha256": "e46559a252da35a5746a2b64e0ce6c096692fbb14c3ab34777e39510cb6f675d",
+      "size_bytes": 16148
+    },
+    {
+      "path": "runtime/research/phase5/phase5-artifact-index-final.json",
+      "sha256": "56c4571cdabff27edea075ec2d9fb4ff29f619f9af689c6c7c41ca29e96156cd",
+      "size_bytes": 7698
+    },
+    {
+      "path": "runtime/research/phase5/phase5-artifact-index.json",
+      "sha256": "c1fa5b8cf7156d0269126167784feb2091d8b57914d59b0e29c426acfbe90894",
+      "size_bytes": 2889
+    },
+    {
+      "path": "runtime/research/phase5/phase5-summary.json",
+      "sha256": "2ae03924699a5dc83936ea101f944ceae0ad7c46cbdec54164b05d34f99d2faf",
+      "size_bytes": 1500
+    },
+    {
+      "path": "runtime/research/phase6/phase6-acquisition-manifest.json",
+      "sha256": "2591c05a59f20a8b90d2adff09a581fd552de9fa8e44de265afb1a788c5d0440",
+      "size_bytes": 11098
+    },
+    {
+      "path": "runtime/research/phase6/phase6-artifact-index.json",
+      "sha256": "f24db330d05475abbb2000966bcc6b5874ddf3c3aeddc90e1b8ea8b600ecc679",
+      "size_bytes": 4856
+    },
+    {
+      "path": "runtime/research/phase6/phase6-summary.json",
+      "sha256": "91339542969317a9226df145614d4250a4471d7d894fbb870ba44d40b32c3474",
+      "size_bytes": 9642
+    },
+    {
+      "path": "runtime/research/phase7/phase7-acquisition-manifest.json",
+      "sha256": "fe116a37f33628e03d4659cf9977aeff8f0cbcaefbf3ad6a1c4a11fdb04215c7",
+      "size_bytes": 3499
+    },
+    {
+      "path": "runtime/research/phase7/phase7-artifact-index.json",
+      "sha256": "ca7bb12f0920ac24356e72bbb0e5c648c1ad2aa2d7cc8ee60cf28e1b75961cce",
+      "size_bytes": 4473
+    },
+    {
+      "path": "runtime/research/phase7/phase7-dataset-manifest.json",
+      "sha256": "2a68706dda98eb2adfc660a137d09662592a3cc7671b2cf2f8ea423748d92c74",
+      "size_bytes": 299147
+    },
+    {
+      "path": "runtime/research/phase7/phase7-summary.json",
+      "sha256": "e450846321cfc3b4bee5cdb5a3f7488ea778e895ea4e430c4b0da9365663923d",
+      "size_bytes": 130846
+    },
+    {
+      "path": "runtime/research/phase8/phase8-acquisition-manifest.json",
+      "sha256": "8306f4f33243560bb08279a8b7d074e880637ae437280aac90bbf37b293c8d4f",
+      "size_bytes": 37659
+    },
+    {
+      "path": "runtime/research/phase8/phase8-artifact-index.json",
+      "sha256": "6356575bbbf4a4baf4c5eb2554a0fef9c5f7f5433403d7909fc0f46e52ced502",
+      "size_bytes": 4112
+    },
+    {
+      "path": "runtime/research/phase8/phase8-dataset-manifest.json",
+      "sha256": "8b50ae4fe5358e342b724dc3d85e2b1979d102c73b2fb8c8ef77dc2db6278b15",
+      "size_bytes": 2522
+    },
+    {
+      "path": "runtime/research/phase8/phase8-summary.json",
+      "sha256": "dbf80656647c841cf989e9fa15a763e252cca7defdead9842fd83607ca18b4af",
+      "size_bytes": 4386
+    },
+    {
+      "path": "runtime/research/phase9/artifact-integrity.json",
+      "sha256": "e9eecf7bf671a23e5cbb7f91f7e1d105bb1e8a2ce1cbd87d0abfe6304c4f9b0e",
+      "size_bytes": 59
+    },
+    {
+      "path": "runtime/research/phase9/phase9-artifact-index.json",
+      "sha256": "7ac462cabc3081b940f21f5d1909923701fab2324aea82963eca3d32d097a2de",
+      "size_bytes": 53227
+    },
+    {
+      "path": "runtime/research/phase9/phase9-summary.json",
+      "sha256": "7d5d2a6bebe7c177a9564936155f69707d93899507055e8e310454b246269865",
+      "size_bytes": 3500
+    },
+    {
+      "path": "runtime/research/phase9/previous-manifest-baseline.sha256",
+      "sha256": "d86340d0a245de376511c4b9b5f2c534a95e62e6bafe445557bf984038372db0",
+      "size_bytes": 1563
+    },
+    {
+      "path": "runtime/research/phase9/previous-manifest-immutability.json",
+      "sha256": "eaaf6bac08f4cc64f055e631ad852c4c29249445c1c2c86d03734dc11ef7a32a",
+      "size_bytes": 3583
+    },
+    {
+      "path": "runtime/research/phase10/artifact-integrity.json",
+      "sha256": "8e777b9850ba741586765abe94671f62b3296cd66c70e5d651db7e712c22c600",
+      "size_bytes": 57
+    },
+    {
+      "path": "runtime/research/phase10/phase10-artifact-index.json",
+      "sha256": "a351cfffd6c29560b33eaa4bfadd3446b69f192f4e54deb7e6b73ea614dfa78f",
+      "size_bytes": 891
+    },
+    {
+      "path": "runtime/research/phase10/phase10-summary.json",
+      "sha256": "10d21e8a58f3d33e6650468bf569320af8b48a0fd156ccf44d6f9c6ecd2c653e",
+      "size_bytes": 5521
+    },
+    {
+      "path": "runtime/research/phase11/artifact-integrity.json",
+      "sha256": "64f3942f6131d5990262beec0d94142e5ef700fd68b5edef2aeea972fc72814a",
+      "size_bytes": 60
+    },
+    {
+      "path": "runtime/research/phase11/phase11-acquisition-manifest.json",
+      "sha256": "1d7574349db9cc894639a3b1cac477bb45b98bb74298851268cf590a147e351d",
+      "size_bytes": 35946
+    },
+    {
+      "path": "runtime/research/phase11/phase11-artifact-index.json",
+      "sha256": "a78698d93ec5b1fa98cd23d738d8f3ebdfdff1cb03d41b39c7b4431ce89de5e2",
+      "size_bytes": 41837
+    },
+    {
+      "path": "runtime/research/phase11/phase11-prior-phase-manifest-hashes.json",
+      "sha256": "36fd8ced0514fde2dc3736c4bd0880d0d236eeca4f6ba6e9e93d2b83f79816b5",
+      "size_bytes": 2534
+    },
+    {
+      "path": "runtime/research/phase11/phase11-summary.json",
+      "sha256": "d784c8a9ef2501f703dfc2c2a261b03bfe77e139d3407e4031f8ad116168fd26",
+      "size_bytes": 20965
+    },
+    {
+      "path": "runtime/research/phase11/previous-phase-manifest-integrity.json",
+      "sha256": "1bc8d3867ba31f9996b98d6fc7109d5ec541cf6e8dd00940378fc6a8128aeace",
+      "size_bytes": 117
+    },
+    {
+      "path": "runtime/research/phase12/artifact-integrity.json",
+      "sha256": "748a0b510d299bc1b2a5d0d306cad3201f319140e7f96bb670dcc68f62a71d2a",
+      "size_bytes": 1572
+    },
+    {
+      "path": "runtime/research/phase12/phase12-artifact-index.json",
+      "sha256": "590f97f3db23532b94f145686979cbfe96b782397a01ee28c4a7ba28037d7307",
+      "size_bytes": 5517
+    },
+    {
+      "path": "runtime/research/phase12/phase12-dataset-manifest.json",
+      "sha256": "9db44078e824cdb4b4d275e9a5adbe682d51456a55f4e893214230586997baab",
+      "size_bytes": 29118
+    },
+    {
+      "path": "runtime/research/phase12/phase12-summary.json",
+      "sha256": "eb3cf4cb6e1c2ba2baa77f746722c0c4d5912e8c41bc396bcba42e082a5c7c07",
+      "size_bytes": 18723
+    },
+    {
+      "path": "runtime/research/phase13/artifact-integrity.json",
+      "sha256": "45a7d8dfb5f4546ebe1d5da3ecb7bc5c11cb66f1b55d3c6382a03c2d08b9e205",
+      "size_bytes": 59
+    },
+    {
+      "path": "runtime/research/phase13/phase13-artifact-index.json",
+      "sha256": "4dbd4b5b1871e78312aaef9cbc086c00bf0786ec8aaadd8530772fb958a0c01f",
+      "size_bytes": 4782
+    },
+    {
+      "path": "runtime/research/phase13/phase13-cohort-manifest.json",
+      "sha256": "8f989c48723ed76c6afd9cf6cd9ece2a5ca316f41d5fbdbce1cfd00b4813fcbf",
+      "size_bytes": 593
+    },
+    {
+      "path": "runtime/research/phase13/phase13-dataset-manifest.json",
+      "sha256": "1230701b0c5a2dde635c5e155edf948b4f91557bf3bd04696735e1100c6a5401",
+      "size_bytes": 16608
+    },
+    {
+      "path": "runtime/research/phase13/phase13-summary.json",
+      "sha256": "286622ff2cca773dabfd48f341b48ec1fc4dcb52d7e5cdcc1717936ef88d93e7",
+      "size_bytes": 5846
+    }
+  ],
+  "before_snapshot_path": "/tmp/phase14-baseline-phase5-13.json",
+  "before_snapshot_sha256": "80e643a04c6db6eeeff04983add80b89e50befa8f09373b6fc696e19578ff455",
+  "changed_paths": [],
+  "previous_phase_artifact_immutability": "PASS",
+  "run_metadata": {
+    "cluster_bootstrap_repetitions": 2000,
+    "cross_sectional_permutations": 1000,
+    "dataset_sha256": "b7b07f60352d4b8d52d3917f6af35bb3d377b313428db30867ce79d2c67fd3f5",
+    "date_range": [
+      "2023-01-02",
+      "2025-06-30"
+    ],
+    "factor_registry_sha256": "557bd10155caef63b696841d6893da3b07e1b6651b587c385cd79dbb3da128eb",
+    "generated_at_utc": "2026-10-01T08:09:19.242994+00:00",
+    "horizons_sessions": [
+      3,
+      5,
+      10
+    ],
+    "numpy_version": "2.5.3",
+    "pipeline_config_sha256": "88dcb008acee28dfdac087773a24d392049930e044c1cf88407cdb7f9d5bd4e7",
+    "random_generator": "numpy.Generator(PCG64)",
+    "random_seed": 20261001,
+    "round_trip_cost_pct": 0.53,
+    "source_git_sha": "ef7a79128bdc596d715f3ddbdcc29350c3795ce5",
+    "targets": [
+      "ABSOLUTE_RETURN",
+      "SIMPLE_EXCESS_RETURN",
+      "BETA_RESIDUAL_RETURN"
+    ],
+    "time_dislocation_permutations": 500
+  }
+}

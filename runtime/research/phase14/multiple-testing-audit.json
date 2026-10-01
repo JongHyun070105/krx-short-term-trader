@@ -1,0 +1,182 @@
+{
+  "artifact": "multiple-testing-audit",
+  "effective_family_count": 14,
+  "effective_family_count_definition": "number of frozen semantic factor families; no estimated correlation-based effective count",
+  "family_max_statistic_results": [
+    {
+      "empirical_p": 0.000999000999000999,
+      "family_id": "abnormal_traded_value_activity",
+      "null_max_p95": 0.017234005371954495,
+      "observed_family_best_statistic": 0.030747968955796734,
+      "selection_adjusted_pass": true
+    },
+    {
+      "empirical_p": 0.000999000999000999,
+      "family_id": "beta_residual_return",
+      "null_max_p95": 0.018890976250319064,
+      "observed_family_best_statistic": 0.038840570312905894,
+      "selection_adjusted_pass": true
+    },
+    {
+      "empirical_p": 0.000999000999000999,
+      "family_id": "idiosyncratic_volatility",
+      "null_max_p95": 0.017322274373305784,
+      "observed_family_best_statistic": 0.10051189889246417,
+      "selection_adjusted_pass": true
+    },
+    {
+      "empirical_p": 1.0,
+      "family_id": "market_breadth",
+      "null_max_p95": 0.0,
+      "observed_family_best_statistic": 0.0,
+      "selection_adjusted_pass": false
+    },
+    {
+      "empirical_p": 1.0,
+      "family_id": "market_context",
+      "null_max_p95": 0.0,
+      "observed_family_best_statistic": 0.0,
+      "selection_adjusted_pass": false
+    },
+    {
+      "empirical_p": 1.0,
+      "family_id": "market_excess_dispersion",
+      "null_max_p95": 0.0,
+      "observed_family_best_statistic": 0.0,
+      "selection_adjusted_pass": false
+    },
+    {
+      "empirical_p": 0.000999000999000999,
+      "family_id": "market_excess_return",
+      "null_max_p95": 0.02027554078238893,
+      "observed_family_best_statistic": 0.044722369284871,
+      "selection_adjusted_pass": true
+    },
+    {
+      "empirical_p": 0.000999000999000999,
+      "family_id": "phase13_excess_turnover_interaction",
+      "null_max_p95": 0.020897197714720584,
+      "observed_family_best_statistic": 0.0679672747910035,
+      "selection_adjusted_pass": true
+    },
+    {
+      "empirical_p": 0.000999000999000999,
+      "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+      "null_max_p95": 0.020889041006058758,
+      "observed_family_best_statistic": 0.0668794061419711,
+      "selection_adjusted_pass": true
+    },
+    {
+      "empirical_p": 0.000999000999000999,
+      "family_id": "phase13_residual_rank_turnover_interaction",
+      "null_max_p95": 0.021008966909967154,
+      "observed_family_best_statistic": 0.06086073583387782,
+      "selection_adjusted_pass": true
+    },
+    {
+      "empirical_p": 0.000999000999000999,
+      "family_id": "range_position",
+      "null_max_p95": 0.017554717929174492,
+      "observed_family_best_statistic": 0.030726401800610627,
+      "selection_adjusted_pass": true
+    },
+    {
+      "empirical_p": 1.0,
+      "family_id": "raw_trailing_return",
+      "null_max_p95": 0.019369033959711283,
+      "observed_family_best_statistic": -0.014045945697617045,
+      "selection_adjusted_pass": false
+    },
+    {
+      "empirical_p": 0.000999000999000999,
+      "family_id": "residual_cross_sectional_rank",
+      "null_max_p95": 0.018832949312292138,
+      "observed_family_best_statistic": 0.038840570312905894,
+      "selection_adjusted_pass": true
+    },
+    {
+      "empirical_p": 1.0,
+      "family_id": "residual_drawdown",
+      "null_max_p95": 0.016459316587635144,
+      "observed_family_best_statistic": -0.026385135196538675,
+      "selection_adjusted_pass": false
+    }
+  ],
+  "formal_fdr_or_fwer_method": "NOT_IMPLEMENTED",
+  "historical_research_counts": {
+    "candidate_rule_count_completeness": "LOWER_BOUND; early exploratory variants are not exhaustively enumerable from final records",
+    "candidate_rules_explicitly_staged_in_Phase11_and_Phase13": 2,
+    "combined_named_family_labels_minimum": 24,
+    "directional_interpretations_minimum": 2,
+    "factor_families_minimum": 11,
+    "historical_forward_horizons_sessions_minimum": [
+      1,
+      2,
+      3,
+      5,
+      10,
+      20
+    ],
+    "historical_market_splits": 2,
+    "independent_historical_periods_remaining": 0,
+    "interaction_families_minimum": 4,
+    "metadata_exposed_non_pristine_blocks": 1,
+    "strategy_families_minimum": 9,
+    "unread_external_blocks_available": 1
+  },
+  "interpretation": "A selected cell is not reported as if it were the sole historical test.",
+  "phase14_search_surface": {
+    "candidate_selection_opportunities": 3225,
+    "directional_interpretations": 118,
+    "factor_definitions": 63,
+    "factor_families": 14,
+    "fixed_quantile_states": 5,
+    "historical_interaction_state_variants": 39,
+    "horizons": [
+      3,
+      5,
+      10
+    ],
+    "market_scopes_including_pooled": [
+      "ALL",
+      "KOSPI",
+      "KOSDAQ"
+    ],
+    "raw_directional_metric_cells": 3186,
+    "raw_quantile_state_cells": 8505,
+    "targets": [
+      "ABSOLUTE_RETURN",
+      "SIMPLE_EXCESS_RETURN",
+      "BETA_RESIDUAL_RETURN"
+    ]
+  },
+  "primary_selection_control": "complete within-family max-statistic permutation surface",
+  "run_metadata": {
+    "cluster_bootstrap_repetitions": 2000,
+    "cross_sectional_permutations": 1000,
+    "dataset_sha256": "b7b07f60352d4b8d52d3917f6af35bb3d377b313428db30867ce79d2c67fd3f5",
+    "date_range": [
+      "2023-01-02",
+      "2025-06-30"
+    ],
+    "factor_registry_sha256": "557bd10155caef63b696841d6893da3b07e1b6651b587c385cd79dbb3da128eb",
+    "generated_at_utc": "2026-10-01T08:09:19.242994+00:00",
+    "horizons_sessions": [
+      3,
+      5,
+      10
+    ],
+    "numpy_version": "2.5.3",
+    "pipeline_config_sha256": "88dcb008acee28dfdac087773a24d392049930e044c1cf88407cdb7f9d5bd4e7",
+    "random_generator": "numpy.Generator(PCG64)",
+    "random_seed": 20261001,
+    "round_trip_cost_pct": 0.53,
+    "source_git_sha": "ef7a79128bdc596d715f3ddbdcc29350c3795ce5",
+    "targets": [
+      "ABSOLUTE_RETURN",
+      "SIMPLE_EXCESS_RETURN",
+      "BETA_RESIDUAL_RETURN"
+    ],
+    "time_dislocation_permutations": 500
+  }
+}

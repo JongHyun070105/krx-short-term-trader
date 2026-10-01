@@ -1,0 +1,637 @@
+{
+  "analysis_date_window": [
+    "2023-01-02",
+    "2025-06-30"
+  ],
+  "analysis_source_git_sha": "ef7a79128bdc596d715f3ddbdcc29350c3795ce5",
+  "artifact": "phase14-summary",
+  "data_source": "Phase 13 safe factor panel, primary panel clipped at 2025-06-30",
+  "factor_registry_summary": {
+    "artifact": "phase14-factor-registry",
+    "candidate_reference": {
+      "entry_exit_or_position_sizing": "NOT_INCLUDED",
+      "factor_id": "phase13_excess_turnover_interaction__LE_-4__EXPANDED",
+      "historical_rule_label": "5d excess return <= -4% x expanded traded-value ratio >= 1.5",
+      "market_scope": "KOSPI in the historical Phase 13 candidate; both market splits are retained in the V2 search surface"
+    },
+    "directional_hypothesis_count": 118,
+    "factor_count": 63,
+    "family_count": 14,
+    "interaction_state_definitions": {
+      "excess_return_5d_pct": [
+        "LE_-4",
+        "-4_TO_-2",
+        "-2_TO_0",
+        "0_TO_2",
+        "2_TO_4",
+        "GE_4"
+      ],
+      "idio_volatility_20d_pct": {
+        "cuts": "Discovery-only 1/3 and 2/3 empirical quantiles, matching Phase 13",
+        "states": [
+          "LOW",
+          "MID",
+          "HIGH"
+        ]
+      },
+      "residual_drawdown_20d_pct": [
+        "DEEP_LE_-8",
+        "-8_TO_-4",
+        "-4_TO_0",
+        "AT_HIGH_OR_ABOVE"
+      ],
+      "residual_rank_20d_state": [
+        "LOWER",
+        "MIDDLE",
+        "UPPER"
+      ],
+      "turnover_ratio_5d_vs_prior20_median": [
+        "CONTRACTED",
+        "NORMAL",
+        "EXPANDED"
+      ]
+    },
+    "items": "63 factor definitions; see factor-registry.json",
+    "limitations": [
+      "Current-listing cohort is survivorship biased; point-in-time membership is partial.",
+      "KIS adjusted prices have no historical vintage control.",
+      "Market context, breadth, and dispersion are conditioning diagnostics, not candidate factors."
+    ],
+    "schema_version": 1,
+    "source": "Phase 13 pre-Confirmation factor definitions and state maps",
+    "state_quantile_count": 5
+  },
+  "factor_summary": {
+    "concentration_by_family": {
+      "abnormal_traded_value_activity": {
+        "date_clusters": 587,
+        "top_five_dates_share_pct": 4.596391310525008,
+        "top_three_symbols_share_pct": 18.884101593505502
+      },
+      "beta_residual_return": {
+        "date_clusters": 584,
+        "top_five_dates_share_pct": 4.640507191116382,
+        "top_three_symbols_share_pct": 17.30105283979097
+      },
+      "idiosyncratic_volatility": {
+        "date_clusters": 587,
+        "top_five_dates_share_pct": 4.469609856504678,
+        "top_three_symbols_share_pct": 16.501085884202887
+      },
+      "market_breadth": {
+        "date_clusters": 0,
+        "top_five_dates_share_pct": null,
+        "top_three_symbols_share_pct": null
+      },
+      "market_context": {
+        "date_clusters": 0,
+        "top_five_dates_share_pct": null,
+        "top_three_symbols_share_pct": null
+      },
+      "market_excess_dispersion": {
+        "date_clusters": 0,
+        "top_five_dates_share_pct": null,
+        "top_three_symbols_share_pct": null
+      },
+      "market_excess_return": {
+        "date_clusters": 587,
+        "top_five_dates_share_pct": 4.793522666674451,
+        "top_three_symbols_share_pct": 18.315574248473787
+      },
+      "negative_control": {
+        "date_clusters": 601,
+        "top_five_dates_share_pct": 4.696538215718945,
+        "top_three_symbols_share_pct": 12.051556090333921
+      },
+      "phase13_excess_turnover_interaction": {
+        "date_clusters": 0,
+        "top_five_dates_share_pct": null,
+        "top_three_symbols_share_pct": null
+      },
+      "phase13_residual_drawdown_idio_vol_interaction": {
+        "date_clusters": 26,
+        "top_five_dates_share_pct": 49.85540931635198,
+        "top_three_symbols_share_pct": 35.41275814366058
+      },
+      "phase13_residual_rank_turnover_interaction": {
+        "date_clusters": 0,
+        "top_five_dates_share_pct": null,
+        "top_three_symbols_share_pct": null
+      },
+      "range_position": {
+        "date_clusters": 601,
+        "top_five_dates_share_pct": 5.456155080205785,
+        "top_three_symbols_share_pct": 15.03299336141919
+      },
+      "raw_trailing_return": {
+        "date_clusters": 587,
+        "top_five_dates_share_pct": 4.399879754484296,
+        "top_three_symbols_share_pct": 21.27523069682979
+      },
+      "residual_cross_sectional_rank": {
+        "date_clusters": 584,
+        "top_five_dates_share_pct": 4.640507191116382,
+        "top_three_symbols_share_pct": 17.30105283979097
+      },
+      "residual_drawdown": {
+        "date_clusters": 601,
+        "top_five_dates_share_pct": 4.413890912892537,
+        "top_three_symbols_share_pct": 28.342098503832094
+      }
+    },
+    "cost_sufficient_families": [
+      "idiosyncratic_volatility"
+    ],
+    "directionally_stable_families": [
+      "beta_residual_return",
+      "idiosyncratic_volatility",
+      "market_excess_return",
+      "range_position",
+      "residual_cross_sectional_rank"
+    ],
+    "market_adjusted_families": [
+      "idiosyncratic_volatility"
+    ],
+    "monotonic_quantile_families": [
+      "beta_residual_return",
+      "residual_cross_sectional_rank"
+    ],
+    "nonzero_predictive_ic_families": [
+      "abnormal_traded_value_activity",
+      "beta_residual_return",
+      "idiosyncratic_volatility",
+      "market_excess_return",
+      "phase13_excess_turnover_interaction",
+      "phase13_residual_drawdown_idio_vol_interaction",
+      "phase13_residual_rank_turnover_interaction",
+      "range_position",
+      "residual_cross_sectional_rank"
+    ],
+    "selection_aware_null_separating_families": [
+      "abnormal_traded_value_activity",
+      "beta_residual_return",
+      "idiosyncratic_volatility",
+      "market_excess_return",
+      "phase13_excess_turnover_interaction",
+      "phase13_residual_drawdown_idio_vol_interaction",
+      "phase13_residual_rank_turnover_interaction",
+      "range_position",
+      "residual_cross_sectional_rank"
+    ]
+  },
+  "historical_family_audit": {
+    "artifact": "historical-family-audit",
+    "config_frozen_first": true,
+    "phase13_h2_used_only_as_challenge_label": true,
+    "results": [
+      {
+        "challenge_outcomes_not_used_for_v2_verdict": true,
+        "historical_family": "Phase 11 market-stress rebound / market-context mean reversion",
+        "input_window": [
+          "2023-01-02",
+          "2025-06-30"
+        ],
+        "later_known_outcome": "NO_CANDIDATE; phase 12 candidate not created",
+        "old_pipeline_result": "REJECTED_AFTER_VALIDATION; Phase 12 found market beta and stress composition, not a stable mechanism",
+        "pipeline_v2_factor_verdict": "FAIL",
+        "v2_factor_family": "market_context",
+        "v2_would_have_prevented_candidate_research": true
+      },
+      {
+        "challenge_outcomes_not_used_for_v2_verdict": true,
+        "historical_family": "Phase 13 standalone residual reversal",
+        "input_window": [
+          "2023-01-02",
+          "2025-06-30"
+        ],
+        "later_known_outcome": "STANDALONE_STATE_NOT_PROMOTED",
+        "old_pipeline_result": "WEAK; absolute effect below 0.53% friction",
+        "pipeline_v2_factor_verdict": "WEAK",
+        "v2_factor_family": "beta_residual_return",
+        "v2_would_have_prevented_candidate_research": true
+      },
+      {
+        "challenge_outcomes_not_used_for_v2_verdict": true,
+        "historical_family": "Phase 10 daily price states",
+        "input_window": [
+          "2023-01-02",
+          "2025-06-30"
+        ],
+        "later_known_outcome": "NO_CANDIDATE",
+        "old_pipeline_result": "NO_QUALIFYING_FAMILY; no candidate",
+        "pipeline_v2_factor_verdict": "FAIL",
+        "v2_factor_family": "raw_trailing_return",
+        "v2_would_have_prevented_candidate_research": true
+      },
+      {
+        "challenge_outcomes_not_used_for_v2_verdict": true,
+        "historical_family": "Phase 13 excess-reversal x expanded-turnover candidate family",
+        "input_window": [
+          "2023-01-02",
+          "2025-06-30"
+        ],
+        "later_known_outcome": "PHASE13_CONFIRMATION_FAIL",
+        "old_pipeline_result": "CANDIDATE_CREATED_THEN_CONFIRMATION_FAILED",
+        "pipeline_v2_factor_verdict": "WEAK",
+        "v2_factor_family": "phase13_excess_turnover_interaction",
+        "v2_would_have_prevented_candidate_research": true
+      }
+    ]
+  },
+  "ledger_summary": {
+    "candidate_rule_count_completeness": "LOWER_BOUND; early exploratory variants are not exhaustively enumerable from final records",
+    "candidate_rules_explicitly_staged_in_Phase11_and_Phase13": 2,
+    "combined_named_family_labels_minimum": 24,
+    "directional_interpretations_minimum": 2,
+    "factor_families_minimum": 11,
+    "historical_forward_horizons_sessions_minimum": [
+      1,
+      2,
+      3,
+      5,
+      10,
+      20
+    ],
+    "historical_market_splits": 2,
+    "independent_historical_periods_remaining": 0,
+    "interaction_families_minimum": 4,
+    "metadata_exposed_non_pristine_blocks": 1,
+    "strategy_families_minimum": 9,
+    "unread_external_blocks_available": 1
+  },
+  "phase13_false_positive_audit": {
+    "artifact": "phase13-retrospective-audit",
+    "audit_note": "The caller supplied the historical Phase 13 failure label before implementation; the frozen rules are executed only on the pre-2025-H2 safe panel, and the label is appended after that verdict.",
+    "config_frozen_before_audit": true,
+    "phase13_candidate_family": "phase13_excess_turnover_interaction",
+    "phase13_confirmation_used_as_pipeline_input": false,
+    "pipeline_config_sha256": "88dcb008acee28dfdac087773a24d392049930e044c1cf88407cdb7f9d5bd4e7",
+    "pipeline_false_positive_audit": "PASS",
+    "post_hoc_gate_changes": false,
+    "post_verdict_historical_challenge": {
+      "label": "PHASE13_CONFIRMATION_FAIL",
+      "metrics": {
+        "beta_residual_pct": -1.252423,
+        "gross_pct": -0.92879,
+        "net_1x_pct": -1.45879,
+        "simple_excess_pct": -1.48963
+      },
+      "role": "already-known retrospective challenge label; excluded from all Phase 14 factor metrics, nulls, and thresholds"
+    },
+    "preconfirmation_input_window": [
+      "2023-01-02",
+      "2025-06-30"
+    ],
+    "preconfirmation_v2_verdict": "WEAK",
+    "thresholds_changed_after_challenge": false,
+    "would_have_blocked_candidate_from_confirmation": true
+  },
+  "required_questions": {
+    "Q1": {
+      "candidate_rule_count": "At least 2 explicitly staged one-shot rules (Phase 11 and Phase 13); earlier variants are not exhaustively enumerable.",
+      "combined_named_family_labels_minimum": 24,
+      "factor_families_minimum": 11,
+      "interaction_families_minimum": 4,
+      "strategy_families_minimum": 9
+    },
+    "Q10": {
+      "negative_control_correctly_fails": true,
+      "negative_control_final_state": "FAIL"
+    },
+    "Q11": {
+      "candidate_selection_opportunities": 3225,
+      "directional_interpretations": 118,
+      "factor_definitions": 63,
+      "factor_families": 14,
+      "fixed_quantile_states": 5,
+      "historical_interaction_state_variants": 39,
+      "horizons": [
+        3,
+        5,
+        10
+      ],
+      "market_scopes_including_pooled": [
+        "ALL",
+        "KOSPI",
+        "KOSDAQ"
+      ],
+      "raw_directional_metric_cells": 3186,
+      "raw_quantile_state_cells": 8505,
+      "targets": [
+        "ABSOLUTE_RETURN",
+        "SIMPLE_EXCESS_RETURN",
+        "BETA_RESIDUAL_RETURN"
+      ]
+    },
+    "Q12": [
+      "idiosyncratic_volatility"
+    ],
+    "Q13": [
+      "idiosyncratic_volatility"
+    ],
+    "Q14": {
+      "abnormal_traded_value_activity": {
+        "date_clusters": 587,
+        "top_five_dates_share_pct": 4.596391310525008,
+        "top_three_symbols_share_pct": 18.884101593505502
+      },
+      "beta_residual_return": {
+        "date_clusters": 584,
+        "top_five_dates_share_pct": 4.640507191116382,
+        "top_three_symbols_share_pct": 17.30105283979097
+      },
+      "idiosyncratic_volatility": {
+        "date_clusters": 587,
+        "top_five_dates_share_pct": 4.469609856504678,
+        "top_three_symbols_share_pct": 16.501085884202887
+      },
+      "market_breadth": {
+        "date_clusters": 0,
+        "top_five_dates_share_pct": null,
+        "top_three_symbols_share_pct": null
+      },
+      "market_context": {
+        "date_clusters": 0,
+        "top_five_dates_share_pct": null,
+        "top_three_symbols_share_pct": null
+      },
+      "market_excess_dispersion": {
+        "date_clusters": 0,
+        "top_five_dates_share_pct": null,
+        "top_three_symbols_share_pct": null
+      },
+      "market_excess_return": {
+        "date_clusters": 587,
+        "top_five_dates_share_pct": 4.793522666674451,
+        "top_three_symbols_share_pct": 18.315574248473787
+      },
+      "negative_control": {
+        "date_clusters": 601,
+        "top_five_dates_share_pct": 4.696538215718945,
+        "top_three_symbols_share_pct": 12.051556090333921
+      },
+      "phase13_excess_turnover_interaction": {
+        "date_clusters": 0,
+        "top_five_dates_share_pct": null,
+        "top_three_symbols_share_pct": null
+      },
+      "phase13_residual_drawdown_idio_vol_interaction": {
+        "date_clusters": 26,
+        "top_five_dates_share_pct": 49.85540931635198,
+        "top_three_symbols_share_pct": 35.41275814366058
+      },
+      "phase13_residual_rank_turnover_interaction": {
+        "date_clusters": 0,
+        "top_five_dates_share_pct": null,
+        "top_three_symbols_share_pct": null
+      },
+      "range_position": {
+        "date_clusters": 601,
+        "top_five_dates_share_pct": 5.456155080205785,
+        "top_three_symbols_share_pct": 15.03299336141919
+      },
+      "raw_trailing_return": {
+        "date_clusters": 587,
+        "top_five_dates_share_pct": 4.399879754484296,
+        "top_three_symbols_share_pct": 21.27523069682979
+      },
+      "residual_cross_sectional_rank": {
+        "date_clusters": 584,
+        "top_five_dates_share_pct": 4.640507191116382,
+        "top_three_symbols_share_pct": 17.30105283979097
+      },
+      "residual_drawdown": {
+        "date_clusters": 601,
+        "top_five_dates_share_pct": 4.413890912892537,
+        "top_three_symbols_share_pct": 28.342098503832094
+      }
+    },
+    "Q15": {
+      "preconfirmation_v2_verdict": "WEAK",
+      "would_v2_have_blocked_phase13": true
+    },
+    "Q16": "N/A: V2 would have blocked it before Confirmation; no failed block needs explanation.",
+    "Q17": {
+      "future_strategy_synthesis_family": "NONE",
+      "viability": "NONE"
+    },
+    "Q18": {
+      "existing_information": "WEAK",
+      "next_research_mode": "NEW_INFORMATION_SOURCE",
+      "recommendation": "New reproducible point-in-time information source"
+    },
+    "Q2": {
+      "consumed_confirmation": [
+        "2025-07-01..2025-12-30"
+      ],
+      "heavily_touched": [
+        "2023-01-02..2024-06-28",
+        "2024-07-01..2025-06-30"
+      ],
+      "holdout_metadata_exposed_not_pristine": [
+        "2026-07-28..2026-08-28"
+      ],
+      "other_touched_excluded": [
+        "2026-04-17..2026-06-30 Phase 10 Development"
+      ]
+    },
+    "Q3": {
+      "external_window": "2026-01-05..2026-04-16; unread and not used in Phase 14",
+      "future_prospective_period_policy": "None specified in inspected Phase 10-13 policy artifacts",
+      "holdout_window": "Outcome unread but metadata exposed; not pristine",
+      "independent_historical_periods_remaining": 0,
+      "unread_external_blocks_available": 1
+    },
+    "Q4": {
+      "interpretation": "Distribution scale is not factor edge or profitability; family gates still require factor structure.",
+      "opportunity_vs_0_53pct_friction": [
+        {
+          "cross_sectional_spread_pct": 8.454386367038458,
+          "horizon_sessions": 3,
+          "spread_to_friction_ratio": 15.951672390638599,
+          "target": "ABSOLUTE_RETURN",
+          "typical_absolute_move_pct": 2.152528036484147,
+          "typical_move_to_friction_ratio": 4.061373653743673,
+          "upper_tail_absolute_move_pct": 7.337127426852615,
+          "upper_tail_to_friction_ratio": 13.843636654438896
+        },
+        {
+          "cross_sectional_spread_pct": 8.454386367038458,
+          "horizon_sessions": 3,
+          "spread_to_friction_ratio": 15.951672390638599,
+          "target": "SIMPLE_EXCESS_RETURN",
+          "typical_absolute_move_pct": 2.0698268209813744,
+          "typical_move_to_friction_ratio": 3.905333624493159,
+          "upper_tail_absolute_move_pct": 6.644399878847739,
+          "upper_tail_to_friction_ratio": 12.536603544995733
+        },
+        {
+          "cross_sectional_spread_pct": 8.225591296998667,
+          "horizon_sessions": 3,
+          "spread_to_friction_ratio": 15.519983579242767,
+          "target": "BETA_RESIDUAL_RETURN",
+          "typical_absolute_move_pct": 1.9326739750335211,
+          "typical_move_to_friction_ratio": 3.646554669874568,
+          "upper_tail_absolute_move_pct": 6.494705236304453,
+          "upper_tail_to_friction_ratio": 12.25416082321595
+        },
+        {
+          "cross_sectional_spread_pct": 11.112484381577387,
+          "horizon_sessions": 5,
+          "spread_to_friction_ratio": 20.96695166335356,
+          "target": "ABSOLUTE_RETURN",
+          "typical_absolute_move_pct": 2.877697841726623,
+          "typical_move_to_friction_ratio": 5.429618569295515,
+          "upper_tail_absolute_move_pct": 9.615568424111508,
+          "upper_tail_to_friction_ratio": 18.142581932285864
+        },
+        {
+          "cross_sectional_spread_pct": 11.112484381577387,
+          "horizon_sessions": 5,
+          "spread_to_friction_ratio": 20.96695166335356,
+          "target": "SIMPLE_EXCESS_RETURN",
+          "typical_absolute_move_pct": 2.7387133371972183,
+          "typical_move_to_friction_ratio": 5.167383655089091,
+          "upper_tail_absolute_move_pct": 8.678189683649759,
+          "upper_tail_to_friction_ratio": 16.373942799339165
+        },
+        {
+          "cross_sectional_spread_pct": 10.87175229309639,
+          "horizon_sessions": 5,
+          "spread_to_friction_ratio": 20.512740175653565,
+          "target": "BETA_RESIDUAL_RETURN",
+          "typical_absolute_move_pct": 2.5392148951870963,
+          "typical_move_to_friction_ratio": 4.790971500353011,
+          "upper_tail_absolute_move_pct": 8.43014910683958,
+          "upper_tail_to_friction_ratio": 15.905941711018077
+        },
+        {
+          "cross_sectional_spread_pct": 16.241993263300902,
+          "horizon_sessions": 10,
+          "spread_to_friction_ratio": 30.645270308114906,
+          "target": "ABSOLUTE_RETURN",
+          "typical_absolute_move_pct": 4.1666666666666625,
+          "typical_move_to_friction_ratio": 7.861635220125778,
+          "upper_tail_absolute_move_pct": 13.85281385281385,
+          "upper_tail_to_friction_ratio": 26.137384627950656
+        },
+        {
+          "cross_sectional_spread_pct": 16.241993263300902,
+          "horizon_sessions": 10,
+          "spread_to_friction_ratio": 30.645270308114906,
+          "target": "SIMPLE_EXCESS_RETURN",
+          "typical_absolute_move_pct": 4.0232278121576375,
+          "typical_move_to_friction_ratio": 7.590995871995542,
+          "upper_tail_absolute_move_pct": 12.483494603761391,
+          "upper_tail_to_friction_ratio": 23.55376340332338
+        },
+        {
+          "cross_sectional_spread_pct": 15.79080063195687,
+          "horizon_sessions": 10,
+          "spread_to_friction_ratio": 29.793963456522395,
+          "target": "BETA_RESIDUAL_RETURN",
+          "typical_absolute_move_pct": 3.7199919551122367,
+          "typical_move_to_friction_ratio": 7.018852745494786,
+          "upper_tail_absolute_move_pct": 12.223004924866355,
+          "upper_tail_to_friction_ratio": 23.062273443144065
+        }
+      ]
+    },
+    "Q5": [
+      "abnormal_traded_value_activity",
+      "beta_residual_return",
+      "idiosyncratic_volatility",
+      "market_excess_return",
+      "phase13_excess_turnover_interaction",
+      "phase13_residual_drawdown_idio_vol_interaction",
+      "phase13_residual_rank_turnover_interaction",
+      "range_position",
+      "residual_cross_sectional_rank"
+    ],
+    "Q6": [
+      "beta_residual_return",
+      "residual_cross_sectional_rank"
+    ],
+    "Q7": [
+      "beta_residual_return",
+      "idiosyncratic_volatility",
+      "market_excess_return",
+      "range_position",
+      "residual_cross_sectional_rank"
+    ],
+    "Q8": [
+      "abnormal_traded_value_activity",
+      "beta_residual_return",
+      "idiosyncratic_volatility",
+      "market_excess_return",
+      "phase13_excess_turnover_interaction",
+      "phase13_residual_drawdown_idio_vol_interaction",
+      "phase13_residual_rank_turnover_interaction",
+      "range_position",
+      "residual_cross_sectional_rank"
+    ],
+    "Q9": {
+      "full_pipeline_negative_control_promotions": "0/1",
+      "negative_control_randomized_surface_max_at_least_0_02_ic_rate": 0.016
+    }
+  },
+  "run_metadata": {
+    "cluster_bootstrap_repetitions": 2000,
+    "cross_sectional_permutations": 1000,
+    "dataset_sha256": "b7b07f60352d4b8d52d3917f6af35bb3d377b313428db30867ce79d2c67fd3f5",
+    "date_range": [
+      "2023-01-02",
+      "2025-06-30"
+    ],
+    "factor_registry_sha256": "557bd10155caef63b696841d6893da3b07e1b6651b587c385cd79dbb3da128eb",
+    "generated_at_utc": "2026-10-01T08:09:19.242994+00:00",
+    "horizons_sessions": [
+      3,
+      5,
+      10
+    ],
+    "numpy_version": "2.5.3",
+    "pipeline_config_sha256": "88dcb008acee28dfdac087773a24d392049930e044c1cf88407cdb7f9d5bd4e7",
+    "random_generator": "numpy.Generator(PCG64)",
+    "random_seed": 20261001,
+    "round_trip_cost_pct": 0.53,
+    "source_git_sha": "ef7a79128bdc596d715f3ddbdcc29350c3795ce5",
+    "targets": [
+      "ABSOLUTE_RETURN",
+      "SIMPLE_EXCESS_RETURN",
+      "BETA_RESIDUAL_RETURN"
+    ],
+    "time_dislocation_permutations": 500
+  },
+  "run_protections": {
+    "external_2026_input_rows": 0,
+    "holdout_2026_input_rows": 0,
+    "new_strategy_candidate": "NOT_CREATED",
+    "phase10_2026_development_input_rows": 0,
+    "phase13_confirmation_input_rows": 0,
+    "private_exchange_api": "NOT_USED",
+    "strategy_synthesis": "NOT_PERFORMED",
+    "trading_or_broker_path": "NOT_USED"
+  },
+  "starting_sha": "160fb16419f33be45efeac7e48ab4b1eda444661",
+  "status_matrix": {
+    "ALPHA": "UNPROVEN",
+    "BEST_FACTOR_FAMILY": "NONE",
+    "BEST_FACTOR_VIABILITY": "NONE",
+    "ECONOMIC_GATE": "PASS",
+    "EXISTING_FACTOR_INFORMATION": "WEAK",
+    "EXTERNAL_2026": "NOT_READ",
+    "HOLDOUT_2026": "NOT_READ",
+    "LIVE": "DISABLED",
+    "MULTIPLE_TESTING_CONTROL": "PASS",
+    "NEGATIVE_CONTROL": "PASS",
+    "NEXT_RESEARCH_MODE": "NEW_INFORMATION_SOURCE",
+    "NULL_FRAMEWORK": "PASS",
+    "OPPORTUNITY_SURFACE": "INFORMATIVE",
+    "PIPELINE_FALSE_POSITIVE_AUDIT": "PASS",
+    "PIPELINE_V2": "PASS",
+    "PREDICTABILITY_FRAMEWORK": "PASS",
+    "RESEARCH_LEDGER": "COMPLETE",
+    "SHADOW_NEXT_SESSION": "NO"
+  }
+}

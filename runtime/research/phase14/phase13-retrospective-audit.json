@@ -1,0 +1,55 @@
+{
+  "artifact": "phase13-retrospective-audit",
+  "audit_note": "The caller supplied the historical Phase 13 failure label before implementation; the frozen rules are executed only on the pre-2025-H2 safe panel, and the label is appended after that verdict.",
+  "config_frozen_before_audit": true,
+  "phase13_candidate_family": "phase13_excess_turnover_interaction",
+  "phase13_confirmation_used_as_pipeline_input": false,
+  "pipeline_config_sha256": "88dcb008acee28dfdac087773a24d392049930e044c1cf88407cdb7f9d5bd4e7",
+  "pipeline_false_positive_audit": "PASS",
+  "post_hoc_gate_changes": false,
+  "post_verdict_historical_challenge": {
+    "label": "PHASE13_CONFIRMATION_FAIL",
+    "metrics": {
+      "beta_residual_pct": -1.252423,
+      "gross_pct": -0.92879,
+      "net_1x_pct": -1.45879,
+      "simple_excess_pct": -1.48963
+    },
+    "role": "already-known retrospective challenge label; excluded from all Phase 14 factor metrics, nulls, and thresholds"
+  },
+  "preconfirmation_input_window": [
+    "2023-01-02",
+    "2025-06-30"
+  ],
+  "preconfirmation_v2_verdict": "WEAK",
+  "run_metadata": {
+    "cluster_bootstrap_repetitions": 2000,
+    "cross_sectional_permutations": 1000,
+    "dataset_sha256": "b7b07f60352d4b8d52d3917f6af35bb3d377b313428db30867ce79d2c67fd3f5",
+    "date_range": [
+      "2023-01-02",
+      "2025-06-30"
+    ],
+    "factor_registry_sha256": "557bd10155caef63b696841d6893da3b07e1b6651b587c385cd79dbb3da128eb",
+    "generated_at_utc": "2026-10-01T08:09:19.242994+00:00",
+    "horizons_sessions": [
+      3,
+      5,
+      10
+    ],
+    "numpy_version": "2.5.3",
+    "pipeline_config_sha256": "88dcb008acee28dfdac087773a24d392049930e044c1cf88407cdb7f9d5bd4e7",
+    "random_generator": "numpy.Generator(PCG64)",
+    "random_seed": 20261001,
+    "round_trip_cost_pct": 0.53,
+    "source_git_sha": "ef7a79128bdc596d715f3ddbdcc29350c3795ce5",
+    "targets": [
+      "ABSOLUTE_RETURN",
+      "SIMPLE_EXCESS_RETURN",
+      "BETA_RESIDUAL_RETURN"
+    ],
+    "time_dislocation_permutations": 500
+  },
+  "thresholds_changed_after_challenge": false,
+  "would_have_blocked_candidate_from_confirmation": true
+}

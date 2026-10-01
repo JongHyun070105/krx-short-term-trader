@@ -1,0 +1,1948 @@
+{
+  "allowed_states": [
+    "FAIL",
+    "WEAK",
+    "PROMISING_FOR_FUTURE_STUDY"
+  ],
+  "artifact": "factor-viability",
+  "best_factor_family": null,
+  "best_factor_viability": "NONE",
+  "existing_factor_information": "WEAK",
+  "next_research_mode": "NEW_INFORMATION_SOURCE",
+  "pipeline_calibration": "PASS",
+  "results": [
+    {
+      "cluster_bootstrap": [
+        {
+          "bootstrap_sha256": "bbd6c7dc7794029b902ceae9a7e7053a5f063c34a4b942961ed2ef9a85663dbc",
+          "ci90_pct": [
+            -0.5228575973080789,
+            0.2057844699366888
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 587,
+          "observed_cluster_mean_pct": -0.16508397672030914,
+          "repetitions": 2000,
+          "seed": 25650517,
+          "selected_observations": 5062,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "ABSOLUTE_RETURN"
+        },
+        {
+          "bootstrap_sha256": "234ae799d31d5016d2a624e0e3ab52e3a8d9badb20b8fb309a80894106063203",
+          "ci90_pct": [
+            -0.6296522473706743,
+            -0.13456476025711142
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 587,
+          "observed_cluster_mean_pct": -0.37630381791621725,
+          "repetitions": 2000,
+          "seed": 25650517,
+          "selected_observations": 5062,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "SIMPLE_EXCESS_RETURN"
+        },
+        {
+          "bootstrap_sha256": "99dc5cc9e4d50d7509729ff44001cdb870b69055769e38fea5875e7d8458f386",
+          "ci90_pct": [
+            -0.3896027618014088,
+            0.09580088420482877
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 570,
+          "observed_cluster_mean_pct": -0.14288818251187185,
+          "repetitions": 2000,
+          "seed": 25650517,
+          "selected_observations": 4815,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "BETA_RESIDUAL_RETURN"
+        }
+      ],
+      "concentration": {
+        "top_five_dates_share_pct": 4.596391310525008,
+        "top_three_symbols_share_pct": 18.884101593505502
+      },
+      "conditioning_only": false,
+      "data_coverage": {
+        "all_panel_observations": 164733,
+        "availability_time": "T session close, derived as 15:30 Asia/Seoul from the Phase 13 post-close signal convention",
+        "markets": [
+          "KOSDAQ",
+          "KOSPI"
+        ],
+        "non_null_observations": 161988,
+        "non_null_rate": 0.9833366720693486,
+        "quality_flags": [
+          "CURRENT_LISTING_COHORT",
+          "ADJUSTED_PRICE_REVISION_RISK"
+        ],
+        "symbols": 95,
+        "unique_dates": 601
+      },
+      "date_clusters": 587,
+      "dimensions": {
+        "CONCENTRATION": "PASS",
+        "DATA_QUALITY": "PARTIAL",
+        "ECONOMIC_SCALE": "FAIL",
+        "INDEPENDENT_SAMPLE_DEPTH": "PASS",
+        "MARKET_ADJUSTED_EDGE": "FAIL",
+        "MONOTONICITY": "FAIL",
+        "MULTIPLE_TESTING_ROBUSTNESS": "PASS",
+        "NULL_SEPARATION": "PASS",
+        "PREDICTABILITY": "PASS",
+        "SURVIVORSHIP_RISK": "HIGH",
+        "WALK_FORWARD_STABILITY": "FAIL"
+      },
+      "economic_edge_to_friction_ratio": -0.31147920135907387,
+      "family_id": "abnormal_traded_value_activity",
+      "final_state": "WEAK",
+      "market_beta_dominated": "NO",
+      "market_component_share_pct": -127.94690641222186,
+      "null_empirical_p": 0.000999000999000999,
+      "oriented_quantile_spread_pct": 0.09427742037675935,
+      "selected_quantile_spread_pct": -0.09427742037675935,
+      "selected_surface": {
+        "direction": "negative",
+        "factor_id": "abnormal_traded_value_activity",
+        "family_id": "abnormal_traded_value_activity",
+        "horizon_sessions": 10,
+        "market_scope": "KOSDAQ",
+        "mean_ic": -0.030747968955796734,
+        "oriented_mean_ic": 0.030747968955796734,
+        "target": "ABSOLUTE_RETURN"
+      },
+      "stability_components": {
+        "effect_size_decay_last_over_first": 0.017283661324187957,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.6,
+          "positive_blocks": 3
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.6,
+          "positive_blocks": 3
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.6,
+          "positive_blocks": 3
+        }
+      },
+      "strategy_synthesis": "NOT_PERFORMED",
+      "supporting_horizon_count": 3,
+      "supporting_surface_count": 9,
+      "supporting_target_count": 3,
+      "surface_breadth_pass": true,
+      "survivorship_and_vintage_warning": "CURRENT_LISTING_BIASED; PIT_PRICE_HISTORY_NOT_AVAILABLE; ADJUSTED_PRICE_REVISION_RISK_PRESENT",
+      "unique_signal_dates": 587
+    },
+    {
+      "cluster_bootstrap": [
+        {
+          "bootstrap_sha256": "8662850e04f3e4a2baf81780d1eebe3131cb05d8ecc09ef33bf7d7a75c54c831",
+          "ci90_pct": [
+            -0.17693828759169755,
+            0.26442345618039
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 584,
+          "observed_cluster_mean_pct": 0.04008219907319671,
+          "repetitions": 2000,
+          "seed": 28821544,
+          "selected_observations": 5127,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "ABSOLUTE_RETURN"
+        },
+        {
+          "bootstrap_sha256": "10c547be5fc5afee85007224233a7c9adc66e2a914e5854ffd7d592774b3e707",
+          "ci90_pct": [
+            -0.06559676213046871,
+            0.23720875604861563
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 584,
+          "observed_cluster_mean_pct": 0.08106687070364726,
+          "repetitions": 2000,
+          "seed": 28821544,
+          "selected_observations": 5127,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "SIMPLE_EXCESS_RETURN"
+        },
+        {
+          "bootstrap_sha256": "23c86730a4b5bf4b0ff6391d22c8ade0ea1b7f360b49be0f8c6e3bd112ecb238",
+          "ci90_pct": [
+            -0.057341399558274185,
+            0.23654328926709647
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 584,
+          "observed_cluster_mean_pct": 0.09191853471733388,
+          "repetitions": 2000,
+          "seed": 28821544,
+          "selected_observations": 5127,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "BETA_RESIDUAL_RETURN"
+        }
+      ],
+      "concentration": {
+        "top_five_dates_share_pct": 4.640507191116382,
+        "top_three_symbols_share_pct": 17.30105283979097
+      },
+      "conditioning_only": false,
+      "data_coverage": {
+        "all_panel_observations": 164733,
+        "availability_time": "T session close, derived as 15:30 Asia/Seoul from the Phase 13 post-close signal convention",
+        "markets": [
+          "KOSDAQ",
+          "KOSPI"
+        ],
+        "non_null_observations": 157965,
+        "non_null_rate": 0.9589153357250824,
+        "quality_flags": [
+          "CURRENT_LISTING_COHORT",
+          "ADJUSTED_PRICE_REVISION_RISK"
+        ],
+        "symbols": 94,
+        "unique_dates": 584
+      },
+      "date_clusters": 584,
+      "dimensions": {
+        "CONCENTRATION": "PASS",
+        "DATA_QUALITY": "PARTIAL",
+        "ECONOMIC_SCALE": "FAIL",
+        "INDEPENDENT_SAMPLE_DEPTH": "PASS",
+        "MARKET_ADJUSTED_EDGE": "FAIL",
+        "MONOTONICITY": "PASS",
+        "MULTIPLE_TESTING_ROBUSTNESS": "PASS",
+        "NULL_SEPARATION": "PASS",
+        "PREDICTABILITY": "PASS",
+        "SURVIVORSHIP_RISK": "HIGH",
+        "WALK_FORWARD_STABILITY": "PASS"
+      },
+      "economic_edge_to_friction_ratio": 0.07562679070414466,
+      "family_id": "beta_residual_return",
+      "final_state": "WEAK",
+      "market_beta_dominated": "UNCERTAIN",
+      "market_component_share_pct": null,
+      "null_empirical_p": 0.000999000999000999,
+      "oriented_quantile_spread_pct": 0.4171907350045324,
+      "selected_quantile_spread_pct": -0.4171907350045324,
+      "selected_surface": {
+        "direction": "negative",
+        "factor_id": "beta_residual_return_5d",
+        "family_id": "beta_residual_return",
+        "horizon_sessions": 3,
+        "market_scope": "KOSDAQ",
+        "mean_ic": -0.038840570312905894,
+        "oriented_mean_ic": 0.038840570312905894,
+        "target": "BETA_RESIDUAL_RETURN"
+      },
+      "stability_components": {
+        "effect_size_decay_last_over_first": 2.2700754522688267,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 1.0,
+          "positive_blocks": 5
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        }
+      },
+      "strategy_synthesis": "NOT_PERFORMED",
+      "supporting_horizon_count": 3,
+      "supporting_surface_count": 18,
+      "supporting_target_count": 3,
+      "surface_breadth_pass": true,
+      "survivorship_and_vintage_warning": "CURRENT_LISTING_BIASED; PIT_PRICE_HISTORY_NOT_AVAILABLE; ADJUSTED_PRICE_REVISION_RISK_PRESENT",
+      "unique_signal_dates": 584
+    },
+    {
+      "cluster_bootstrap": [
+        {
+          "bootstrap_sha256": "b1aad4910aafaa851937eb1e4768548921377b287297f4f1fdd325f864b7124c",
+          "ci90_pct": [
+            0.309616452122656,
+            0.8509966354011538
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 587,
+          "observed_cluster_mean_pct": 0.5923692810696338,
+          "repetitions": 2000,
+          "seed": 22018923,
+          "selected_observations": 5270,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "ABSOLUTE_RETURN"
+        },
+        {
+          "bootstrap_sha256": "6887b0292e2a3647f897c78ec422f899d97d5221af11c052d3b35359bcc80c5e",
+          "ci90_pct": [
+            0.15575844609436576,
+            0.6094925522062431
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 587,
+          "observed_cluster_mean_pct": 0.38114943987372574,
+          "repetitions": 2000,
+          "seed": 22018923,
+          "selected_observations": 5270,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "SIMPLE_EXCESS_RETURN"
+        },
+        {
+          "bootstrap_sha256": "f4025230c9f0c50109cc0c720096dcced5f864f30c51d34524f46f67246e3022",
+          "ci90_pct": [
+            0.19249262379921103,
+            0.5886577830411407
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 570,
+          "observed_cluster_mean_pct": 0.3879507212319002,
+          "repetitions": 2000,
+          "seed": 22018923,
+          "selected_observations": 5008,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "BETA_RESIDUAL_RETURN"
+        }
+      ],
+      "concentration": {
+        "top_five_dates_share_pct": 4.469609856504678,
+        "top_three_symbols_share_pct": 16.501085884202887
+      },
+      "conditioning_only": false,
+      "data_coverage": {
+        "all_panel_observations": 164733,
+        "availability_time": "T session close, derived as 15:30 Asia/Seoul from the Phase 13 post-close signal convention",
+        "markets": [
+          "KOSDAQ",
+          "KOSPI"
+        ],
+        "non_null_observations": 164313,
+        "non_null_rate": 0.9974504197701736,
+        "quality_flags": [
+          "CURRENT_LISTING_COHORT",
+          "ADJUSTED_PRICE_REVISION_RISK"
+        ],
+        "symbols": 96,
+        "unique_dates": 601
+      },
+      "date_clusters": 587,
+      "dimensions": {
+        "CONCENTRATION": "PASS",
+        "DATA_QUALITY": "PARTIAL",
+        "ECONOMIC_SCALE": "PASS",
+        "INDEPENDENT_SAMPLE_DEPTH": "PASS",
+        "MARKET_ADJUSTED_EDGE": "PASS",
+        "MONOTONICITY": "FAIL",
+        "MULTIPLE_TESTING_ROBUSTNESS": "PASS",
+        "NULL_SEPARATION": "PASS",
+        "PREDICTABILITY": "PASS",
+        "SURVIVORSHIP_RISK": "HIGH",
+        "WALK_FORWARD_STABILITY": "PASS"
+      },
+      "economic_edge_to_friction_ratio": 1.1176778888106298,
+      "family_id": "idiosyncratic_volatility",
+      "final_state": "WEAK",
+      "market_beta_dominated": "NO",
+      "market_component_share_pct": 35.656785040323335,
+      "null_empirical_p": 0.000999000999000999,
+      "oriented_quantile_spread_pct": 1.100602983035632,
+      "selected_quantile_spread_pct": -1.100602983035632,
+      "selected_surface": {
+        "direction": "negative",
+        "factor_id": "idiosyncratic_volatility_20d",
+        "family_id": "idiosyncratic_volatility",
+        "horizon_sessions": 10,
+        "market_scope": "KOSDAQ",
+        "mean_ic": -0.10051189889246417,
+        "oriented_mean_ic": 0.10051189889246417,
+        "target": "ABSOLUTE_RETURN"
+      },
+      "stability_components": {
+        "effect_size_decay_last_over_first": 0.2498968745445997,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 1.0,
+          "positive_blocks": 5
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        }
+      },
+      "strategy_synthesis": "NOT_PERFORMED",
+      "supporting_horizon_count": 3,
+      "supporting_surface_count": 9,
+      "supporting_target_count": 3,
+      "surface_breadth_pass": true,
+      "survivorship_and_vintage_warning": "CURRENT_LISTING_BIASED; PIT_PRICE_HISTORY_NOT_AVAILABLE; ADJUSTED_PRICE_REVISION_RISK_PRESENT",
+      "unique_signal_dates": 587
+    },
+    {
+      "cluster_bootstrap": [
+        {
+          "ci90_pct": null,
+          "clusters": 0,
+          "selected_observations": 0,
+          "selected_quantile": 5,
+          "status": "INSUFFICIENT_DATE_CLUSTERS",
+          "target": "ABSOLUTE_RETURN"
+        },
+        {
+          "ci90_pct": null,
+          "clusters": 0,
+          "selected_observations": 0,
+          "selected_quantile": 5,
+          "status": "INSUFFICIENT_DATE_CLUSTERS",
+          "target": "SIMPLE_EXCESS_RETURN"
+        },
+        {
+          "ci90_pct": null,
+          "clusters": 0,
+          "selected_observations": 0,
+          "selected_quantile": 5,
+          "status": "INSUFFICIENT_DATE_CLUSTERS",
+          "target": "BETA_RESIDUAL_RETURN"
+        }
+      ],
+      "concentration": {
+        "top_five_dates_share_pct": null,
+        "top_three_symbols_share_pct": null
+      },
+      "conditioning_only": true,
+      "data_coverage": {
+        "all_panel_observations": 164733,
+        "availability_time": "T session close, derived as 15:30 Asia/Seoul from the Phase 13 post-close signal convention",
+        "markets": [
+          "KOSDAQ",
+          "KOSPI"
+        ],
+        "non_null_observations": 164733,
+        "non_null_rate": 1.0,
+        "quality_flags": [
+          "CURRENT_LISTING_COHORT",
+          "ADJUSTED_PRICE_REVISION_RISK"
+        ],
+        "symbols": 96,
+        "unique_dates": 601
+      },
+      "date_clusters": 0,
+      "dimensions": {
+        "CONCENTRATION": "FAIL",
+        "DATA_QUALITY": "PARTIAL",
+        "ECONOMIC_SCALE": "FAIL",
+        "INDEPENDENT_SAMPLE_DEPTH": "FAIL",
+        "MARKET_ADJUSTED_EDGE": "FAIL",
+        "MONOTONICITY": "FAIL",
+        "MULTIPLE_TESTING_ROBUSTNESS": "FAIL",
+        "NULL_SEPARATION": "FAIL",
+        "PREDICTABILITY": "FAIL",
+        "SURVIVORSHIP_RISK": "HIGH",
+        "WALK_FORWARD_STABILITY": "FAIL"
+      },
+      "economic_edge_to_friction_ratio": null,
+      "family_id": "market_breadth",
+      "final_state": "FAIL",
+      "market_beta_dominated": "UNCERTAIN",
+      "market_component_share_pct": null,
+      "null_empirical_p": 1.0,
+      "oriented_quantile_spread_pct": null,
+      "selected_quantile_spread_pct": null,
+      "selected_surface": {
+        "direction": "positive",
+        "factor_id": "market_breadth_positive",
+        "family_id": "market_breadth",
+        "horizon_sessions": 3,
+        "market_scope": "ALL",
+        "mean_ic": 0.0,
+        "oriented_mean_ic": 0.0,
+        "target": "ABSOLUTE_RETURN"
+      },
+      "stability_components": {
+        "effect_size_decay_last_over_first": null,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        }
+      },
+      "strategy_synthesis": "NOT_PERFORMED",
+      "supporting_horizon_count": 0,
+      "supporting_surface_count": 0,
+      "supporting_target_count": 0,
+      "surface_breadth_pass": false,
+      "survivorship_and_vintage_warning": "CURRENT_LISTING_BIASED; PIT_PRICE_HISTORY_NOT_AVAILABLE; ADJUSTED_PRICE_REVISION_RISK_PRESENT",
+      "unique_signal_dates": 0
+    },
+    {
+      "cluster_bootstrap": [
+        {
+          "ci90_pct": null,
+          "clusters": 0,
+          "selected_observations": 0,
+          "selected_quantile": 5,
+          "status": "INSUFFICIENT_DATE_CLUSTERS",
+          "target": "ABSOLUTE_RETURN"
+        },
+        {
+          "ci90_pct": null,
+          "clusters": 0,
+          "selected_observations": 0,
+          "selected_quantile": 5,
+          "status": "INSUFFICIENT_DATE_CLUSTERS",
+          "target": "SIMPLE_EXCESS_RETURN"
+        },
+        {
+          "ci90_pct": null,
+          "clusters": 0,
+          "selected_observations": 0,
+          "selected_quantile": 5,
+          "status": "INSUFFICIENT_DATE_CLUSTERS",
+          "target": "BETA_RESIDUAL_RETURN"
+        }
+      ],
+      "concentration": {
+        "top_five_dates_share_pct": null,
+        "top_three_symbols_share_pct": null
+      },
+      "conditioning_only": true,
+      "data_coverage": {
+        "all_panel_observations": 164733,
+        "availability_time": "T session close, derived as 15:30 Asia/Seoul from the Phase 13 post-close signal convention",
+        "markets": [
+          "KOSDAQ",
+          "KOSPI"
+        ],
+        "non_null_observations": 164733,
+        "non_null_rate": 1.0,
+        "quality_flags": [
+          "CURRENT_LISTING_COHORT",
+          "ADJUSTED_PRICE_REVISION_RISK"
+        ],
+        "symbols": 96,
+        "unique_dates": 601
+      },
+      "date_clusters": 0,
+      "dimensions": {
+        "CONCENTRATION": "FAIL",
+        "DATA_QUALITY": "PARTIAL",
+        "ECONOMIC_SCALE": "FAIL",
+        "INDEPENDENT_SAMPLE_DEPTH": "FAIL",
+        "MARKET_ADJUSTED_EDGE": "FAIL",
+        "MONOTONICITY": "FAIL",
+        "MULTIPLE_TESTING_ROBUSTNESS": "FAIL",
+        "NULL_SEPARATION": "FAIL",
+        "PREDICTABILITY": "FAIL",
+        "SURVIVORSHIP_RISK": "HIGH",
+        "WALK_FORWARD_STABILITY": "FAIL"
+      },
+      "economic_edge_to_friction_ratio": null,
+      "family_id": "market_context",
+      "final_state": "FAIL",
+      "market_beta_dominated": "UNCERTAIN",
+      "market_component_share_pct": null,
+      "null_empirical_p": 1.0,
+      "oriented_quantile_spread_pct": null,
+      "selected_quantile_spread_pct": null,
+      "selected_surface": {
+        "direction": "positive",
+        "factor_id": "matched_market_return_5d",
+        "family_id": "market_context",
+        "horizon_sessions": 3,
+        "market_scope": "ALL",
+        "mean_ic": 0.0,
+        "oriented_mean_ic": 0.0,
+        "target": "ABSOLUTE_RETURN"
+      },
+      "stability_components": {
+        "effect_size_decay_last_over_first": null,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        }
+      },
+      "strategy_synthesis": "NOT_PERFORMED",
+      "supporting_horizon_count": 0,
+      "supporting_surface_count": 0,
+      "supporting_target_count": 0,
+      "surface_breadth_pass": false,
+      "survivorship_and_vintage_warning": "CURRENT_LISTING_BIASED; PIT_PRICE_HISTORY_NOT_AVAILABLE; ADJUSTED_PRICE_REVISION_RISK_PRESENT",
+      "unique_signal_dates": 0
+    },
+    {
+      "cluster_bootstrap": [
+        {
+          "ci90_pct": null,
+          "clusters": 0,
+          "selected_observations": 0,
+          "selected_quantile": 5,
+          "status": "INSUFFICIENT_DATE_CLUSTERS",
+          "target": "ABSOLUTE_RETURN"
+        },
+        {
+          "ci90_pct": null,
+          "clusters": 0,
+          "selected_observations": 0,
+          "selected_quantile": 5,
+          "status": "INSUFFICIENT_DATE_CLUSTERS",
+          "target": "SIMPLE_EXCESS_RETURN"
+        },
+        {
+          "ci90_pct": null,
+          "clusters": 0,
+          "selected_observations": 0,
+          "selected_quantile": 5,
+          "status": "INSUFFICIENT_DATE_CLUSTERS",
+          "target": "BETA_RESIDUAL_RETURN"
+        }
+      ],
+      "concentration": {
+        "top_five_dates_share_pct": null,
+        "top_three_symbols_share_pct": null
+      },
+      "conditioning_only": true,
+      "data_coverage": {
+        "all_panel_observations": 164733,
+        "availability_time": "T session close, derived as 15:30 Asia/Seoul from the Phase 13 post-close signal convention",
+        "markets": [
+          "KOSDAQ",
+          "KOSPI"
+        ],
+        "non_null_observations": 164733,
+        "non_null_rate": 1.0,
+        "quality_flags": [
+          "CURRENT_LISTING_COHORT",
+          "ADJUSTED_PRICE_REVISION_RISK"
+        ],
+        "symbols": 96,
+        "unique_dates": 601
+      },
+      "date_clusters": 0,
+      "dimensions": {
+        "CONCENTRATION": "FAIL",
+        "DATA_QUALITY": "PARTIAL",
+        "ECONOMIC_SCALE": "FAIL",
+        "INDEPENDENT_SAMPLE_DEPTH": "FAIL",
+        "MARKET_ADJUSTED_EDGE": "FAIL",
+        "MONOTONICITY": "FAIL",
+        "MULTIPLE_TESTING_ROBUSTNESS": "FAIL",
+        "NULL_SEPARATION": "FAIL",
+        "PREDICTABILITY": "FAIL",
+        "SURVIVORSHIP_RISK": "HIGH",
+        "WALK_FORWARD_STABILITY": "FAIL"
+      },
+      "economic_edge_to_friction_ratio": null,
+      "family_id": "market_excess_dispersion",
+      "final_state": "FAIL",
+      "market_beta_dominated": "UNCERTAIN",
+      "market_component_share_pct": null,
+      "null_empirical_p": 1.0,
+      "oriented_quantile_spread_pct": null,
+      "selected_quantile_spread_pct": null,
+      "selected_surface": {
+        "direction": "positive",
+        "factor_id": "market_excess_dispersion_1d",
+        "family_id": "market_excess_dispersion",
+        "horizon_sessions": 3,
+        "market_scope": "ALL",
+        "mean_ic": 0.0,
+        "oriented_mean_ic": 0.0,
+        "target": "ABSOLUTE_RETURN"
+      },
+      "stability_components": {
+        "effect_size_decay_last_over_first": null,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        }
+      },
+      "strategy_synthesis": "NOT_PERFORMED",
+      "supporting_horizon_count": 0,
+      "supporting_surface_count": 0,
+      "supporting_target_count": 0,
+      "surface_breadth_pass": false,
+      "survivorship_and_vintage_warning": "CURRENT_LISTING_BIASED; PIT_PRICE_HISTORY_NOT_AVAILABLE; ADJUSTED_PRICE_REVISION_RISK_PRESENT",
+      "unique_signal_dates": 0
+    },
+    {
+      "cluster_bootstrap": [
+        {
+          "bootstrap_sha256": "333c644671cb2d1c2495a64a988bfabdeb2bfa750390fa1ec9beb6ffe3f99d08",
+          "ci90_pct": [
+            -0.315958797440987,
+            0.5676063202117866
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 587,
+          "observed_cluster_mean_pct": 0.11510366615158638,
+          "repetitions": 2000,
+          "seed": 26899448,
+          "selected_observations": 5290,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "ABSOLUTE_RETURN"
+        },
+        {
+          "bootstrap_sha256": "ad788d81693efd18ab1571be0fd5665e2a68be85281fda9a2bc38b16594d99f9",
+          "ci90_pct": [
+            -0.4052693744612367,
+            0.21488473785921988
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 587,
+          "observed_cluster_mean_pct": -0.09611617504432167,
+          "repetitions": 2000,
+          "seed": 26899448,
+          "selected_observations": 5290,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "SIMPLE_EXCESS_RETURN"
+        },
+        {
+          "bootstrap_sha256": "7847036b1750fc401e325521963cad372efb4a7c42936bdf02cd75476731154e",
+          "ci90_pct": [
+            -0.14789652741673112,
+            0.45486825992122926
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 570,
+          "observed_cluster_mean_pct": 0.15685034949453608,
+          "repetitions": 2000,
+          "seed": 26899448,
+          "selected_observations": 5000,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "BETA_RESIDUAL_RETURN"
+        }
+      ],
+      "concentration": {
+        "top_five_dates_share_pct": 4.793522666674451,
+        "top_three_symbols_share_pct": 18.315574248473787
+      },
+      "conditioning_only": false,
+      "data_coverage": {
+        "all_panel_observations": 164733,
+        "availability_time": "T session close, derived as 15:30 Asia/Seoul from the Phase 13 post-close signal convention",
+        "markets": [
+          "KOSDAQ",
+          "KOSPI"
+        ],
+        "non_null_observations": 164523,
+        "non_null_rate": 0.9987252098850867,
+        "quality_flags": [
+          "CURRENT_LISTING_COHORT",
+          "ADJUSTED_PRICE_REVISION_RISK"
+        ],
+        "symbols": 96,
+        "unique_dates": 601
+      },
+      "date_clusters": 587,
+      "dimensions": {
+        "CONCENTRATION": "PASS",
+        "DATA_QUALITY": "PARTIAL",
+        "ECONOMIC_SCALE": "FAIL",
+        "INDEPENDENT_SAMPLE_DEPTH": "PASS",
+        "MARKET_ADJUSTED_EDGE": "FAIL",
+        "MONOTONICITY": "FAIL",
+        "MULTIPLE_TESTING_ROBUSTNESS": "PASS",
+        "NULL_SEPARATION": "PASS",
+        "PREDICTABILITY": "PASS",
+        "SURVIVORSHIP_RISK": "HIGH",
+        "WALK_FORWARD_STABILITY": "PASS"
+      },
+      "economic_edge_to_friction_ratio": 0.21717672858789916,
+      "family_id": "market_excess_return",
+      "final_state": "WEAK",
+      "market_beta_dominated": "YES",
+      "market_component_share_pct": 183.50400839339093,
+      "null_empirical_p": 0.000999000999000999,
+      "oriented_quantile_spread_pct": 0.9596394474709491,
+      "selected_quantile_spread_pct": -0.9596394474709491,
+      "selected_surface": {
+        "direction": "negative",
+        "factor_id": "market_excess_return_10d",
+        "family_id": "market_excess_return",
+        "horizon_sessions": 10,
+        "market_scope": "KOSDAQ",
+        "mean_ic": -0.044722369284871,
+        "oriented_mean_ic": 0.044722369284871,
+        "target": "ABSOLUTE_RETURN"
+      },
+      "stability_components": {
+        "effect_size_decay_last_over_first": 60.71822430084698,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        }
+      },
+      "strategy_synthesis": "NOT_PERFORMED",
+      "supporting_horizon_count": 3,
+      "supporting_surface_count": 43,
+      "supporting_target_count": 3,
+      "surface_breadth_pass": true,
+      "survivorship_and_vintage_warning": "CURRENT_LISTING_BIASED; PIT_PRICE_HISTORY_NOT_AVAILABLE; ADJUSTED_PRICE_REVISION_RISK_PRESENT",
+      "unique_signal_dates": 587
+    },
+    {
+      "cluster_bootstrap": [
+        {
+          "bootstrap_sha256": "26bcc1f5f2475c11595114efab3b70b8b744032a0506a2fc246b274c9685160e",
+          "ci90_pct": [
+            -0.03066677759076814,
+            0.3888947789656717
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 601,
+          "observed_cluster_mean_pct": 0.17268041384222918,
+          "repetitions": 2000,
+          "seed": 35546280,
+          "selected_observations": 4904,
+          "selected_quantile": 5,
+          "status": "COMPUTED",
+          "target": "ABSOLUTE_RETURN"
+        },
+        {
+          "bootstrap_sha256": "4c2b770d0f2aa9c1adb0db668b204cecc56477de2bb40149a51508344c7e3aed",
+          "ci90_pct": [
+            0.012997595678325691,
+            0.3225413337377812
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 601,
+          "observed_cluster_mean_pct": 0.1722973418477646,
+          "repetitions": 2000,
+          "seed": 35546280,
+          "selected_observations": 4904,
+          "selected_quantile": 5,
+          "status": "COMPUTED",
+          "target": "SIMPLE_EXCESS_RETURN"
+        },
+        {
+          "bootstrap_sha256": "7cf3ba267795be3cbce7937ed97b7ab4854c50567cd9100561150847b306acaf",
+          "ci90_pct": [
+            -0.04927423094272902,
+            0.24212589976183876
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 584,
+          "observed_cluster_mean_pct": 0.09545309399094576,
+          "repetitions": 2000,
+          "seed": 35546280,
+          "selected_observations": 4672,
+          "selected_quantile": 5,
+          "status": "COMPUTED",
+          "target": "BETA_RESIDUAL_RETURN"
+        }
+      ],
+      "concentration": {
+        "top_five_dates_share_pct": 4.696538215718945,
+        "top_three_symbols_share_pct": 12.051556090333921
+      },
+      "conditioning_only": false,
+      "data_coverage": {
+        "all_panel_observations": 164733,
+        "availability_time": "T session close, derived as 15:30 Asia/Seoul from the Phase 13 post-close signal convention",
+        "markets": [
+          "KOSDAQ",
+          "KOSPI"
+        ],
+        "non_null_observations": 164733,
+        "non_null_rate": 1.0,
+        "quality_flags": [
+          "CURRENT_LISTING_COHORT",
+          "ADJUSTED_PRICE_REVISION_RISK"
+        ],
+        "symbols": 96,
+        "unique_dates": 601
+      },
+      "date_clusters": 601,
+      "dimensions": {
+        "CONCENTRATION": "PASS",
+        "DATA_QUALITY": "PARTIAL",
+        "ECONOMIC_SCALE": "FAIL",
+        "INDEPENDENT_SAMPLE_DEPTH": "PASS",
+        "MARKET_ADJUSTED_EDGE": "PASS",
+        "MONOTONICITY": "FAIL",
+        "MULTIPLE_TESTING_ROBUSTNESS": "FAIL",
+        "NULL_SEPARATION": "FAIL",
+        "PREDICTABILITY": "FAIL",
+        "SURVIVORSHIP_RISK": "HIGH",
+        "WALK_FORWARD_STABILITY": "FAIL"
+      },
+      "economic_edge_to_friction_ratio": 0.32581210158911167,
+      "family_id": "negative_control",
+      "final_state": "FAIL",
+      "market_beta_dominated": "NO",
+      "market_component_share_pct": 0.22183870535230835,
+      "null_empirical_p": 0.27472527472527475,
+      "oriented_quantile_spread_pct": 0.12636272845255017,
+      "selected_quantile_spread_pct": 0.12636272845255017,
+      "selected_surface": {
+        "direction": "positive",
+        "factor_id": "negative_control_stable_hash_pseudorank",
+        "family_id": "negative_control",
+        "horizon_sessions": 3,
+        "market_scope": "KOSDAQ",
+        "mean_ic": 0.012823381913535012,
+        "oriented_mean_ic": 0.012823381913535012,
+        "target": "ABSOLUTE_RETURN"
+      },
+      "stability_components": {
+        "effect_size_decay_last_over_first": 2.6453821069717645,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 1.0,
+          "positive_blocks": 5
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.6,
+          "positive_blocks": 3
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.6,
+          "positive_blocks": 3
+        }
+      },
+      "strategy_synthesis": "NOT_PERFORMED",
+      "supporting_horizon_count": 0,
+      "supporting_surface_count": 0,
+      "supporting_target_count": 0,
+      "surface_breadth_pass": false,
+      "survivorship_and_vintage_warning": "CURRENT_LISTING_BIASED; PIT_PRICE_HISTORY_NOT_AVAILABLE; ADJUSTED_PRICE_REVISION_RISK_PRESENT",
+      "unique_signal_dates": 601
+    },
+    {
+      "cluster_bootstrap": [
+        {
+          "ci90_pct": null,
+          "clusters": 0,
+          "selected_observations": 0,
+          "selected_quantile": 1,
+          "status": "INSUFFICIENT_DATE_CLUSTERS",
+          "target": "ABSOLUTE_RETURN"
+        },
+        {
+          "ci90_pct": null,
+          "clusters": 0,
+          "selected_observations": 0,
+          "selected_quantile": 1,
+          "status": "INSUFFICIENT_DATE_CLUSTERS",
+          "target": "SIMPLE_EXCESS_RETURN"
+        },
+        {
+          "ci90_pct": null,
+          "clusters": 0,
+          "selected_observations": 0,
+          "selected_quantile": 1,
+          "status": "INSUFFICIENT_DATE_CLUSTERS",
+          "target": "BETA_RESIDUAL_RETURN"
+        }
+      ],
+      "concentration": {
+        "top_five_dates_share_pct": null,
+        "top_three_symbols_share_pct": null
+      },
+      "conditioning_only": false,
+      "data_coverage": {
+        "all_panel_observations": 164733,
+        "availability_time": "T session close, derived as 15:30 Asia/Seoul from the Phase 13 post-close signal convention",
+        "markets": [
+          "KOSDAQ",
+          "KOSPI"
+        ],
+        "non_null_observations": 161988,
+        "non_null_rate": 0.9833366720693486,
+        "quality_flags": [
+          "CURRENT_LISTING_COHORT",
+          "ADJUSTED_PRICE_REVISION_RISK"
+        ],
+        "symbols": 95,
+        "unique_dates": 601
+      },
+      "date_clusters": 0,
+      "dimensions": {
+        "CONCENTRATION": "FAIL",
+        "DATA_QUALITY": "PARTIAL",
+        "ECONOMIC_SCALE": "FAIL",
+        "INDEPENDENT_SAMPLE_DEPTH": "FAIL",
+        "MARKET_ADJUSTED_EDGE": "FAIL",
+        "MONOTONICITY": "FAIL",
+        "MULTIPLE_TESTING_ROBUSTNESS": "PASS",
+        "NULL_SEPARATION": "PASS",
+        "PREDICTABILITY": "PASS",
+        "SURVIVORSHIP_RISK": "HIGH",
+        "WALK_FORWARD_STABILITY": "FAIL"
+      },
+      "economic_edge_to_friction_ratio": null,
+      "family_id": "phase13_excess_turnover_interaction",
+      "final_state": "WEAK",
+      "market_beta_dominated": "UNCERTAIN",
+      "market_component_share_pct": null,
+      "null_empirical_p": 0.000999000999000999,
+      "oriented_quantile_spread_pct": null,
+      "selected_quantile_spread_pct": null,
+      "selected_surface": {
+        "direction": "negative",
+        "factor_id": "phase13_excess_turnover_interaction__GE_4__EXPANDED",
+        "family_id": "phase13_excess_turnover_interaction",
+        "horizon_sessions": 10,
+        "market_scope": "KOSDAQ",
+        "mean_ic": -0.0679672747910035,
+        "oriented_mean_ic": 0.0679672747910035,
+        "target": "ABSOLUTE_RETURN"
+      },
+      "stability_components": {
+        "effect_size_decay_last_over_first": null,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 1.0,
+          "positive_blocks": 5
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        }
+      },
+      "strategy_synthesis": "NOT_PERFORMED",
+      "supporting_horizon_count": 3,
+      "supporting_surface_count": 16,
+      "supporting_target_count": 3,
+      "surface_breadth_pass": true,
+      "survivorship_and_vintage_warning": "CURRENT_LISTING_BIASED; PIT_PRICE_HISTORY_NOT_AVAILABLE; ADJUSTED_PRICE_REVISION_RISK_PRESENT",
+      "unique_signal_dates": 0
+    },
+    {
+      "cluster_bootstrap": [
+        {
+          "bootstrap_sha256": "77da48030cf4e960881365160ae7ba4335e9f8137d347a08af4132b0ea337e60",
+          "ci90_pct": [
+            -2.0309966497055147,
+            0.3406407925238196
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 26,
+          "observed_cluster_mean_pct": -0.8868025303841525,
+          "repetitions": 2000,
+          "seed": 30957758,
+          "selected_observations": 338,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "ABSOLUTE_RETURN"
+        },
+        {
+          "bootstrap_sha256": "e56619db473efa25833444aa194e2195d84d218829e6b73422051ef260d3566c",
+          "ci90_pct": [
+            -1.0628971656708885,
+            1.1082354832160675
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 26,
+          "observed_cluster_mean_pct": 0.022671707443695475,
+          "repetitions": 2000,
+          "seed": 30957758,
+          "selected_observations": 338,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "SIMPLE_EXCESS_RETURN"
+        },
+        {
+          "bootstrap_sha256": "2b252c0fd0d4b021db467b821ce92264c1f34ec8a66f872c08da3a2b0618c97e",
+          "ci90_pct": [
+            -2.386628517457032,
+            -0.28385342127656216
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 19,
+          "observed_cluster_mean_pct": -1.387511038152893,
+          "repetitions": 2000,
+          "seed": 30957758,
+          "selected_observations": 218,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "BETA_RESIDUAL_RETURN"
+        }
+      ],
+      "concentration": {
+        "top_five_dates_share_pct": 49.85540931635198,
+        "top_three_symbols_share_pct": 35.41275814366058
+      },
+      "conditioning_only": false,
+      "data_coverage": {
+        "all_panel_observations": 164733,
+        "availability_time": "T session close, derived as 15:30 Asia/Seoul from the Phase 13 post-close signal convention",
+        "markets": [
+          "KOSDAQ",
+          "KOSPI"
+        ],
+        "non_null_observations": 164313,
+        "non_null_rate": 0.9974504197701736,
+        "quality_flags": [
+          "CURRENT_LISTING_COHORT",
+          "ADJUSTED_PRICE_REVISION_RISK"
+        ],
+        "symbols": 96,
+        "unique_dates": 601
+      },
+      "date_clusters": 26,
+      "dimensions": {
+        "CONCENTRATION": "PASS",
+        "DATA_QUALITY": "PARTIAL",
+        "ECONOMIC_SCALE": "FAIL",
+        "INDEPENDENT_SAMPLE_DEPTH": "FAIL",
+        "MARKET_ADJUSTED_EDGE": "FAIL",
+        "MONOTONICITY": "FAIL",
+        "MULTIPLE_TESTING_ROBUSTNESS": "PASS",
+        "NULL_SEPARATION": "PASS",
+        "PREDICTABILITY": "PASS",
+        "SURVIVORSHIP_RISK": "HIGH",
+        "WALK_FORWARD_STABILITY": "FAIL"
+      },
+      "economic_edge_to_friction_ratio": -1.673212321479533,
+      "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+      "final_state": "WEAK",
+      "market_beta_dominated": "YES",
+      "market_component_share_pct": 102.55656774387802,
+      "null_empirical_p": 0.000999000999000999,
+      "oriented_quantile_spread_pct": -0.8098769079242478,
+      "selected_quantile_spread_pct": 0.8098769079242478,
+      "selected_surface": {
+        "direction": "negative",
+        "factor_id": "phase13_residual_drawdown_idio_vol_interaction__DEEP_LE_-8__HIGH",
+        "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+        "horizon_sessions": 10,
+        "market_scope": "KOSDAQ",
+        "mean_ic": -0.0668794061419711,
+        "oriented_mean_ic": 0.0668794061419711,
+        "target": "BETA_RESIDUAL_RETURN"
+      },
+      "stability_components": {
+        "effect_size_decay_last_over_first": 0.7511035208909848,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 1.0,
+          "positive_blocks": 5
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.4,
+          "positive_blocks": 2
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.4,
+          "positive_blocks": 2
+        }
+      },
+      "strategy_synthesis": "NOT_PERFORMED",
+      "supporting_horizon_count": 3,
+      "supporting_surface_count": 12,
+      "supporting_target_count": 3,
+      "surface_breadth_pass": true,
+      "survivorship_and_vintage_warning": "CURRENT_LISTING_BIASED; PIT_PRICE_HISTORY_NOT_AVAILABLE; ADJUSTED_PRICE_REVISION_RISK_PRESENT",
+      "unique_signal_dates": 26
+    },
+    {
+      "cluster_bootstrap": [
+        {
+          "ci90_pct": null,
+          "clusters": 0,
+          "selected_observations": 0,
+          "selected_quantile": 1,
+          "status": "INSUFFICIENT_DATE_CLUSTERS",
+          "target": "ABSOLUTE_RETURN"
+        },
+        {
+          "ci90_pct": null,
+          "clusters": 0,
+          "selected_observations": 0,
+          "selected_quantile": 1,
+          "status": "INSUFFICIENT_DATE_CLUSTERS",
+          "target": "SIMPLE_EXCESS_RETURN"
+        },
+        {
+          "ci90_pct": null,
+          "clusters": 0,
+          "selected_observations": 0,
+          "selected_quantile": 1,
+          "status": "INSUFFICIENT_DATE_CLUSTERS",
+          "target": "BETA_RESIDUAL_RETURN"
+        }
+      ],
+      "concentration": {
+        "top_five_dates_share_pct": null,
+        "top_three_symbols_share_pct": null
+      },
+      "conditioning_only": false,
+      "data_coverage": {
+        "all_panel_observations": 164733,
+        "availability_time": "T session close, derived as 15:30 Asia/Seoul from the Phase 13 post-close signal convention",
+        "markets": [
+          "KOSDAQ",
+          "KOSPI"
+        ],
+        "non_null_observations": 155742,
+        "non_null_rate": 0.9454207717943581,
+        "quality_flags": [
+          "CURRENT_LISTING_COHORT",
+          "ADJUSTED_PRICE_REVISION_RISK"
+        ],
+        "symbols": 93,
+        "unique_dates": 584
+      },
+      "date_clusters": 0,
+      "dimensions": {
+        "CONCENTRATION": "FAIL",
+        "DATA_QUALITY": "PARTIAL",
+        "ECONOMIC_SCALE": "FAIL",
+        "INDEPENDENT_SAMPLE_DEPTH": "FAIL",
+        "MARKET_ADJUSTED_EDGE": "FAIL",
+        "MONOTONICITY": "FAIL",
+        "MULTIPLE_TESTING_ROBUSTNESS": "PASS",
+        "NULL_SEPARATION": "PASS",
+        "PREDICTABILITY": "PASS",
+        "SURVIVORSHIP_RISK": "HIGH",
+        "WALK_FORWARD_STABILITY": "FAIL"
+      },
+      "economic_edge_to_friction_ratio": null,
+      "family_id": "phase13_residual_rank_turnover_interaction",
+      "final_state": "WEAK",
+      "market_beta_dominated": "UNCERTAIN",
+      "market_component_share_pct": null,
+      "null_empirical_p": 0.000999000999000999,
+      "oriented_quantile_spread_pct": null,
+      "selected_quantile_spread_pct": null,
+      "selected_surface": {
+        "direction": "negative",
+        "factor_id": "phase13_residual_rank_turnover_interaction__UPPER__EXPANDED",
+        "family_id": "phase13_residual_rank_turnover_interaction",
+        "horizon_sessions": 10,
+        "market_scope": "KOSDAQ",
+        "mean_ic": -0.06086073583387782,
+        "oriented_mean_ic": 0.06086073583387782,
+        "target": "BETA_RESIDUAL_RETURN"
+      },
+      "stability_components": {
+        "effect_size_decay_last_over_first": null,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        }
+      },
+      "strategy_synthesis": "NOT_PERFORMED",
+      "supporting_horizon_count": 3,
+      "supporting_surface_count": 9,
+      "supporting_target_count": 3,
+      "surface_breadth_pass": true,
+      "survivorship_and_vintage_warning": "CURRENT_LISTING_BIASED; PIT_PRICE_HISTORY_NOT_AVAILABLE; ADJUSTED_PRICE_REVISION_RISK_PRESENT",
+      "unique_signal_dates": 0
+    },
+    {
+      "cluster_bootstrap": [
+        {
+          "bootstrap_sha256": "bb6ad8731c2a308cee5456987b580781115c9969f653759d78ddcda017478df9",
+          "ci90_pct": [
+            -0.19540187494247171,
+            0.2246584301349843
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 601,
+          "observed_cluster_mean_pct": 0.013627716948182607,
+          "repetitions": 2000,
+          "seed": 33657613,
+          "selected_observations": 5189,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "ABSOLUTE_RETURN"
+        },
+        {
+          "bootstrap_sha256": "1f598a08efff84838309d3b3585ee47ed4b23de8edbe86b29db7a644bf11502a",
+          "ci90_pct": [
+            -0.1340122805461352,
+            0.15765452968051516
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 601,
+          "observed_cluster_mean_pct": 0.013244644953718038,
+          "repetitions": 2000,
+          "seed": 33657613,
+          "selected_observations": 5189,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "SIMPLE_EXCESS_RETURN"
+        },
+        {
+          "bootstrap_sha256": "26eb87ff65752666053268f8ea0df02f9ea3e662293158cdc0cc4908198eaec9",
+          "ci90_pct": [
+            -0.06698463266920632,
+            0.22360130943960393
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 584,
+          "observed_cluster_mean_pct": 0.07676974387652911,
+          "repetitions": 2000,
+          "seed": 33657613,
+          "selected_observations": 4953,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "BETA_RESIDUAL_RETURN"
+        }
+      ],
+      "concentration": {
+        "top_five_dates_share_pct": 5.456155080205785,
+        "top_three_symbols_share_pct": 15.03299336141919
+      },
+      "conditioning_only": false,
+      "data_coverage": {
+        "all_panel_observations": 164733,
+        "availability_time": "T session close, derived as 15:30 Asia/Seoul from the Phase 13 post-close signal convention",
+        "markets": [
+          "KOSDAQ",
+          "KOSPI"
+        ],
+        "non_null_observations": 162297,
+        "non_null_rate": 0.9852124346670066,
+        "quality_flags": [
+          "CURRENT_LISTING_COHORT",
+          "ADJUSTED_PRICE_REVISION_RISK"
+        ],
+        "symbols": 95,
+        "unique_dates": 601
+      },
+      "date_clusters": 601,
+      "dimensions": {
+        "CONCENTRATION": "PASS",
+        "DATA_QUALITY": "PARTIAL",
+        "ECONOMIC_SCALE": "FAIL",
+        "INDEPENDENT_SAMPLE_DEPTH": "PASS",
+        "MARKET_ADJUSTED_EDGE": "FAIL",
+        "MONOTONICITY": "FAIL",
+        "MULTIPLE_TESTING_ROBUSTNESS": "PASS",
+        "NULL_SEPARATION": "PASS",
+        "PREDICTABILITY": "PASS",
+        "SURVIVORSHIP_RISK": "HIGH",
+        "WALK_FORWARD_STABILITY": "PASS"
+      },
+      "economic_edge_to_friction_ratio": 0.025712673487137017,
+      "family_id": "range_position",
+      "final_state": "WEAK",
+      "market_beta_dominated": "UNCERTAIN",
+      "market_component_share_pct": null,
+      "null_empirical_p": 0.000999000999000999,
+      "oriented_quantile_spread_pct": 0.4125214541604994,
+      "selected_quantile_spread_pct": -0.4125214541604994,
+      "selected_surface": {
+        "direction": "negative",
+        "factor_id": "range_position_20d",
+        "family_id": "range_position",
+        "horizon_sessions": 3,
+        "market_scope": "KOSDAQ",
+        "mean_ic": -0.030726401800610627,
+        "oriented_mean_ic": 0.030726401800610627,
+        "target": "BETA_RESIDUAL_RETURN"
+      },
+      "stability_components": {
+        "effect_size_decay_last_over_first": 4.559195199002626,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 1.0,
+          "positive_blocks": 5
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        }
+      },
+      "strategy_synthesis": "NOT_PERFORMED",
+      "supporting_horizon_count": 3,
+      "supporting_surface_count": 7,
+      "supporting_target_count": 3,
+      "surface_breadth_pass": true,
+      "survivorship_and_vintage_warning": "CURRENT_LISTING_BIASED; PIT_PRICE_HISTORY_NOT_AVAILABLE; ADJUSTED_PRICE_REVISION_RISK_PRESENT",
+      "unique_signal_dates": 601
+    },
+    {
+      "cluster_bootstrap": [
+        {
+          "bootstrap_sha256": "cc4112a07667b76a11489ea24e476a54b09869f03c3e8377b2939705fbf3872e",
+          "ci90_pct": [
+            0.1963897466935822,
+            0.8297997012747754
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 587,
+          "observed_cluster_mean_pct": 0.5139003129746473,
+          "repetitions": 2000,
+          "seed": 22753934,
+          "selected_observations": 5644,
+          "selected_quantile": 5,
+          "status": "COMPUTED",
+          "target": "ABSOLUTE_RETURN"
+        },
+        {
+          "bootstrap_sha256": "d8cbcc62b3ddb89a705e0fea097dc15037b89a062beaa556d77fc3c0624c7056",
+          "ci90_pct": [
+            -0.111618042238668,
+            0.3704678650366965
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 587,
+          "observed_cluster_mean_pct": 0.12621163237265898,
+          "repetitions": 2000,
+          "seed": 22753934,
+          "selected_observations": 5644,
+          "selected_quantile": 5,
+          "status": "COMPUTED",
+          "target": "SIMPLE_EXCESS_RETURN"
+        },
+        {
+          "bootstrap_sha256": "954adcb3967952096cadeb8e0ef771a1ba66d72d52843b4803be8dd80ae0d8ad",
+          "ci90_pct": [
+            -0.026344942144635976,
+            0.4671092512240442
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 570,
+          "observed_cluster_mean_pct": 0.2311906522831261,
+          "repetitions": 2000,
+          "seed": 22753934,
+          "selected_observations": 5379,
+          "selected_quantile": 5,
+          "status": "COMPUTED",
+          "target": "BETA_RESIDUAL_RETURN"
+        }
+      ],
+      "concentration": {
+        "top_five_dates_share_pct": 4.399879754484296,
+        "top_three_symbols_share_pct": 21.27523069682979
+      },
+      "conditioning_only": false,
+      "data_coverage": {
+        "all_panel_observations": 164733,
+        "availability_time": "T session close, derived as 15:30 Asia/Seoul from the Phase 13 post-close signal convention",
+        "markets": [
+          "KOSDAQ",
+          "KOSPI"
+        ],
+        "non_null_observations": 164628,
+        "non_null_rate": 0.9993626049425434,
+        "quality_flags": [
+          "CURRENT_LISTING_COHORT",
+          "ADJUSTED_PRICE_REVISION_RISK"
+        ],
+        "symbols": 96,
+        "unique_dates": 601
+      },
+      "date_clusters": 587,
+      "dimensions": {
+        "CONCENTRATION": "PASS",
+        "DATA_QUALITY": "PARTIAL",
+        "ECONOMIC_SCALE": "FAIL",
+        "INDEPENDENT_SAMPLE_DEPTH": "PASS",
+        "MARKET_ADJUSTED_EDGE": "FAIL",
+        "MONOTONICITY": "FAIL",
+        "MULTIPLE_TESTING_ROBUSTNESS": "FAIL",
+        "NULL_SEPARATION": "FAIL",
+        "PREDICTABILITY": "FAIL",
+        "SURVIVORSHIP_RISK": "HIGH",
+        "WALK_FORWARD_STABILITY": "FAIL"
+      },
+      "economic_edge_to_friction_ratio": 0.9696232320276362,
+      "family_id": "raw_trailing_return",
+      "final_state": "FAIL",
+      "market_beta_dominated": "NO",
+      "market_component_share_pct": 75.44044454028469,
+      "null_empirical_p": 1.0,
+      "oriented_quantile_spread_pct": -0.028452183577071105,
+      "selected_quantile_spread_pct": -0.028452183577071105,
+      "selected_surface": {
+        "direction": "positive",
+        "factor_id": "raw_trailing_return_5d",
+        "family_id": "raw_trailing_return",
+        "horizon_sessions": 10,
+        "market_scope": "KOSPI",
+        "mean_ic": -0.014045945697617045,
+        "oriented_mean_ic": -0.014045945697617045,
+        "target": "BETA_RESIDUAL_RETURN"
+      },
+      "stability_components": {
+        "effect_size_decay_last_over_first": 0.957731702511294,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.2,
+          "positive_blocks": 1
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.6,
+          "positive_blocks": 3
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.6,
+          "positive_blocks": 3
+        }
+      },
+      "strategy_synthesis": "NOT_PERFORMED",
+      "supporting_horizon_count": 0,
+      "supporting_surface_count": 0,
+      "supporting_target_count": 0,
+      "surface_breadth_pass": false,
+      "survivorship_and_vintage_warning": "CURRENT_LISTING_BIASED; PIT_PRICE_HISTORY_NOT_AVAILABLE; ADJUSTED_PRICE_REVISION_RISK_PRESENT",
+      "unique_signal_dates": 587
+    },
+    {
+      "cluster_bootstrap": [
+        {
+          "bootstrap_sha256": "119f990d3042e27ab4d9f0f5086b85243276ca6d5e4cdb9e1f168ed138d030e4",
+          "ci90_pct": [
+            -0.19929608288505518,
+            0.26264484108322766
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 584,
+          "observed_cluster_mean_pct": 0.04008219907319671,
+          "repetitions": 2000,
+          "seed": 21377655,
+          "selected_observations": 5127,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "ABSOLUTE_RETURN"
+        },
+        {
+          "bootstrap_sha256": "6522eb4d22dc9f844487263f18782898d5aa7870e3a09f1a6e1ab6c74a9b663c",
+          "ci90_pct": [
+            -0.06219693139056377,
+            0.22560246936914907
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 584,
+          "observed_cluster_mean_pct": 0.08106687070364726,
+          "repetitions": 2000,
+          "seed": 21377655,
+          "selected_observations": 5127,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "SIMPLE_EXCESS_RETURN"
+        },
+        {
+          "bootstrap_sha256": "a695e01ae5230f050dc1d46b1ec33da77c86383766611f0856fcc2c9d89b4236",
+          "ci90_pct": [
+            -0.05232222648753473,
+            0.2418667677542768
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 584,
+          "observed_cluster_mean_pct": 0.09191853471733388,
+          "repetitions": 2000,
+          "seed": 21377655,
+          "selected_observations": 5127,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "BETA_RESIDUAL_RETURN"
+        }
+      ],
+      "concentration": {
+        "top_five_dates_share_pct": 4.640507191116382,
+        "top_three_symbols_share_pct": 17.30105283979097
+      },
+      "conditioning_only": false,
+      "data_coverage": {
+        "all_panel_observations": 164733,
+        "availability_time": "T session close, derived as 15:30 Asia/Seoul from the Phase 13 post-close signal convention",
+        "markets": [
+          "KOSDAQ",
+          "KOSPI"
+        ],
+        "non_null_observations": 157965,
+        "non_null_rate": 0.9589153357250824,
+        "quality_flags": [
+          "CURRENT_LISTING_COHORT",
+          "ADJUSTED_PRICE_REVISION_RISK"
+        ],
+        "symbols": 94,
+        "unique_dates": 584
+      },
+      "date_clusters": 584,
+      "dimensions": {
+        "CONCENTRATION": "PASS",
+        "DATA_QUALITY": "PARTIAL",
+        "ECONOMIC_SCALE": "FAIL",
+        "INDEPENDENT_SAMPLE_DEPTH": "PASS",
+        "MARKET_ADJUSTED_EDGE": "FAIL",
+        "MONOTONICITY": "PASS",
+        "MULTIPLE_TESTING_ROBUSTNESS": "PASS",
+        "NULL_SEPARATION": "PASS",
+        "PREDICTABILITY": "PASS",
+        "SURVIVORSHIP_RISK": "HIGH",
+        "WALK_FORWARD_STABILITY": "PASS"
+      },
+      "economic_edge_to_friction_ratio": 0.07562679070414466,
+      "family_id": "residual_cross_sectional_rank",
+      "final_state": "WEAK",
+      "market_beta_dominated": "UNCERTAIN",
+      "market_component_share_pct": null,
+      "null_empirical_p": 0.000999000999000999,
+      "oriented_quantile_spread_pct": 0.4171907350045324,
+      "selected_quantile_spread_pct": -0.4171907350045324,
+      "selected_surface": {
+        "direction": "negative",
+        "factor_id": "residual_cross_sectional_rank_5d",
+        "family_id": "residual_cross_sectional_rank",
+        "horizon_sessions": 3,
+        "market_scope": "KOSDAQ",
+        "mean_ic": -0.038840570312905894,
+        "oriented_mean_ic": 0.038840570312905894,
+        "target": "BETA_RESIDUAL_RETURN"
+      },
+      "stability_components": {
+        "effect_size_decay_last_over_first": 2.2700754522688267,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 1.0,
+          "positive_blocks": 5
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.8,
+          "positive_blocks": 4
+        }
+      },
+      "strategy_synthesis": "NOT_PERFORMED",
+      "supporting_horizon_count": 3,
+      "supporting_surface_count": 18,
+      "supporting_target_count": 3,
+      "surface_breadth_pass": true,
+      "survivorship_and_vintage_warning": "CURRENT_LISTING_BIASED; PIT_PRICE_HISTORY_NOT_AVAILABLE; ADJUSTED_PRICE_REVISION_RISK_PRESENT",
+      "unique_signal_dates": 584
+    },
+    {
+      "cluster_bootstrap": [
+        {
+          "bootstrap_sha256": "b3ff5b77dc4b1edb7d239afbbb81715f490c1eb71aa49cedfab6b69afecbebe3",
+          "ci90_pct": [
+            0.0005740984465789674,
+            0.35847234124297855
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 601,
+          "observed_cluster_mean_pct": 0.17370150099749784,
+          "repetitions": 2000,
+          "seed": 23334636,
+          "selected_observations": 6010,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "ABSOLUTE_RETURN"
+        },
+        {
+          "bootstrap_sha256": "089677a4ee97034ea5b962c18b10201639b8c09b206eed2efc8e6749205cabc5",
+          "ci90_pct": [
+            -0.042455395178141356,
+            0.23856608005955754
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 601,
+          "observed_cluster_mean_pct": 0.10476421866798966,
+          "repetitions": 2000,
+          "seed": 23334636,
+          "selected_observations": 6010,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "SIMPLE_EXCESS_RETURN"
+        },
+        {
+          "bootstrap_sha256": "abcbee52463339007d4ff3a8d2f59c992c2f605d6b49a9e31c9fbce3db67d071",
+          "ci90_pct": [
+            -0.08335332758392419,
+            0.19532606754503673
+          ],
+          "cluster": "signal_date; all market subgroups are averaged within date",
+          "clusters": 584,
+          "observed_cluster_mean_pct": 0.05792299208516336,
+          "repetitions": 2000,
+          "seed": 23334636,
+          "selected_observations": 5840,
+          "selected_quantile": 1,
+          "status": "COMPUTED",
+          "target": "BETA_RESIDUAL_RETURN"
+        }
+      ],
+      "concentration": {
+        "top_five_dates_share_pct": 4.413890912892537,
+        "top_three_symbols_share_pct": 28.342098503832094
+      },
+      "conditioning_only": false,
+      "data_coverage": {
+        "all_panel_observations": 164733,
+        "availability_time": "T session close, derived as 15:30 Asia/Seoul from the Phase 13 post-close signal convention",
+        "markets": [
+          "KOSDAQ",
+          "KOSPI"
+        ],
+        "non_null_observations": 164313,
+        "non_null_rate": 0.9974504197701736,
+        "quality_flags": [
+          "CURRENT_LISTING_COHORT",
+          "ADJUSTED_PRICE_REVISION_RISK"
+        ],
+        "symbols": 96,
+        "unique_dates": 601
+      },
+      "date_clusters": 601,
+      "dimensions": {
+        "CONCENTRATION": "PASS",
+        "DATA_QUALITY": "PARTIAL",
+        "ECONOMIC_SCALE": "FAIL",
+        "INDEPENDENT_SAMPLE_DEPTH": "PASS",
+        "MARKET_ADJUSTED_EDGE": "FAIL",
+        "MONOTONICITY": "FAIL",
+        "MULTIPLE_TESTING_ROBUSTNESS": "FAIL",
+        "NULL_SEPARATION": "FAIL",
+        "PREDICTABILITY": "FAIL",
+        "SURVIVORSHIP_RISK": "HIGH",
+        "WALK_FORWARD_STABILITY": "FAIL"
+      },
+      "economic_edge_to_friction_ratio": 0.3277386811273545,
+      "family_id": "residual_drawdown",
+      "final_state": "FAIL",
+      "market_beta_dominated": "NO",
+      "market_component_share_pct": 39.68721164390009,
+      "null_empirical_p": 1.0,
+      "oriented_quantile_spread_pct": 0.027205985626713586,
+      "selected_quantile_spread_pct": -0.027205985626713586,
+      "selected_surface": {
+        "direction": "negative",
+        "factor_id": "residual_drawdown_20d",
+        "family_id": "residual_drawdown",
+        "horizon_sessions": 3,
+        "market_scope": "KOSPI",
+        "mean_ic": 0.026385135196538675,
+        "oriented_mean_ic": -0.026385135196538675,
+        "target": "ABSOLUTE_RETURN"
+      },
+      "stability_components": {
+        "effect_size_decay_last_over_first": 0.46251862341408007,
+        "ic_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.0,
+          "positive_blocks": 0
+        },
+        "market_consistency": "reported separately in market-adjusted gate",
+        "sample_sufficiency": {
+          "blocks_with_at_least_20_dates": 5,
+          "required_blocks": 5
+        },
+        "sign_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.6,
+          "positive_blocks": 3
+        },
+        "spread_consistency": {
+          "eligible_blocks": 5,
+          "fraction": 0.6,
+          "positive_blocks": 3
+        }
+      },
+      "strategy_synthesis": "NOT_PERFORMED",
+      "supporting_horizon_count": 0,
+      "supporting_surface_count": 0,
+      "supporting_target_count": 0,
+      "surface_breadth_pass": false,
+      "survivorship_and_vintage_warning": "CURRENT_LISTING_BIASED; PIT_PRICE_HISTORY_NOT_AVAILABLE; ADJUSTED_PRICE_REVISION_RISK_PRESENT",
+      "unique_signal_dates": 601
+    }
+  ],
+  "run_metadata": {
+    "cluster_bootstrap_repetitions": 2000,
+    "cross_sectional_permutations": 1000,
+    "dataset_sha256": "b7b07f60352d4b8d52d3917f6af35bb3d377b313428db30867ce79d2c67fd3f5",
+    "date_range": [
+      "2023-01-02",
+      "2025-06-30"
+    ],
+    "factor_registry_sha256": "557bd10155caef63b696841d6893da3b07e1b6651b587c385cd79dbb3da128eb",
+    "generated_at_utc": "2026-10-01T08:09:19.242994+00:00",
+    "horizons_sessions": [
+      3,
+      5,
+      10
+    ],
+    "numpy_version": "2.5.3",
+    "pipeline_config_sha256": "88dcb008acee28dfdac087773a24d392049930e044c1cf88407cdb7f9d5bd4e7",
+    "random_generator": "numpy.Generator(PCG64)",
+    "random_seed": 20261001,
+    "round_trip_cost_pct": 0.53,
+    "source_git_sha": "ef7a79128bdc596d715f3ddbdcc29350c3795ce5",
+    "targets": [
+      "ABSOLUTE_RETURN",
+      "SIMPLE_EXCESS_RETURN",
+      "BETA_RESIDUAL_RETURN"
+    ],
+    "time_dislocation_permutations": 500
+  }
+}

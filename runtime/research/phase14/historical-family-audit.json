@@ -1,0 +1,87 @@
+{
+  "artifact": "historical-family-audit",
+  "config_frozen_first": true,
+  "phase13_h2_used_only_as_challenge_label": true,
+  "results": [
+    {
+      "challenge_outcomes_not_used_for_v2_verdict": true,
+      "historical_family": "Phase 11 market-stress rebound / market-context mean reversion",
+      "input_window": [
+        "2023-01-02",
+        "2025-06-30"
+      ],
+      "later_known_outcome": "NO_CANDIDATE; phase 12 candidate not created",
+      "old_pipeline_result": "REJECTED_AFTER_VALIDATION; Phase 12 found market beta and stress composition, not a stable mechanism",
+      "pipeline_v2_factor_verdict": "FAIL",
+      "v2_factor_family": "market_context",
+      "v2_would_have_prevented_candidate_research": true
+    },
+    {
+      "challenge_outcomes_not_used_for_v2_verdict": true,
+      "historical_family": "Phase 13 standalone residual reversal",
+      "input_window": [
+        "2023-01-02",
+        "2025-06-30"
+      ],
+      "later_known_outcome": "STANDALONE_STATE_NOT_PROMOTED",
+      "old_pipeline_result": "WEAK; absolute effect below 0.53% friction",
+      "pipeline_v2_factor_verdict": "WEAK",
+      "v2_factor_family": "beta_residual_return",
+      "v2_would_have_prevented_candidate_research": true
+    },
+    {
+      "challenge_outcomes_not_used_for_v2_verdict": true,
+      "historical_family": "Phase 10 daily price states",
+      "input_window": [
+        "2023-01-02",
+        "2025-06-30"
+      ],
+      "later_known_outcome": "NO_CANDIDATE",
+      "old_pipeline_result": "NO_QUALIFYING_FAMILY; no candidate",
+      "pipeline_v2_factor_verdict": "FAIL",
+      "v2_factor_family": "raw_trailing_return",
+      "v2_would_have_prevented_candidate_research": true
+    },
+    {
+      "challenge_outcomes_not_used_for_v2_verdict": true,
+      "historical_family": "Phase 13 excess-reversal x expanded-turnover candidate family",
+      "input_window": [
+        "2023-01-02",
+        "2025-06-30"
+      ],
+      "later_known_outcome": "PHASE13_CONFIRMATION_FAIL",
+      "old_pipeline_result": "CANDIDATE_CREATED_THEN_CONFIRMATION_FAILED",
+      "pipeline_v2_factor_verdict": "WEAK",
+      "v2_factor_family": "phase13_excess_turnover_interaction",
+      "v2_would_have_prevented_candidate_research": true
+    }
+  ],
+  "run_metadata": {
+    "cluster_bootstrap_repetitions": 2000,
+    "cross_sectional_permutations": 1000,
+    "dataset_sha256": "b7b07f60352d4b8d52d3917f6af35bb3d377b313428db30867ce79d2c67fd3f5",
+    "date_range": [
+      "2023-01-02",
+      "2025-06-30"
+    ],
+    "factor_registry_sha256": "557bd10155caef63b696841d6893da3b07e1b6651b587c385cd79dbb3da128eb",
+    "generated_at_utc": "2026-10-01T08:09:19.242994+00:00",
+    "horizons_sessions": [
+      3,
+      5,
+      10
+    ],
+    "numpy_version": "2.5.3",
+    "pipeline_config_sha256": "88dcb008acee28dfdac087773a24d392049930e044c1cf88407cdb7f9d5bd4e7",
+    "random_generator": "numpy.Generator(PCG64)",
+    "random_seed": 20261001,
+    "round_trip_cost_pct": 0.53,
+    "source_git_sha": "ef7a79128bdc596d715f3ddbdcc29350c3795ce5",
+    "targets": [
+      "ABSOLUTE_RETURN",
+      "SIMPLE_EXCESS_RETURN",
+      "BETA_RESIDUAL_RETURN"
+    ],
+    "time_dislocation_permutations": 500
+  }
+}

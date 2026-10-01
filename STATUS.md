@@ -71,6 +71,16 @@ PHASE13_EXTERNAL_2026: NOT_READ
 PHASE13_HOLDOUT_2026: NOT_READ
 PHASE13_ARTIFACT_INTEGRITY: PASS (28 indexed artifacts; Phase 5–12 snapshot unchanged)
 PHASE13_TESTS: PASS (297 total; 268 baseline + 29 Phase 13)
+PHASE14_RESEARCH_LEDGER: COMPLETE (9 strategy / 11 factor / 4 interaction family labels minimum)
+PHASE14_PIPELINE_V2: PASS (63 factor definitions, 14 families; strategy-free)
+PHASE14_FACTOR_VIABILITY: WEAK (no PROMISING_FOR_FUTURE_STUDY family; best NONE)
+PHASE14_FALSE_POSITIVE_AUDIT: PASS (Phase 13 interaction family WEAK pre-Confirmation)
+PHASE14_EXISTING_INFORMATION: WEAK
+PHASE14_NEXT_RESEARCH_MODE: NEW_INFORMATION_SOURCE
+PHASE14_EXTERNAL_2026: NOT_READ
+PHASE14_HOLDOUT_2026: NOT_READ (outcomes unread; metadata previously exposed)
+PHASE14_ARTIFACT_INTEGRITY: PASS (25 indexed payloads; Phase 5–13 snapshot 38/38 unchanged)
+PHASE14_TESTS: PASS (323 total; baseline 297 plus 26 Phase 14)
 VWAP_RECLAIM_ANATOMY: FAIL (15m Development gate passed 2/5; no variants created)
 VWAP_A: NOT_CREATED
 VWAP_B: NOT_CREATED
@@ -92,6 +102,10 @@ PHASE8_SHADOW_NEXT_SESSION: NO
 ```
 
 Phase 2, Phase 2.5, Phase 3, Phase 4, and Phase 5 evidence is summarized in [RESULTS.md](RESULTS.md). Manifests, event rows, and Phase 5 diagnostics are retained in ignored `runtime/research/phase5/`. Phase 6 research artifacts are in ignored `runtime/research/phase6/`.
+
+## Phase 14 current decision
+
+Phase 14 Research Pipeline v2 is implemented and run using only the Phase 13 safe panel through 2025-06-30. The pipeline found descriptive and selection-aware IC structure, but no factor family passed the full pre-strategy viability gate. `BEST_FACTOR_FAMILY=NONE`; existing price/liquidity information is `WEAK`; the next research mode is `NEW_INFORMATION_SOURCE`. Its pre-Confirmation audit classified the Phase 13 interaction family `WEAK`, which would have blocked the candidate from Confirmation. No strategy or candidate was created. See the [Phase 14 report](docs/research/phase14-research-pipeline-v2.md) and machine-readable `runtime/research/phase14/` artifacts. External 2026 and Holdout outcomes remain unread; Holdout metadata exposure remains disclosed.
 
 ## Phase 9 current decision
 

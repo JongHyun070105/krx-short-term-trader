@@ -1,0 +1,534 @@
+{
+  "artifact": "economic-feasibility",
+  "interpretation": {
+    "ratio_1_to_2": "requires strong evidence",
+    "ratio_above_2": "economically interesting screening scale only",
+    "ratio_below_1": "generally economically weak"
+  },
+  "results": [
+    {
+      "absolute_long_only_effect_pct": -0.16508397672030917,
+      "break_even_friction_pct": -0.16508397672030917,
+      "caveat": "Factor-level screen only; does not define a trade, entry, exit, sizing, or net strategy return.",
+      "cost_assumption_components": {
+        "fee_each_side_pct": {
+          "status": "ASSUMED_HISTORICAL_BASELINE",
+          "value": 0.015
+        },
+        "sell_tax_equivalent_pct": {
+          "status": "HISTORICALLY_DOCUMENTED_COMPONENT",
+          "value": 0.2
+        },
+        "slippage_each_side_pct": {
+          "status": "CONSERVATIVE_ASSUMPTION",
+          "value": 0.15
+        }
+      },
+      "economic_scale_grade": "FAIL",
+      "edge_to_friction_ratio": -0.31147920135907387,
+      "expected_friction_pct": 0.53,
+      "factor_id": "abnormal_traded_value_activity",
+      "family_id": "abnormal_traded_value_activity",
+      "gross_above_friction": false,
+      "gross_effect_scale_pct": -0.16508397672030917,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 1048,
+      "observations": 5062,
+      "orientation": "negative",
+      "selected_long_only_quantile": 1,
+      "target_horizon_sessions": 10,
+      "unique_dates": 587
+    },
+    {
+      "absolute_long_only_effect_pct": 0.04008219907319667,
+      "break_even_friction_pct": 0.04008219907319667,
+      "caveat": "Factor-level screen only; does not define a trade, entry, exit, sizing, or net strategy return.",
+      "cost_assumption_components": {
+        "fee_each_side_pct": {
+          "status": "ASSUMED_HISTORICAL_BASELINE",
+          "value": 0.015
+        },
+        "sell_tax_equivalent_pct": {
+          "status": "HISTORICALLY_DOCUMENTED_COMPONENT",
+          "value": 0.2
+        },
+        "slippage_each_side_pct": {
+          "status": "CONSERVATIVE_ASSUMPTION",
+          "value": 0.15
+        }
+      },
+      "economic_scale_grade": "FAIL",
+      "edge_to_friction_ratio": 0.07562679070414466,
+      "expected_friction_pct": 0.53,
+      "factor_id": "beta_residual_return_5d",
+      "family_id": "beta_residual_return",
+      "gross_above_friction": false,
+      "gross_effect_scale_pct": 0.04008219907319667,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 2435,
+      "observations": 5127,
+      "orientation": "negative",
+      "selected_long_only_quantile": 1,
+      "target_horizon_sessions": 3,
+      "unique_dates": 584
+    },
+    {
+      "absolute_long_only_effect_pct": 0.5923692810696338,
+      "break_even_friction_pct": 0.5923692810696338,
+      "caveat": "Factor-level screen only; does not define a trade, entry, exit, sizing, or net strategy return.",
+      "cost_assumption_components": {
+        "fee_each_side_pct": {
+          "status": "ASSUMED_HISTORICAL_BASELINE",
+          "value": 0.015
+        },
+        "sell_tax_equivalent_pct": {
+          "status": "HISTORICALLY_DOCUMENTED_COMPONENT",
+          "value": 0.2
+        },
+        "slippage_each_side_pct": {
+          "status": "CONSERVATIVE_ASSUMPTION",
+          "value": 0.15
+        }
+      },
+      "economic_scale_grade": "PASS",
+      "edge_to_friction_ratio": 1.1176778888106298,
+      "expected_friction_pct": 0.53,
+      "factor_id": "idiosyncratic_volatility_20d",
+      "family_id": "idiosyncratic_volatility",
+      "gross_above_friction": true,
+      "gross_effect_scale_pct": 0.5923692810696338,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 743,
+      "observations": 5270,
+      "orientation": "negative",
+      "selected_long_only_quantile": 1,
+      "target_horizon_sessions": 10,
+      "unique_dates": 587
+    },
+    {
+      "absolute_long_only_effect_pct": null,
+      "break_even_friction_pct": null,
+      "caveat": "Factor-level screen only; does not define a trade, entry, exit, sizing, or net strategy return.",
+      "cost_assumption_components": {
+        "fee_each_side_pct": {
+          "status": "ASSUMED_HISTORICAL_BASELINE",
+          "value": 0.015
+        },
+        "sell_tax_equivalent_pct": {
+          "status": "HISTORICALLY_DOCUMENTED_COMPONENT",
+          "value": 0.2
+        },
+        "slippage_each_side_pct": {
+          "status": "CONSERVATIVE_ASSUMPTION",
+          "value": 0.15
+        }
+      },
+      "economic_scale_grade": "UNKNOWN",
+      "edge_to_friction_ratio": null,
+      "expected_friction_pct": 0.53,
+      "factor_id": "market_breadth_positive",
+      "family_id": "market_breadth",
+      "gross_above_friction": false,
+      "gross_effect_scale_pct": null,
+      "market_scope": "ALL",
+      "non_overlap_observations": 0,
+      "observations": 0,
+      "orientation": "positive",
+      "selected_long_only_quantile": 5,
+      "target_horizon_sessions": 3,
+      "unique_dates": 0
+    },
+    {
+      "absolute_long_only_effect_pct": null,
+      "break_even_friction_pct": null,
+      "caveat": "Factor-level screen only; does not define a trade, entry, exit, sizing, or net strategy return.",
+      "cost_assumption_components": {
+        "fee_each_side_pct": {
+          "status": "ASSUMED_HISTORICAL_BASELINE",
+          "value": 0.015
+        },
+        "sell_tax_equivalent_pct": {
+          "status": "HISTORICALLY_DOCUMENTED_COMPONENT",
+          "value": 0.2
+        },
+        "slippage_each_side_pct": {
+          "status": "CONSERVATIVE_ASSUMPTION",
+          "value": 0.15
+        }
+      },
+      "economic_scale_grade": "UNKNOWN",
+      "edge_to_friction_ratio": null,
+      "expected_friction_pct": 0.53,
+      "factor_id": "matched_market_return_5d",
+      "family_id": "market_context",
+      "gross_above_friction": false,
+      "gross_effect_scale_pct": null,
+      "market_scope": "ALL",
+      "non_overlap_observations": 0,
+      "observations": 0,
+      "orientation": "positive",
+      "selected_long_only_quantile": 5,
+      "target_horizon_sessions": 3,
+      "unique_dates": 0
+    },
+    {
+      "absolute_long_only_effect_pct": null,
+      "break_even_friction_pct": null,
+      "caveat": "Factor-level screen only; does not define a trade, entry, exit, sizing, or net strategy return.",
+      "cost_assumption_components": {
+        "fee_each_side_pct": {
+          "status": "ASSUMED_HISTORICAL_BASELINE",
+          "value": 0.015
+        },
+        "sell_tax_equivalent_pct": {
+          "status": "HISTORICALLY_DOCUMENTED_COMPONENT",
+          "value": 0.2
+        },
+        "slippage_each_side_pct": {
+          "status": "CONSERVATIVE_ASSUMPTION",
+          "value": 0.15
+        }
+      },
+      "economic_scale_grade": "UNKNOWN",
+      "edge_to_friction_ratio": null,
+      "expected_friction_pct": 0.53,
+      "factor_id": "market_excess_dispersion_1d",
+      "family_id": "market_excess_dispersion",
+      "gross_above_friction": false,
+      "gross_effect_scale_pct": null,
+      "market_scope": "ALL",
+      "non_overlap_observations": 0,
+      "observations": 0,
+      "orientation": "positive",
+      "selected_long_only_quantile": 5,
+      "target_horizon_sessions": 3,
+      "unique_dates": 0
+    },
+    {
+      "absolute_long_only_effect_pct": 0.11510366615158656,
+      "break_even_friction_pct": 0.11510366615158656,
+      "caveat": "Factor-level screen only; does not define a trade, entry, exit, sizing, or net strategy return.",
+      "cost_assumption_components": {
+        "fee_each_side_pct": {
+          "status": "ASSUMED_HISTORICAL_BASELINE",
+          "value": 0.015
+        },
+        "sell_tax_equivalent_pct": {
+          "status": "HISTORICALLY_DOCUMENTED_COMPONENT",
+          "value": 0.2
+        },
+        "slippage_each_side_pct": {
+          "status": "CONSERVATIVE_ASSUMPTION",
+          "value": 0.15
+        }
+      },
+      "economic_scale_grade": "FAIL",
+      "edge_to_friction_ratio": 0.21717672858789916,
+      "expected_friction_pct": 0.53,
+      "factor_id": "market_excess_return_10d",
+      "family_id": "market_excess_return",
+      "gross_above_friction": false,
+      "gross_effect_scale_pct": 0.11510366615158656,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 1050,
+      "observations": 5290,
+      "orientation": "negative",
+      "selected_long_only_quantile": 1,
+      "target_horizon_sessions": 10,
+      "unique_dates": 587
+    },
+    {
+      "absolute_long_only_effect_pct": 0.1726804138422292,
+      "break_even_friction_pct": 0.1726804138422292,
+      "caveat": "Factor-level screen only; does not define a trade, entry, exit, sizing, or net strategy return.",
+      "cost_assumption_components": {
+        "fee_each_side_pct": {
+          "status": "ASSUMED_HISTORICAL_BASELINE",
+          "value": 0.015
+        },
+        "sell_tax_equivalent_pct": {
+          "status": "HISTORICALLY_DOCUMENTED_COMPONENT",
+          "value": 0.2
+        },
+        "slippage_each_side_pct": {
+          "status": "CONSERVATIVE_ASSUMPTION",
+          "value": 0.15
+        }
+      },
+      "economic_scale_grade": "FAIL",
+      "edge_to_friction_ratio": 0.32581210158911167,
+      "expected_friction_pct": 0.53,
+      "factor_id": "negative_control_stable_hash_pseudorank",
+      "family_id": "negative_control",
+      "gross_above_friction": false,
+      "gross_effect_scale_pct": 0.1726804138422292,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 3515,
+      "observations": 4904,
+      "orientation": "positive",
+      "selected_long_only_quantile": 5,
+      "target_horizon_sessions": 3,
+      "unique_dates": 601
+    },
+    {
+      "absolute_long_only_effect_pct": null,
+      "break_even_friction_pct": null,
+      "caveat": "Factor-level screen only; does not define a trade, entry, exit, sizing, or net strategy return.",
+      "cost_assumption_components": {
+        "fee_each_side_pct": {
+          "status": "ASSUMED_HISTORICAL_BASELINE",
+          "value": 0.015
+        },
+        "sell_tax_equivalent_pct": {
+          "status": "HISTORICALLY_DOCUMENTED_COMPONENT",
+          "value": 0.2
+        },
+        "slippage_each_side_pct": {
+          "status": "CONSERVATIVE_ASSUMPTION",
+          "value": 0.15
+        }
+      },
+      "economic_scale_grade": "UNKNOWN",
+      "edge_to_friction_ratio": null,
+      "expected_friction_pct": 0.53,
+      "factor_id": "phase13_excess_turnover_interaction__GE_4__EXPANDED",
+      "family_id": "phase13_excess_turnover_interaction",
+      "gross_above_friction": false,
+      "gross_effect_scale_pct": null,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 0,
+      "observations": 0,
+      "orientation": "negative",
+      "selected_long_only_quantile": 1,
+      "target_horizon_sessions": 10,
+      "unique_dates": 0
+    },
+    {
+      "absolute_long_only_effect_pct": -0.8868025303841525,
+      "break_even_friction_pct": -0.8868025303841525,
+      "caveat": "Factor-level screen only; does not define a trade, entry, exit, sizing, or net strategy return.",
+      "cost_assumption_components": {
+        "fee_each_side_pct": {
+          "status": "ASSUMED_HISTORICAL_BASELINE",
+          "value": 0.015
+        },
+        "sell_tax_equivalent_pct": {
+          "status": "HISTORICALLY_DOCUMENTED_COMPONENT",
+          "value": 0.2
+        },
+        "slippage_each_side_pct": {
+          "status": "CONSERVATIVE_ASSUMPTION",
+          "value": 0.15
+        }
+      },
+      "economic_scale_grade": "FAIL",
+      "edge_to_friction_ratio": -1.673212321479533,
+      "expected_friction_pct": 0.53,
+      "factor_id": "phase13_residual_drawdown_idio_vol_interaction__DEEP_LE_-8__HIGH",
+      "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+      "gross_above_friction": false,
+      "gross_effect_scale_pct": -0.8868025303841525,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 105,
+      "observations": 338,
+      "orientation": "negative",
+      "selected_long_only_quantile": 1,
+      "target_horizon_sessions": 10,
+      "unique_dates": 26
+    },
+    {
+      "absolute_long_only_effect_pct": null,
+      "break_even_friction_pct": null,
+      "caveat": "Factor-level screen only; does not define a trade, entry, exit, sizing, or net strategy return.",
+      "cost_assumption_components": {
+        "fee_each_side_pct": {
+          "status": "ASSUMED_HISTORICAL_BASELINE",
+          "value": 0.015
+        },
+        "sell_tax_equivalent_pct": {
+          "status": "HISTORICALLY_DOCUMENTED_COMPONENT",
+          "value": 0.2
+        },
+        "slippage_each_side_pct": {
+          "status": "CONSERVATIVE_ASSUMPTION",
+          "value": 0.15
+        }
+      },
+      "economic_scale_grade": "UNKNOWN",
+      "edge_to_friction_ratio": null,
+      "expected_friction_pct": 0.53,
+      "factor_id": "phase13_residual_rank_turnover_interaction__UPPER__EXPANDED",
+      "family_id": "phase13_residual_rank_turnover_interaction",
+      "gross_above_friction": false,
+      "gross_effect_scale_pct": null,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 0,
+      "observations": 0,
+      "orientation": "negative",
+      "selected_long_only_quantile": 1,
+      "target_horizon_sessions": 10,
+      "unique_dates": 0
+    },
+    {
+      "absolute_long_only_effect_pct": 0.013627716948182619,
+      "break_even_friction_pct": 0.013627716948182619,
+      "caveat": "Factor-level screen only; does not define a trade, entry, exit, sizing, or net strategy return.",
+      "cost_assumption_components": {
+        "fee_each_side_pct": {
+          "status": "ASSUMED_HISTORICAL_BASELINE",
+          "value": 0.015
+        },
+        "sell_tax_equivalent_pct": {
+          "status": "HISTORICALLY_DOCUMENTED_COMPONENT",
+          "value": 0.2
+        },
+        "slippage_each_side_pct": {
+          "status": "CONSERVATIVE_ASSUMPTION",
+          "value": 0.15
+        }
+      },
+      "economic_scale_grade": "FAIL",
+      "edge_to_friction_ratio": 0.025712673487137017,
+      "expected_friction_pct": 0.53,
+      "factor_id": "range_position_20d",
+      "family_id": "range_position",
+      "gross_above_friction": false,
+      "gross_effect_scale_pct": 0.013627716948182619,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 2356,
+      "observations": 5189,
+      "orientation": "negative",
+      "selected_long_only_quantile": 1,
+      "target_horizon_sessions": 3,
+      "unique_dates": 601
+    },
+    {
+      "absolute_long_only_effect_pct": 0.5139003129746472,
+      "break_even_friction_pct": 0.5139003129746472,
+      "caveat": "Factor-level screen only; does not define a trade, entry, exit, sizing, or net strategy return.",
+      "cost_assumption_components": {
+        "fee_each_side_pct": {
+          "status": "ASSUMED_HISTORICAL_BASELINE",
+          "value": 0.015
+        },
+        "sell_tax_equivalent_pct": {
+          "status": "HISTORICALLY_DOCUMENTED_COMPONENT",
+          "value": 0.2
+        },
+        "slippage_each_side_pct": {
+          "status": "CONSERVATIVE_ASSUMPTION",
+          "value": 0.15
+        }
+      },
+      "economic_scale_grade": "FAIL",
+      "edge_to_friction_ratio": 0.9696232320276362,
+      "expected_friction_pct": 0.53,
+      "factor_id": "raw_trailing_return_5d",
+      "family_id": "raw_trailing_return",
+      "gross_above_friction": false,
+      "gross_effect_scale_pct": 0.5139003129746472,
+      "market_scope": "KOSPI",
+      "non_overlap_observations": 1458,
+      "observations": 5644,
+      "orientation": "positive",
+      "selected_long_only_quantile": 5,
+      "target_horizon_sessions": 10,
+      "unique_dates": 587
+    },
+    {
+      "absolute_long_only_effect_pct": 0.04008219907319667,
+      "break_even_friction_pct": 0.04008219907319667,
+      "caveat": "Factor-level screen only; does not define a trade, entry, exit, sizing, or net strategy return.",
+      "cost_assumption_components": {
+        "fee_each_side_pct": {
+          "status": "ASSUMED_HISTORICAL_BASELINE",
+          "value": 0.015
+        },
+        "sell_tax_equivalent_pct": {
+          "status": "HISTORICALLY_DOCUMENTED_COMPONENT",
+          "value": 0.2
+        },
+        "slippage_each_side_pct": {
+          "status": "CONSERVATIVE_ASSUMPTION",
+          "value": 0.15
+        }
+      },
+      "economic_scale_grade": "FAIL",
+      "edge_to_friction_ratio": 0.07562679070414466,
+      "expected_friction_pct": 0.53,
+      "factor_id": "residual_cross_sectional_rank_5d",
+      "family_id": "residual_cross_sectional_rank",
+      "gross_above_friction": false,
+      "gross_effect_scale_pct": 0.04008219907319667,
+      "market_scope": "KOSDAQ",
+      "non_overlap_observations": 2435,
+      "observations": 5127,
+      "orientation": "negative",
+      "selected_long_only_quantile": 1,
+      "target_horizon_sessions": 3,
+      "unique_dates": 584
+    },
+    {
+      "absolute_long_only_effect_pct": 0.1737015009974979,
+      "break_even_friction_pct": 0.1737015009974979,
+      "caveat": "Factor-level screen only; does not define a trade, entry, exit, sizing, or net strategy return.",
+      "cost_assumption_components": {
+        "fee_each_side_pct": {
+          "status": "ASSUMED_HISTORICAL_BASELINE",
+          "value": 0.015
+        },
+        "sell_tax_equivalent_pct": {
+          "status": "HISTORICALLY_DOCUMENTED_COMPONENT",
+          "value": 0.2
+        },
+        "slippage_each_side_pct": {
+          "status": "CONSERVATIVE_ASSUMPTION",
+          "value": 0.15
+        }
+      },
+      "economic_scale_grade": "FAIL",
+      "edge_to_friction_ratio": 0.3277386811273545,
+      "expected_friction_pct": 0.53,
+      "factor_id": "residual_drawdown_20d",
+      "family_id": "residual_drawdown",
+      "gross_above_friction": false,
+      "gross_effect_scale_pct": 0.1737015009974979,
+      "market_scope": "KOSPI",
+      "non_overlap_observations": 2201,
+      "observations": 6010,
+      "orientation": "negative",
+      "selected_long_only_quantile": 1,
+      "target_horizon_sessions": 3,
+      "unique_dates": 601
+    }
+  ],
+  "round_trip_cost_pct": 0.53,
+  "run_metadata": {
+    "cluster_bootstrap_repetitions": 2000,
+    "cross_sectional_permutations": 1000,
+    "dataset_sha256": "b7b07f60352d4b8d52d3917f6af35bb3d377b313428db30867ce79d2c67fd3f5",
+    "date_range": [
+      "2023-01-02",
+      "2025-06-30"
+    ],
+    "factor_registry_sha256": "557bd10155caef63b696841d6893da3b07e1b6651b587c385cd79dbb3da128eb",
+    "generated_at_utc": "2026-10-01T08:09:19.242994+00:00",
+    "horizons_sessions": [
+      3,
+      5,
+      10
+    ],
+    "numpy_version": "2.5.3",
+    "pipeline_config_sha256": "88dcb008acee28dfdac087773a24d392049930e044c1cf88407cdb7f9d5bd4e7",
+    "random_generator": "numpy.Generator(PCG64)",
+    "random_seed": 20261001,
+    "round_trip_cost_pct": 0.53,
+    "source_git_sha": "ef7a79128bdc596d715f3ddbdcc29350c3795ce5",
+    "targets": [
+      "ABSOLUTE_RETURN",
+      "SIMPLE_EXCESS_RETURN",
+      "BETA_RESIDUAL_RETURN"
+    ],
+    "time_dislocation_permutations": 500
+  }
+}

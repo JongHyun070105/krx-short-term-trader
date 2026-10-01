@@ -1,0 +1,159 @@
+{
+  "algorithm": "SHA-256",
+  "artifact": "phase14-artifact-index",
+  "files": [
+    {
+      "path": "concentration-analysis.json",
+      "sha256": "086973ed08c9937c72e67ffe6f27310b3fe062562ba95979e54d3e4ca857626b",
+      "size_bytes": 22944
+    },
+    {
+      "path": "economic-feasibility.json",
+      "sha256": "1773305658fcbd73a74993a1bcce75454c9a2f464c86f292509647780e652276",
+      "size_bytes": 18999
+    },
+    {
+      "path": "evidence-periods.json",
+      "sha256": "7db8d405da95acd35b28653c2da063b2ef3a54ed92bdf6abc957b8a0356586d2",
+      "size_bytes": 1024
+    },
+    {
+      "path": "factor-monotonicity.json",
+      "sha256": "90d78e56d6047c6d599e7d61bce262419498e1775c2e58a05863a9149a247ed4",
+      "size_bytes": 868431
+    },
+    {
+      "path": "factor-predictability.json",
+      "sha256": "76824c219be28f4f60e2e80578a72bb6475f7fefdb8d1f57a622e1745a95a5ff",
+      "size_bytes": 1014246
+    },
+    {
+      "path": "factor-registry.json",
+      "sha256": "557bd10155caef63b696841d6893da3b07e1b6651b587c385cd79dbb3da128eb",
+      "size_bytes": 61272
+    },
+    {
+      "path": "factor-viability.json",
+      "sha256": "d5dd155182e292a51e789c76cd0977ae158bf8eadc4127ff214e2fcf8ce0d0e6",
+      "size_bytes": 67759
+    },
+    {
+      "path": "historical-family-audit.json",
+      "sha256": "dce4e0827b13530d6a76f5380462c7068c96edd0d62411bfab7400d781105b9c",
+      "size_bytes": 3188
+    },
+    {
+      "path": "market-adjusted-edge.json",
+      "sha256": "835a8f01b55829d341bf0793956f5bb3b3ddb23f5505828bab119c8d26fab31f",
+      "size_bytes": 20874
+    },
+    {
+      "path": "multiple-testing-audit.json",
+      "sha256": "d3fce82347aa6d89a85c820b799d661bb49b477c2e77cae7bfb40b63f4f01dfb",
+      "size_bytes": 6028
+    },
+    {
+      "path": "negative-control-results.json",
+      "sha256": "b43b4f15d2445cd979bb8647862e8568747b3efb97463c1027759c6992a537b8",
+      "size_bytes": 1572
+    },
+    {
+      "path": "null-max-statistics.json",
+      "sha256": "169f9d95ec03e7135141e1d20511186dd48e8040b1dbfa61c98c3ef34aeaffea",
+      "size_bytes": 425634
+    },
+    {
+      "path": "null-model-config.json",
+      "sha256": "a3c9c288a3ef734d7a9f4abc97aec4f0dbd97818e0ad4f8212656c7e214baaf8",
+      "size_bytes": 6027
+    },
+    {
+      "path": "opportunity-surface.json",
+      "sha256": "82c961f918f80888d9f998e78583ad540402bcdd02f08d5327a1651336836b8b",
+      "size_bytes": 10426
+    },
+    {
+      "path": "phase13-retrospective-audit.json",
+      "sha256": "4f492e27f07b9d32e878e4b554e1c5f3d08af0bdea2909b64c9aaf091fe0acb3",
+      "size_bytes": 2126
+    },
+    {
+      "path": "phase14-run-metadata.json",
+      "sha256": "54870f4ecad21574628d2a68e3a937cb5c9857f37c9d0bec62ef58ef12b58b0f",
+      "size_bytes": 867
+    },
+    {
+      "path": "phase14-summary.json",
+      "sha256": "4d1d8da1a370412be25b9b93335fe54481741aff1b9a62b10f2f66401775b870",
+      "size_bytes": 23071
+    },
+    {
+      "path": "pipeline-v2-config.json",
+      "sha256": "88dcb008acee28dfdac087773a24d392049930e044c1cf88407cdb7f9d5bd4e7",
+      "size_bytes": 7288
+    },
+    {
+      "path": "pipeline-v2-config.sha256",
+      "sha256": "1c2397a0aeb800d58c34981f2e309a1bfa0ac53f8a4075e6b6387195efd3634a",
+      "size_bytes": 90
+    },
+    {
+      "path": "previous-phase-artifact-snapshot.json",
+      "sha256": "091a319121a77021896cae67aa2c9a2bcd7298dca41a695909dcee9828d490f9",
+      "size_bytes": 15783
+    },
+    {
+      "path": "quantile-spreads.json",
+      "sha256": "3f5051f853813466781e7d96578b09b4a7a556b74b03f2c80286c19bcc7e9cdd",
+      "size_bytes": 2233704
+    },
+    {
+      "path": "research-degrees-of-freedom.json",
+      "sha256": "2bec5fd0201a545bf78aa97568b944c713569efb640da140e206d948dbe13253",
+      "size_bytes": 753
+    },
+    {
+      "path": "research-ledger.json",
+      "sha256": "5c0d481164ae222c990dad663b8d51f667c3beff830f938dbaa08a5412197110",
+      "size_bytes": 4190
+    },
+    {
+      "path": "time-dislocation-null.json",
+      "sha256": "5291adfd1185015ed6964e07c70b9c3c7989dfeda6c87fd209c6f3b15ab53378",
+      "size_bytes": 1847
+    },
+    {
+      "path": "walk-forward-stability.json",
+      "sha256": "31f61f4fd2767f067d0e446fc3efcd4a16a7a2402c42f38248dcb5a7335bb2ef",
+      "size_bytes": 57782
+    }
+  ],
+  "run_metadata": {
+    "cluster_bootstrap_repetitions": 2000,
+    "cross_sectional_permutations": 1000,
+    "dataset_sha256": "b7b07f60352d4b8d52d3917f6af35bb3d377b313428db30867ce79d2c67fd3f5",
+    "date_range": [
+      "2023-01-02",
+      "2025-06-30"
+    ],
+    "factor_registry_sha256": "557bd10155caef63b696841d6893da3b07e1b6651b587c385cd79dbb3da128eb",
+    "generated_at_utc": "2026-10-01T08:09:19.242994+00:00",
+    "horizons_sessions": [
+      3,
+      5,
+      10
+    ],
+    "numpy_version": "2.5.3",
+    "pipeline_config_sha256": "88dcb008acee28dfdac087773a24d392049930e044c1cf88407cdb7f9d5bd4e7",
+    "random_generator": "numpy.Generator(PCG64)",
+    "random_seed": 20261001,
+    "round_trip_cost_pct": 0.53,
+    "source_git_sha": "ef7a79128bdc596d715f3ddbdcc29350c3795ce5",
+    "targets": [
+      "ABSOLUTE_RETURN",
+      "SIMPLE_EXCESS_RETURN",
+      "BETA_RESIDUAL_RETURN"
+    ],
+    "time_dislocation_permutations": 500
+  }
+}
