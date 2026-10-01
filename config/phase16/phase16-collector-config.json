@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "config_version": "phase16-v1",
+  "timezone": "Asia/Seoul",
+  "storage_schema_version": 1,
+  "canonicalization_version": 1,
+  "enabled_sources": [
+    "kis_current_listings"
+  ],
+  "sources": {
+    "kis_current_listings": {
+      "source_name": "KIS current KOSPI/KOSDAQ stock master",
+      "provider": "Korea Investment & Securities",
+      "endpoint_id": "kis_current_listing_master_archive_v1",
+      "urls": {
+        "KOSPI": "https://new.real.download.dws.co.kr/common/master/kospi_code.mst.zip",
+        "KOSDAQ": "https://new.real.download.dws.co.kr/common/master/kosdaq_code.mst.zip"
+      },
+      "request_semantics": "CURRENT_ONLY",
+      "range_contract_proven": true,
+      "range_evidence": "Repository current-master adapter downloads current KOSPI/KOSDAQ symbol archives; no historical date parameter or history is requested.",
+      "scope": "FULL_CURRENT_LISTINGS",
+      "raw_archive_retention": false
+    },
+    "kis_per_stock_flow": {
+      "source_name": "KIS per-stock investor daily flow",
+      "provider": "Korea Investment & Securities",
+      "endpoint_id": "/uapi/domestic-stock/v1/quotations/investor-trade-by-stock-daily",
+      "request_semantics": "TRAILING_WINDOW",
+      "observed_rows_per_request": 31,
+      "range_contract_proven": false,
+      "exact_date_semantics_proven": false,
+      "enabled": false,
+      "deferred_reason": "Phase 15 observed 31 dated rows ending on the requested date; lower range/cap and vintage semantics are not documented. The current response may include protected 2026 Jul-Aug rows."
+    },
+    "kis_market_flow": {
+      "source_name": "KIS market investor daily flow",
+      "provider": "Korea Investment & Securities",
+      "endpoint_id": "/uapi/domestic-stock/v1/quotations/inquire-investor-daily-by-market",
+      "request_semantics": "TRAILING_WINDOW",
+      "observed_rows_per_request": 300,
+      "range_contract_proven": false,
+      "exact_date_semantics_proven": false,
+      "enabled": false,
+      "deferred_reason": "Phase 15 observed up to 300 dated rows; response range is not proven exact-date and overlaps protected periods."
+    },
+    "kis_program_flow": {
+      "source_name": "KIS per-stock program trading",
+      "provider": "Korea Investment & Securities",
+      "endpoint_id": "/uapi/domestic-stock/v1/quotations/program-trade-by-stock-daily",
+      "request_semantics": "TRAILING_WINDOW",
+      "observed_rows_per_request": 30,
+      "range_contract_proven": false,
+      "exact_date_semantics_proven": false,
+      "enabled": false,
+      "deferred_reason": "Phase 15 observed up to 30 dated rows; response range is not proven exact-date and may overlap protected 2026 Jul-Aug rows."
+    },
+    "krx_market_flow": {
+      "source_name": "KRX official market investor statistics",
+      "provider": "Korea Exchange",
+      "endpoint_id": "krx_market_investor_statistics_unverified",
+      "request_semantics": "UNKNOWN",
+      "range_contract_proven": false,
+      "enabled": false,
+      "deferred_reason": "No reproducible exact-day response contract or safe local adapter has been verified."
+    }
+  },
+  "cohorts": {
+    "full_research_cohort": {
+      "path": "runtime/research/phase4/cohort-manifest.json",
+      "scope": "FROZEN_RESEARCH_COHORT",
+      "expected_symbols": 100,
+      "cohort_sha256": "5bcad330613b94bda148401cddcba8e62262a96e3e38acd4b70e4ed013e78f95"
+    },
+    "probe_cohort": {
+      "path": "runtime/research/phase15/pilot-request-manifest.json",
+      "scope": "DETERMINISTIC_6_SYMBOL_PROBE",
+      "symbols": {
+        "KOSPI": ["005930", "000660", "005380"],
+        "KOSDAQ": ["086520", "028300", "293490"]
+      }
+    }
+  },
+  "protected_ranges": [
+    {"start": "2026-01-05", "end": "2026-04-16", "label": "EXTERNAL_2026"},
+    {"start": "2026-07-28", "end": "2026-08-28", "label": "HOLDOUT_2026"}
+  ],
+  "observation_schedule": {
+    "enabled_jobs": [
+      {"name": "daily-current-listings", "source": "kis_current_listings", "local_time": "20:15", "frequency": "daily"}
+    ],
+    "deferred_flow_slots_kst": ["16:10", "18:00", "20:15", "22:15", "next_business_day 08:20"],
+    "flow_full_cohort_kst": "20:15",
+    "flow_followup_slots": ["T", "T_PLUS_1_BUSINESS_DAY", "T_PLUS_5_BUSINESS_DAYS"],
+    "flow_jobs_enabled": false,
+    "flow_followups_enabled": false,
+    "missed_observation_policy": "record MISSED_OBSERVATION; never backdate or reconstruct an observation"
+  },
+  "request_policy": {
+    "authenticated_kis_min_interval_seconds": 4,
+    "max_retries": 2,
+    "retry_transient_only": true,
+    "shared_limiter_path": "runtime/kis_rate_limit.json",
+    "collector_lock_path": "runtime/research/phase16/locks/collector.lock"
+  },
+  "storage": {
+    "root": "runtime/research/phase16",
+    "raw_flow_retention": "disabled until provider terms are confirmed",
+    "warning_bytes": 5368709120,
+    "critical_bytes": 10737418240
+  },
+  "microstructure": {
+    "status": "DEFERRED",
+    "enabled": false,
+    "max_symbols": 0,
+    "sampling_method": null,
+    "daily_size_budget_bytes": 0,
+    "retention_days": 0,
+    "reason": "Optional source-specific capture, storage and retention budgets have not been established."
+  },
+  "source_stability_gate": {
+    "minimum_completed_sessions": 20,
+    "minimum_multi_vintage_sessions": 10,
+    "gate_type": "DATA_QUALITY_ONLY"
+  },
+  "research_boundaries": {
+    "factor_or_return_analysis": false,
+    "external_2026": "NOT_READ",
+    "holdout_2026": "NOT_READ",
+    "alpha": "UNPROVEN",
+    "live": "DISABLED",
+    "shadow_next_session": "NO"
+  }
+}

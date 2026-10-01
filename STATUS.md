@@ -129,6 +129,14 @@ PHASE8_SHADOW_NEXT_SESSION: NO
 
 Phase 2, Phase 2.5, Phase 3, Phase 4, and Phase 5 evidence is summarized in [RESULTS.md](RESULTS.md). Manifests, event rows, and Phase 5 diagnostics are retained in ignored `runtime/research/phase5/`. Phase 6 research artifacts are in ignored `runtime/research/phase6/`.
 
+## Phase 16 — Prospective Evidence Builder
+
+`PHASE16_BUILDER=COMPLETE`; immutable store, protected-response guard, and manifest chain pass. Only current KIS listing archives are enabled. KIS per-stock (31-row), market (up to 300-row), and program (up to 30-row) flow endpoints are denied before network access because their possible responses overlap protected 2026 data. KRX exact-day market-flow semantics remain unverified. No flow rows were requested or read.
+
+The 2026-10-01 23:07:40.276373 KST manual bootstrap persisted two prospective snapshots: 3,544 current listing rows and all 100/100 frozen cohort members. Chain tip: `2689ccfd549f098c233dbc5aa57e95c22defbb5b5b9e63d88ce9e873bc2b6e79`; config SHA-256: `c0e09886391463c1cfa35f25caf718b064796cdb73b552abff63257169b71b47`. Completed flow sessions and multi-vintage sessions are both 0; source stability is `INSUFFICIENT_OBSERVATIONS`, Phase 17 readiness is NO. A user LaunchAgent is active daily at 20:15 KST for current listings only. Phase 5–15 artifacts passed rehash verification (850/850). External 2026 and Holdout remain `NOT_READ`; Alpha is `UNPROVEN`; Shadow is NO; Live is DISABLED. See [Phase 16 report](docs/research/phase16-prospective-evidence-builder.md); local evidence and daily witness remain under ignored `runtime/research/phase16/`.
+
+`PHASE16_TESTS=PASS` (401 total; baseline 366 plus 35 Phase 16 tests); `PHASE16_RUFF=PASS`; `PHASE16_DIFF_CHECK=PASS`.
+
 ## Phase 15 current decision
 
 Phase 15 source qualification is `PARTIAL`. The official KIS per-stock investor-flow endpoint returned historical rolling windows for the bounded 2018–2025 samples, but all seven same-request repeat pairs produced different canonical response hashes. KIS market-flow and program-trading repeats were identical in one sample each; both also returned rolling dated windows. Publication timestamps, historical vintages, complete coverage, and provider rate limits remain unresolved. No source qualifies for Phase 14 factor research, so the primary and secondary sources are `NONE`; the recommended next mode is prospective collection with locally frozen, timestamped vintages after terms are confirmed. No alpha study or strategy candidate was run.
