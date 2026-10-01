@@ -302,10 +302,12 @@ def test_time_dislocation_null_preserves_seed_and_safe_window() -> None:
         permutations=8,
         seed=RANDOM_SEED,
         minimum_shift_sessions=10,
+        minimum_eligible_symbols=10,
     )
     assert result["status"] == "COMPUTED"
     assert result["seed"] == RANDOM_SEED
     assert result["protected_period_rows_used"] == 0
+    assert result["excluded_short_history_symbols"] == 0
     assert result["date_range"][1] <= "2025-06-30"
 
 

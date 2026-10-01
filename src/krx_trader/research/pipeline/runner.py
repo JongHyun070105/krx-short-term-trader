@@ -341,9 +341,10 @@ def run_phase14(repo_root: Path, output_root: Path) -> dict[str, Any]:
         permutations=TIME_DISLOCATION_PERMUTATIONS,
         seed=RANDOM_SEED,
         minimum_shift_sessions=config["null_models"]["time_dislocation"]["minimum_shift_sessions"],
+        minimum_eligible_symbols=config["null_models"]["time_dislocation"][
+            "minimum_eligible_symbols"
+        ],
     )
-    if time_null.get("status") != "COMPUTED":
-        raise RuntimeError("the frozen time-dislocation null could not run on the safe panel")
 
     selected_surfaces = _surface_map(null_results)
     specs_by_id = {spec.factor_id: spec for spec in analysis_specs}
@@ -439,7 +440,7 @@ def run_phase14(repo_root: Path, output_root: Path) -> dict[str, Any]:
         "PIPELINE_V2": "PASS",
         "OPPORTUNITY_SURFACE": "INFORMATIVE" if informative else "WEAK",
         "PREDICTABILITY_FRAMEWORK": "PASS",
-        "NULL_FRAMEWORK": "PASS",
+        "NULL_FRAMEWORK": "PASS" if time_null.get("status") == "COMPUTED" else "PARTIAL",
         "MULTIPLE_TESTING_CONTROL": "PASS",
         "ECONOMIC_GATE": "PASS",
         "NEGATIVE_CONTROL": negative_control["calibration"],

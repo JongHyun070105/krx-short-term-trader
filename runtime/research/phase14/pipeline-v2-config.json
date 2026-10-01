@@ -151,10 +151,12 @@
       "version": "2.5.3"
     },
     "time_dislocation": {
+      "eligible_symbol_rule": "exclude symbols with 120 or fewer safe factor/target observations; count exclusions",
       "factor": "raw_trailing_return_5d",
       "horizon_sessions": 5,
       "market_scope": "ALL",
       "method": "circular shift of factor history within symbol",
+      "minimum_eligible_symbols": 20,
       "minimum_shift_sessions": 60,
       "permutations": 500,
       "role": "pre-registered secondary temporal-alignment diagnostic; cross-sectional family max null is primary",

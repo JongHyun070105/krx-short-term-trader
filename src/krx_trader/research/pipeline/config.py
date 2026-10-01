@@ -138,6 +138,8 @@ def default_config() -> dict[str, Any]:
                 "permutations": TIME_DISLOCATION_PERMUTATIONS,
                 "seed": RANDOM_SEED,
                 "minimum_shift_sessions": 60,
+                "minimum_eligible_symbols": 20,
+                "eligible_symbol_rule": "exclude symbols with 120 or fewer safe factor/target observations; count exclusions",
                 "factor": "raw_trailing_return_5d",
                 "target": "ABSOLUTE_RETURN",
                 "horizon_sessions": 5,

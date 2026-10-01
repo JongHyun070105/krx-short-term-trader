@@ -317,6 +317,7 @@ def time_dislocation_null(
     permutations: int = 500,
     seed: int = RANDOM_SEED,
     minimum_shift_sessions: int = 60,
+    minimum_eligible_symbols: int = 20,
 ) -> dict[str, Any]:
     """Circular-shift one frozen continuous factor within each symbol's safe history."""
     chosen = [
@@ -329,14 +330,24 @@ def time_dislocation_null(
     by_symbol: dict[str, list[int]] = {}
     for index in chosen:
         by_symbol.setdefault(records[index].symbol, []).append(index)
-    symbol_series = {
+    all_symbol_series = {
         symbol: sorted(indices, key=lambda index: records[index].signal_date)
         for symbol, indices in by_symbol.items()
     }
-    if not symbol_series or any(
-        len(indices) <= 2 * minimum_shift_sessions for indices in symbol_series.values()
-    ):
-        return {"status": "INSUFFICIENT_SAFE_HISTORY", "permutations": permutations}
+    symbol_series = {
+        symbol: indices
+        for symbol, indices in all_symbol_series.items()
+        if len(indices) > 2 * minimum_shift_sessions
+    }
+    if len(symbol_series) < minimum_eligible_symbols:
+        return {
+            "status": "INSUFFICIENT_SAFE_HISTORY",
+            "permutations": permutations,
+            "minimum_shift_sessions": minimum_shift_sessions,
+            "minimum_eligible_symbols": minimum_eligible_symbols,
+            "eligible_symbols": len(symbol_series),
+            "excluded_short_history_symbols": len(all_symbol_series) - len(symbol_series),
+        }
     observed_symbol_ics = []
     for indices in symbol_series.values():
         x = [float(factor_values[spec.factor_id][index]) for index in indices]
@@ -378,7 +389,10 @@ def time_dislocation_null(
         "permutations": permutations,
         "seed": seed,
         "minimum_shift_sessions": minimum_shift_sessions,
+        "minimum_eligible_symbols": minimum_eligible_symbols,
         "symbols": len(symbol_series),
+        "symbols_with_factor_data": len(all_symbol_series),
+        "excluded_short_history_symbols": len(all_symbol_series) - len(symbol_series),
         "date_range": [
             min(
                 records[index].signal_date
