@@ -1,0 +1,43 @@
+{
+  "analysis_window": {
+    "end": "2025-06-30",
+    "start": "2023-01-02"
+  },
+  "artifact": "phase14-evidence-periods",
+  "confirmation_is_challenge_only": true,
+  "external_2026": "NOT_READ",
+  "holdout_2026": "NOT_READ",
+  "periods": [
+    {
+      "classification": "HEAVILY_TOUCHED_DISCOVERY",
+      "end": "2024-06-28",
+      "start": "2023-01-02"
+    },
+    {
+      "classification": "HEAVILY_TOUCHED_REPLICATION",
+      "end": "2025-06-30",
+      "start": "2024-07-01"
+    },
+    {
+      "classification": "CONSUMED_BY_PHASE13_CONFIRMATION",
+      "end": "2025-12-30",
+      "start": "2025-07-01"
+    },
+    {
+      "classification": "UNREAD_EXTERNAL",
+      "end": "2026-04-16",
+      "start": "2026-01-05"
+    },
+    {
+      "classification": "TOUCHED_PHASE10_DEVELOPMENT_EXCLUDED_FROM_PHASE14",
+      "end": "2026-06-30",
+      "start": "2026-04-17"
+    },
+    {
+      "classification": "OUTCOME_UNREAD_METADATA_EXPOSED",
+      "end": "2026-08-28",
+      "start": "2026-07-28"
+    }
+  ],
+  "schema_version": 1
+}

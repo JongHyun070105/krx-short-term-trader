@@ -1,0 +1,253 @@
+{
+  "analysis_date_window": {
+    "end": "2025-06-30",
+    "start": "2023-01-02"
+  },
+  "artifact": "pipeline-v2-config",
+  "cluster_inference": {
+    "bootstrap_repetitions": 2000,
+    "cluster": "signal_date; preserve all stocks and market subgroups for a sampled date",
+    "never_resample_stock_rows_independently": true,
+    "seed": 20261001
+  },
+  "cost_assumptions": {
+    "conservative_research_round_trip_pct": 0.53,
+    "fee_each_side_pct": 0.015,
+    "sell_tax_equivalent_pct": 0.2,
+    "slippage_each_side_pct": 0.15,
+    "status": "historical comparison baseline; not rewritten"
+  },
+  "direction_hypothesis_count": 118,
+  "excluded_periods": [
+    {
+      "end": "2026-04-16",
+      "start": "2026-01-05",
+      "status": "UNREAD_EXTERNAL"
+    },
+    {
+      "end": "2026-08-28",
+      "start": "2026-07-28",
+      "status": "OUTCOME_UNREAD_METADATA_EXPOSED"
+    }
+  ],
+  "factor_definition_count": 63,
+  "factor_families": [
+    "abnormal_traded_value_activity",
+    "beta_residual_return",
+    "idiosyncratic_volatility",
+    "market_breadth",
+    "market_context",
+    "market_excess_dispersion",
+    "market_excess_return",
+    "phase13_excess_turnover_interaction",
+    "phase13_residual_drawdown_idio_vol_interaction",
+    "phase13_residual_rank_turnover_interaction",
+    "range_position",
+    "raw_trailing_return",
+    "residual_cross_sectional_rank",
+    "residual_drawdown"
+  ],
+  "factor_registry_artifact": "factor-registry.json",
+  "factor_registry_factor_count": 63,
+  "factor_registry_sha256_is_recorded_separately": true,
+  "historical_challenge_block": {
+    "end": "2025-12-30",
+    "included_in_phase14_factor_inputs": false,
+    "role": "HISTORICAL_CHALLENGE_SET",
+    "start": "2025-07-01"
+  },
+  "horizons_sessions": [
+    3,
+    5,
+    10
+  ],
+  "market_scopes": [
+    "ALL",
+    "KOSPI",
+    "KOSDAQ"
+  ],
+  "metrics": {
+    "concentration": [
+      "top_observation_share",
+      "top_five_observation_share",
+      "top_symbol",
+      "top_three_symbols",
+      "top_date",
+      "top_five_dates"
+    ],
+    "independence": [
+      "stock_observations",
+      "unique_signal_dates",
+      "date_clusters",
+      "non_overlap_observations"
+    ],
+    "monotonicity": [
+      "spearman_quantile_number_vs_quantile_mean",
+      "adjacent_quantile_inversions",
+      "extreme_vs_middle_consistency"
+    ],
+    "opportunity": [
+      "mean",
+      "median",
+      "sample_stddev",
+      "p10",
+      "p25",
+      "p75",
+      "p90",
+      "positive_rate",
+      "mean_cross_sectional_dispersion",
+      "unique_dates",
+      "stock_observations"
+    ],
+    "predictability": [
+      "daily_market_date_spearman_ic",
+      "mean_ic",
+      "median_ic",
+      "ic_stddev",
+      "positive_ic_fraction",
+      "icir",
+      "signal_date_cluster_confidence_interval"
+    ],
+    "quantiles": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ],
+    "walk_forward": [
+      "mean_ic",
+      "q5_minus_q1",
+      "target_direction",
+      "sample_size",
+      "unique_dates",
+      "edge_to_friction_ratio"
+    ]
+  },
+  "null_models": {
+    "cross_sectional": {
+      "empirical_p": "(1 + null_maxima_ge_observed) / (permutations + 1)",
+      "method": "within-market-date permutation of factor values across eligible symbols",
+      "permutations": 1000,
+      "seed": 20261001,
+      "statistic": "maximum absolute mean Spearman IC across the complete family surface",
+      "surfaces": [
+        "factor_variants",
+        "orientations",
+        "targets",
+        "horizons",
+        "markets"
+      ]
+    },
+    "negative_control": {
+      "method": "stable SHA-256 pseudo-rank(symbol, signal_date, seed)",
+      "pipeline_passes_allowed": 0,
+      "seed": 20261001
+    },
+    "random_generator": {
+      "bit_generator": "PCG64",
+      "library": "numpy",
+      "reproducibility_scope": "fixed NumPy version, config, inputs, and seed; Generator bit streams can change between versions",
+      "version": "2.5.3"
+    },
+    "time_dislocation": {
+      "factor": "raw_trailing_return_5d",
+      "horizon_sessions": 5,
+      "market_scope": "ALL",
+      "method": "circular shift of factor history within symbol",
+      "minimum_shift_sessions": 60,
+      "permutations": 500,
+      "role": "pre-registered secondary temporal-alignment diagnostic; cross-sectional family max null is primary",
+      "seed": 20261001,
+      "target": "ABSOLUTE_RETURN"
+    }
+  },
+  "quantile_states": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "targets": [
+    "ABSOLUTE_RETURN",
+    "SIMPLE_EXCESS_RETURN",
+    "BETA_RESIDUAL_RETURN"
+  ],
+  "thresholds": {
+    "maximum_adjacent_quantile_inversions": 1,
+    "maximum_market_component_share_pct": 80.0,
+    "maximum_top_five_date_contribution_share_pct": 50.0,
+    "maximum_top_three_symbol_contribution_share_pct": 50.0,
+    "minimum_block_dates_for_directional_stability": 20,
+    "minimum_date_clusters_for_promising": 40,
+    "minimum_distinct_horizons": 2,
+    "minimum_distinct_predictive_surfaces": 3,
+    "minimum_distinct_target_types": 2,
+    "minimum_economic_edge_to_friction_ratio": 1.0,
+    "minimum_family_observations": 200,
+    "minimum_market_adjusted_effect_pct": 0.1,
+    "minimum_monotone_adjacent_steps": 3,
+    "minimum_participants_per_market_date": 10,
+    "minimum_predictive_abs_mean_ic": 0.02,
+    "minimum_stable_blocks": 4,
+    "minimum_unique_signal_dates_for_promising": 40,
+    "required_stability_blocks": 5,
+    "selection_adjusted_empirical_p_max": 0.05
+  },
+  "version": "research-pipeline-v2",
+  "viability_logic": {
+    "allowed_final_states": [
+      "FAIL",
+      "WEAK",
+      "PROMISING_FOR_FUTURE_STUDY"
+    ],
+    "conditioning_only_families_cannot_be_promising": true,
+    "no_strategy_synthesis": true,
+    "promising_requires_all": [
+      "predictive structure across multiple targets and horizons",
+      "at least three directionally coherent factor/target/horizon surfaces",
+      "broad quantile monotonicity rather than one isolated state",
+      "at least four of five predeclared blocks with the same direction",
+      "selection-aware family max empirical p at or below 0.05",
+      "absolute long-only scale at least 0.53% gross",
+      "positive, non-trivial simple-excess and beta-residual structure",
+      "market component share at or below 80%",
+      "at least forty signal-date clusters",
+      "top-five-date and top-three-symbol contribution shares at or below 50%"
+    ],
+    "survivorship_and_price_vintage_limitations_remain_visible": true
+  },
+  "walk_forward_blocks": [
+    {
+      "end": "2023-06-30",
+      "name": "2023_H1",
+      "role": "DISCOVERY",
+      "start": "2023-01-02"
+    },
+    {
+      "end": "2023-12-31",
+      "name": "2023_H2",
+      "role": "DISCOVERY",
+      "start": "2023-07-01"
+    },
+    {
+      "end": "2024-06-28",
+      "name": "2024_H1",
+      "role": "DISCOVERY",
+      "start": "2024-01-01"
+    },
+    {
+      "end": "2024-12-31",
+      "name": "2024_H2",
+      "role": "TOUCHED_REPLICATION",
+      "start": "2024-07-01"
+    },
+    {
+      "end": "2025-06-30",
+      "name": "2025_H1",
+      "role": "TOUCHED_REPLICATION",
+      "start": "2025-01-01"
+    }
+  ]
+}

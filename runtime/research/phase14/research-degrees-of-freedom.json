@@ -1,0 +1,34 @@
+{
+  "artifact": "research-degrees-of-freedom",
+  "directional_interpretations": 118,
+  "directional_metric_cells": 3186,
+  "factor_definitions": 63,
+  "factor_families": 14,
+  "formal_fdr_or_fwer_correction": "NOT_IMPLEMENTED; family max-statistic permutation is primary",
+  "horizons": [
+    3,
+    5,
+    10
+  ],
+  "market_scopes": [
+    "ALL",
+    "KOSPI",
+    "KOSDAQ"
+  ],
+  "quantile_state_cells": 8505,
+  "quantile_states": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "registry_sha256": "557bd10155caef63b696841d6893da3b07e1b6651b587c385cd79dbb3da128eb",
+  "schema_version": 1,
+  "source": "frozen Phase 14 factor registry and pipeline-v2-config",
+  "targets": [
+    "ABSOLUTE_RETURN",
+    "SIMPLE_EXCESS_RETURN",
+    "BETA_RESIDUAL_RETURN"
+  ]
+}

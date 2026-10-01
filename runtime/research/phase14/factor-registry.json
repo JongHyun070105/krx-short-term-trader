@@ -1,0 +1,1662 @@
+{
+  "artifact": "phase14-factor-registry",
+  "candidate_reference": {
+    "entry_exit_or_position_sizing": "NOT_INCLUDED",
+    "factor_id": "phase13_excess_turnover_interaction__LE_-4__EXPANDED",
+    "historical_rule_label": "5d excess return <= -4% x expanded traded-value ratio >= 1.5",
+    "market_scope": "KOSPI in the historical Phase 13 candidate; both market splits are retained in the V2 search surface"
+  },
+  "directional_hypothesis_count": 118,
+  "factor_count": 63,
+  "family_count": 14,
+  "interaction_state_definitions": {
+    "excess_return_5d_pct": [
+      "LE_-4",
+      "-4_TO_-2",
+      "-2_TO_0",
+      "0_TO_2",
+      "2_TO_4",
+      "GE_4"
+    ],
+    "idio_volatility_20d_pct": {
+      "cuts": "Discovery-only 1/3 and 2/3 empirical quantiles, matching Phase 13",
+      "states": [
+        "LOW",
+        "MID",
+        "HIGH"
+      ]
+    },
+    "residual_drawdown_20d_pct": [
+      "DEEP_LE_-8",
+      "-8_TO_-4",
+      "-4_TO_0",
+      "AT_HIGH_OR_ABOVE"
+    ],
+    "residual_rank_20d_state": [
+      "LOWER",
+      "MIDDLE",
+      "UPPER"
+    ],
+    "turnover_ratio_5d_vs_prior20_median": [
+      "CONTRACTED",
+      "NORMAL",
+      "EXPANDED"
+    ]
+  },
+  "items": [
+    {
+      "candidate_reference": false,
+      "factor_id": "raw_trailing_return_1d",
+      "family_id": "raw_trailing_return",
+      "field": "stock_return_1d_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled.",
+      "lookback": "1 sessions",
+      "orientation_hypotheses": [
+        "positive"
+      ],
+      "required_fields": [
+        "stock_return_1d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "momentum",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "raw_trailing_return_3d",
+      "family_id": "raw_trailing_return",
+      "field": "stock_return_3d_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled.",
+      "lookback": "3 sessions",
+      "orientation_hypotheses": [
+        "positive"
+      ],
+      "required_fields": [
+        "stock_return_3d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "momentum",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "raw_trailing_return_5d",
+      "family_id": "raw_trailing_return",
+      "field": "stock_return_5d_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled.",
+      "lookback": "5 sessions",
+      "orientation_hypotheses": [
+        "positive"
+      ],
+      "required_fields": [
+        "stock_return_5d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "momentum",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "raw_trailing_return_10d",
+      "family_id": "raw_trailing_return",
+      "field": "stock_return_10d_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled.",
+      "lookback": "10 sessions",
+      "orientation_hypotheses": [
+        "positive"
+      ],
+      "required_fields": [
+        "stock_return_10d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "momentum",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "raw_trailing_return_20d",
+      "family_id": "raw_trailing_return",
+      "field": "stock_return_20d_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled.",
+      "lookback": "20 sessions",
+      "orientation_hypotheses": [
+        "positive"
+      ],
+      "required_fields": [
+        "stock_return_20d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "momentum",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "market_excess_return_1d",
+      "family_id": "market_excess_return",
+      "field": "excess_return_1d_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. Both historical momentum and reversal interpretations are counted.",
+      "lookback": "1 sessions",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_1d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "momentum_and_reversal",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "market_excess_return_3d",
+      "family_id": "market_excess_return",
+      "field": "excess_return_3d_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. Both historical momentum and reversal interpretations are counted.",
+      "lookback": "3 sessions",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_3d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "momentum_and_reversal",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "market_excess_return_5d",
+      "family_id": "market_excess_return",
+      "field": "excess_return_5d_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. Both historical momentum and reversal interpretations are counted.",
+      "lookback": "5 sessions",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "momentum_and_reversal",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "market_excess_return_10d",
+      "family_id": "market_excess_return",
+      "field": "excess_return_10d_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. Both historical momentum and reversal interpretations are counted.",
+      "lookback": "10 sessions",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_10d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "momentum_and_reversal",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "market_excess_return_20d",
+      "family_id": "market_excess_return",
+      "field": "excess_return_20d_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. Both historical momentum and reversal interpretations are counted.",
+      "lookback": "20 sessions",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_20d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "momentum_and_reversal",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "beta_residual_return_5d",
+      "family_id": "beta_residual_return",
+      "field": "residual_return_5d_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. Phase 13 residual is a diagnostic, not formal asset-pricing alpha.",
+      "lookback": "5 sessions",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_return_5d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "residual_momentum_and_reversal",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "beta_residual_return_20d",
+      "family_id": "beta_residual_return",
+      "field": "residual_return_20d_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. Phase 13 residual is a diagnostic, not formal asset-pricing alpha.",
+      "lookback": "20 sessions",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_return_20d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "residual_momentum_and_reversal",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "residual_drawdown_20d",
+      "family_id": "residual_drawdown",
+      "field": "residual_drawdown_20d_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. Negative orientation preserves the historical recovery interpretation.",
+      "lookback": "20 sessions",
+      "orientation_hypotheses": [
+        "negative"
+      ],
+      "required_fields": [
+        "residual_drawdown_20d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "drawdown_recovery",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "residual_drawdown_60d",
+      "family_id": "residual_drawdown",
+      "field": "residual_drawdown_60d_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. Negative orientation preserves the historical recovery interpretation.",
+      "lookback": "60 sessions",
+      "orientation_hypotheses": [
+        "negative"
+      ],
+      "required_fields": [
+        "residual_drawdown_60d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "drawdown_recovery",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "idiosyncratic_volatility_20d",
+      "family_id": "idiosyncratic_volatility",
+      "field": "idio_volatility_20d_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. The feature uses the historical Phase 13 rolling beta residual definition.",
+      "lookback": "20 sessions",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "idio_volatility_20d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "two_sided",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "abnormal_traded_value_activity",
+      "family_id": "abnormal_traded_value_activity",
+      "field": "turnover_ratio_5d_vs_prior20_median",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. Adjusted-close-times-volume is a liquidity proxy, not cash turnover.",
+      "lookback": "5 sessions vs prior 20-session median",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "two_sided",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "residual_cross_sectional_rank_5d",
+      "family_id": "residual_cross_sectional_rank",
+      "field": "residual_rank_5d_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. Ranks are within frozen market/date cohorts and retain participant counts.",
+      "lookback": "5 sessions",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_rank_5d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "rank_momentum_and_reversal",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "residual_cross_sectional_rank_20d",
+      "family_id": "residual_cross_sectional_rank",
+      "field": "residual_rank_20d_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. Ranks are within frozen market/date cohorts and retain participant counts.",
+      "lookback": "20 sessions",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_rank_20d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "rank_momentum_and_reversal",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "range_position_20d",
+      "family_id": "range_position",
+      "field": "range_position_20d",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. Range position is descriptive and may overlap momentum/reversal interpretations.",
+      "lookback": "20 sessions",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "range_position_20d",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "two_sided",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "matched_market_return_5d",
+      "family_id": "market_context",
+      "field": "MATCHED_MARKET_RETURN_5D",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. Market context is diagnostic conditioning only and is ineligible for a family promotion.",
+      "lookback": "5 sessions",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "MATCHED_MARKET_RETURN_5D",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "conditioning_only",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "matched_market_return_20d",
+      "family_id": "market_context",
+      "field": "MATCHED_MARKET_RETURN_20D",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. Market context is diagnostic conditioning only and is ineligible for a family promotion.",
+      "lookback": "20 sessions",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "MATCHED_MARKET_RETURN_20D",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "conditioning_only",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "matched_market_volatility_20d",
+      "family_id": "market_context",
+      "field": "MATCHED_MARKET_VOLATILITY_20D",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. Market context is diagnostic conditioning only and is ineligible for a family promotion.",
+      "lookback": "20 sessions",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "MATCHED_MARKET_VOLATILITY_20D",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "conditioning_only",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "market_breadth_positive",
+      "family_id": "market_breadth",
+      "field": "market_breadth_positive_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. Breadth is computed over the available current-listing cohort.",
+      "lookback": "1 session",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "market_breadth_positive_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "conditioning_only",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "market_excess_dispersion_1d",
+      "family_id": "market_excess_dispersion",
+      "field": "market_excess_dispersion_1d_pct",
+      "left_field": null,
+      "left_state": null,
+      "limitation": "Current-listing cohort; adjusted-price vintage revisions are not controlled. Dispersion is cross-sectional stock-minus-index daily return dispersion.",
+      "lookback": "1 session",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "market_excess_dispersion_1d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": null,
+      "right_state": null,
+      "semantic_family": "conditioning_only",
+      "source": "src/krx_trader/research/phase13.py:build_phase13_features",
+      "source_type": "HISTORICAL_FACTOR"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_excess_turnover_interaction__LE_-4__CONTRACTED",
+      "family_id": "phase13_excess_turnover_interaction",
+      "field": null,
+      "left_field": "excess_return_5d_pct",
+      "left_state": "LE_-4",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "CONTRACTED",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_excess_turnover_interaction__LE_-4__NORMAL",
+      "family_id": "phase13_excess_turnover_interaction",
+      "field": null,
+      "left_field": "excess_return_5d_pct",
+      "left_state": "LE_-4",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "NORMAL",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": true,
+      "factor_id": "phase13_excess_turnover_interaction__LE_-4__EXPANDED",
+      "family_id": "phase13_excess_turnover_interaction",
+      "field": null,
+      "left_field": "excess_return_5d_pct",
+      "left_state": "LE_-4",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "EXPANDED",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_excess_turnover_interaction__-4_TO_-2__CONTRACTED",
+      "family_id": "phase13_excess_turnover_interaction",
+      "field": null,
+      "left_field": "excess_return_5d_pct",
+      "left_state": "-4_TO_-2",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "CONTRACTED",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_excess_turnover_interaction__-4_TO_-2__NORMAL",
+      "family_id": "phase13_excess_turnover_interaction",
+      "field": null,
+      "left_field": "excess_return_5d_pct",
+      "left_state": "-4_TO_-2",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "NORMAL",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_excess_turnover_interaction__-4_TO_-2__EXPANDED",
+      "family_id": "phase13_excess_turnover_interaction",
+      "field": null,
+      "left_field": "excess_return_5d_pct",
+      "left_state": "-4_TO_-2",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "EXPANDED",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_excess_turnover_interaction__-2_TO_0__CONTRACTED",
+      "family_id": "phase13_excess_turnover_interaction",
+      "field": null,
+      "left_field": "excess_return_5d_pct",
+      "left_state": "-2_TO_0",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "CONTRACTED",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_excess_turnover_interaction__-2_TO_0__NORMAL",
+      "family_id": "phase13_excess_turnover_interaction",
+      "field": null,
+      "left_field": "excess_return_5d_pct",
+      "left_state": "-2_TO_0",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "NORMAL",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_excess_turnover_interaction__-2_TO_0__EXPANDED",
+      "family_id": "phase13_excess_turnover_interaction",
+      "field": null,
+      "left_field": "excess_return_5d_pct",
+      "left_state": "-2_TO_0",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "EXPANDED",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_excess_turnover_interaction__0_TO_2__CONTRACTED",
+      "family_id": "phase13_excess_turnover_interaction",
+      "field": null,
+      "left_field": "excess_return_5d_pct",
+      "left_state": "0_TO_2",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "CONTRACTED",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_excess_turnover_interaction__0_TO_2__NORMAL",
+      "family_id": "phase13_excess_turnover_interaction",
+      "field": null,
+      "left_field": "excess_return_5d_pct",
+      "left_state": "0_TO_2",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "NORMAL",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_excess_turnover_interaction__0_TO_2__EXPANDED",
+      "family_id": "phase13_excess_turnover_interaction",
+      "field": null,
+      "left_field": "excess_return_5d_pct",
+      "left_state": "0_TO_2",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "EXPANDED",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_excess_turnover_interaction__2_TO_4__CONTRACTED",
+      "family_id": "phase13_excess_turnover_interaction",
+      "field": null,
+      "left_field": "excess_return_5d_pct",
+      "left_state": "2_TO_4",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "CONTRACTED",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_excess_turnover_interaction__2_TO_4__NORMAL",
+      "family_id": "phase13_excess_turnover_interaction",
+      "field": null,
+      "left_field": "excess_return_5d_pct",
+      "left_state": "2_TO_4",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "NORMAL",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_excess_turnover_interaction__2_TO_4__EXPANDED",
+      "family_id": "phase13_excess_turnover_interaction",
+      "field": null,
+      "left_field": "excess_return_5d_pct",
+      "left_state": "2_TO_4",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "EXPANDED",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_excess_turnover_interaction__GE_4__CONTRACTED",
+      "family_id": "phase13_excess_turnover_interaction",
+      "field": null,
+      "left_field": "excess_return_5d_pct",
+      "left_state": "GE_4",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "CONTRACTED",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_excess_turnover_interaction__GE_4__NORMAL",
+      "family_id": "phase13_excess_turnover_interaction",
+      "field": null,
+      "left_field": "excess_return_5d_pct",
+      "left_state": "GE_4",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "NORMAL",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_excess_turnover_interaction__GE_4__EXPANDED",
+      "family_id": "phase13_excess_turnover_interaction",
+      "field": null,
+      "left_field": "excess_return_5d_pct",
+      "left_state": "GE_4",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "excess_return_5d_pct",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "EXPANDED",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_drawdown_idio_vol_interaction__DEEP_LE_-8__LOW",
+      "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+      "field": null,
+      "left_field": "residual_drawdown_20d_pct",
+      "left_state": "DEEP_LE_-8",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_drawdown_20d_pct",
+        "idio_volatility_20d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "idio_volatility_20d_pct",
+      "right_state": "LOW",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_drawdown_idio_vol_interaction__DEEP_LE_-8__MID",
+      "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+      "field": null,
+      "left_field": "residual_drawdown_20d_pct",
+      "left_state": "DEEP_LE_-8",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_drawdown_20d_pct",
+        "idio_volatility_20d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "idio_volatility_20d_pct",
+      "right_state": "MID",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_drawdown_idio_vol_interaction__DEEP_LE_-8__HIGH",
+      "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+      "field": null,
+      "left_field": "residual_drawdown_20d_pct",
+      "left_state": "DEEP_LE_-8",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_drawdown_20d_pct",
+        "idio_volatility_20d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "idio_volatility_20d_pct",
+      "right_state": "HIGH",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_drawdown_idio_vol_interaction__-8_TO_-4__LOW",
+      "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+      "field": null,
+      "left_field": "residual_drawdown_20d_pct",
+      "left_state": "-8_TO_-4",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_drawdown_20d_pct",
+        "idio_volatility_20d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "idio_volatility_20d_pct",
+      "right_state": "LOW",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_drawdown_idio_vol_interaction__-8_TO_-4__MID",
+      "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+      "field": null,
+      "left_field": "residual_drawdown_20d_pct",
+      "left_state": "-8_TO_-4",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_drawdown_20d_pct",
+        "idio_volatility_20d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "idio_volatility_20d_pct",
+      "right_state": "MID",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_drawdown_idio_vol_interaction__-8_TO_-4__HIGH",
+      "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+      "field": null,
+      "left_field": "residual_drawdown_20d_pct",
+      "left_state": "-8_TO_-4",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_drawdown_20d_pct",
+        "idio_volatility_20d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "idio_volatility_20d_pct",
+      "right_state": "HIGH",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_drawdown_idio_vol_interaction__-4_TO_0__LOW",
+      "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+      "field": null,
+      "left_field": "residual_drawdown_20d_pct",
+      "left_state": "-4_TO_0",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_drawdown_20d_pct",
+        "idio_volatility_20d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "idio_volatility_20d_pct",
+      "right_state": "LOW",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_drawdown_idio_vol_interaction__-4_TO_0__MID",
+      "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+      "field": null,
+      "left_field": "residual_drawdown_20d_pct",
+      "left_state": "-4_TO_0",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_drawdown_20d_pct",
+        "idio_volatility_20d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "idio_volatility_20d_pct",
+      "right_state": "MID",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_drawdown_idio_vol_interaction__-4_TO_0__HIGH",
+      "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+      "field": null,
+      "left_field": "residual_drawdown_20d_pct",
+      "left_state": "-4_TO_0",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_drawdown_20d_pct",
+        "idio_volatility_20d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "idio_volatility_20d_pct",
+      "right_state": "HIGH",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_drawdown_idio_vol_interaction__AT_HIGH_OR_ABOVE__LOW",
+      "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+      "field": null,
+      "left_field": "residual_drawdown_20d_pct",
+      "left_state": "AT_HIGH_OR_ABOVE",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_drawdown_20d_pct",
+        "idio_volatility_20d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "idio_volatility_20d_pct",
+      "right_state": "LOW",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_drawdown_idio_vol_interaction__AT_HIGH_OR_ABOVE__MID",
+      "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+      "field": null,
+      "left_field": "residual_drawdown_20d_pct",
+      "left_state": "AT_HIGH_OR_ABOVE",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_drawdown_20d_pct",
+        "idio_volatility_20d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "idio_volatility_20d_pct",
+      "right_state": "MID",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_drawdown_idio_vol_interaction__AT_HIGH_OR_ABOVE__HIGH",
+      "family_id": "phase13_residual_drawdown_idio_vol_interaction",
+      "field": null,
+      "left_field": "residual_drawdown_20d_pct",
+      "left_state": "AT_HIGH_OR_ABOVE",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_drawdown_20d_pct",
+        "idio_volatility_20d_pct",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "idio_volatility_20d_pct",
+      "right_state": "HIGH",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_rank_turnover_interaction__LOWER__CONTRACTED",
+      "family_id": "phase13_residual_rank_turnover_interaction",
+      "field": null,
+      "left_field": "residual_rank_20d_state",
+      "left_state": "LOWER",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_rank_20d_state",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "CONTRACTED",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_rank_turnover_interaction__LOWER__NORMAL",
+      "family_id": "phase13_residual_rank_turnover_interaction",
+      "field": null,
+      "left_field": "residual_rank_20d_state",
+      "left_state": "LOWER",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_rank_20d_state",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "NORMAL",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_rank_turnover_interaction__LOWER__EXPANDED",
+      "family_id": "phase13_residual_rank_turnover_interaction",
+      "field": null,
+      "left_field": "residual_rank_20d_state",
+      "left_state": "LOWER",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_rank_20d_state",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "EXPANDED",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_rank_turnover_interaction__MIDDLE__CONTRACTED",
+      "family_id": "phase13_residual_rank_turnover_interaction",
+      "field": null,
+      "left_field": "residual_rank_20d_state",
+      "left_state": "MIDDLE",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_rank_20d_state",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "CONTRACTED",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_rank_turnover_interaction__MIDDLE__NORMAL",
+      "family_id": "phase13_residual_rank_turnover_interaction",
+      "field": null,
+      "left_field": "residual_rank_20d_state",
+      "left_state": "MIDDLE",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_rank_20d_state",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "NORMAL",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_rank_turnover_interaction__MIDDLE__EXPANDED",
+      "family_id": "phase13_residual_rank_turnover_interaction",
+      "field": null,
+      "left_field": "residual_rank_20d_state",
+      "left_state": "MIDDLE",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_rank_20d_state",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "EXPANDED",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_rank_turnover_interaction__UPPER__CONTRACTED",
+      "family_id": "phase13_residual_rank_turnover_interaction",
+      "field": null,
+      "left_field": "residual_rank_20d_state",
+      "left_state": "UPPER",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_rank_20d_state",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "CONTRACTED",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_rank_turnover_interaction__UPPER__NORMAL",
+      "family_id": "phase13_residual_rank_turnover_interaction",
+      "field": null,
+      "left_field": "residual_rank_20d_state",
+      "left_state": "UPPER",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_rank_20d_state",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "NORMAL",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    },
+    {
+      "candidate_reference": false,
+      "factor_id": "phase13_residual_rank_turnover_interaction__UPPER__EXPANDED",
+      "family_id": "phase13_residual_rank_turnover_interaction",
+      "field": null,
+      "left_field": "residual_rank_20d_state",
+      "left_state": "UPPER",
+      "limitation": "Historical Phase 13 state definitions are reused; state indicators are discrete and do not establish a strategy.",
+      "lookback": "Phase 13 fixed state map",
+      "orientation_hypotheses": [
+        "positive",
+        "negative"
+      ],
+      "required_fields": [
+        "residual_rank_20d_state",
+        "turnover_ratio_5d_vs_prior20_median",
+        "date",
+        "symbol",
+        "market"
+      ],
+      "right_field": "turnover_ratio_5d_vs_prior20_median",
+      "right_state": "EXPANDED",
+      "semantic_family": "historical_interaction_state",
+      "source": "src/krx_trader/research/phase13.py:FACTOR_BUCKETS and INTERACTION_DEFINITIONS",
+      "source_type": "HISTORICAL_INTERACTION_STATE"
+    }
+  ],
+  "limitations": [
+    "Current-listing cohort is survivorship biased; point-in-time membership is partial.",
+    "KIS adjusted prices have no historical vintage control.",
+    "Market context, breadth, and dispersion are conditioning diagnostics, not candidate factors."
+  ],
+  "schema_version": 1,
+  "source": "Phase 13 pre-Confirmation factor definitions and state maps",
+  "state_quantile_count": 5
+}

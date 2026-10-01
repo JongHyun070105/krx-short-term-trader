@@ -1,0 +1,111 @@
+{
+  "artifact": "phase14-research-ledger",
+  "counts": {
+    "candidate_rule_count_completeness": "LOWER_BOUND; early exploratory variants are not exhaustively enumerable from final records",
+    "candidate_rules_explicitly_staged_in_Phase11_and_Phase13": 2,
+    "combined_named_family_labels_minimum": 24,
+    "directional_interpretations_minimum": 2,
+    "factor_families_minimum": 11,
+    "historical_forward_horizons_sessions_minimum": [
+      1,
+      2,
+      3,
+      5,
+      10,
+      20
+    ],
+    "historical_market_splits": 2,
+    "independent_historical_periods_remaining": 0,
+    "interaction_families_minimum": 4,
+    "metadata_exposed_non_pristine_blocks": 1,
+    "strategy_families_minimum": 9,
+    "unread_external_blocks_available": 1
+  },
+  "datasets_touched": [
+    "Phase 3-9 intraday OHLCV research/cache artifacts",
+    "Phase 10 daily price/opportunity feature and outcome artifacts",
+    "Phase 11 daily feature, outcome, flow/liquidity and market-context artifacts",
+    "Phase 12 bounded market-stress, breadth, dispersion, volatility and beta artifacts",
+    "Phase 13 safe factor panel, factor maps, interactions, confirmation and audit artifacts"
+  ],
+  "factor_families_examined": [
+    "Raw trailing return",
+    "Market excess return",
+    "Beta residual return",
+    "Residual drawdown",
+    "Idiosyncratic volatility",
+    "Abnormal traded-value activity",
+    "Residual cross-sectional rank",
+    "Range position",
+    "Market context",
+    "Breadth",
+    "Cross-sectional dispersion"
+  ],
+  "family_count_basis": "minimum explicitly named headline families in STATUS, RESULTS, and Phase 10-13 research docs",
+  "historical_candidate_count_note": "Phase 11 and Phase 13 one-shot candidate rules are confirmed from the final records; this is a documented lower bound, not a claim that earlier exploratory variants were absent.",
+  "historical_periods": [
+    {
+      "classification": "HEAVILY_TOUCHED_DISCOVERY",
+      "end": "2024-06-28",
+      "start": "2023-01-02"
+    },
+    {
+      "classification": "HEAVILY_TOUCHED_REPLICATION",
+      "end": "2025-06-30",
+      "start": "2024-07-01"
+    },
+    {
+      "classification": "CONSUMED_BY_PHASE13_CONFIRMATION",
+      "end": "2025-12-30",
+      "start": "2025-07-01"
+    },
+    {
+      "classification": "UNREAD_EXTERNAL",
+      "end": "2026-04-16",
+      "start": "2026-01-05"
+    },
+    {
+      "classification": "TOUCHED_PHASE10_DEVELOPMENT_EXCLUDED_FROM_PHASE14",
+      "end": "2026-06-30",
+      "start": "2026-04-17"
+    },
+    {
+      "classification": "OUTCOME_UNREAD_METADATA_EXPOSED",
+      "end": "2026-08-28",
+      "start": "2026-07-28"
+    }
+  ],
+  "history_is_cumulative": true,
+  "interaction_families_examined": [
+    "Price return x liquidity / turnover (Phase 11)",
+    "Excess return x abnormal turnover (Phase 13)",
+    "Residual drawdown x idiosyncratic volatility (Phase 13)",
+    "Residual rank x abnormal turnover (Phase 13)"
+  ],
+  "phase14_computation_exclusions": [
+    "2025-07-01 through 2025-12-30 confirmation observations are not pipeline inputs",
+    "2026 External period is not read",
+    "2026-04-17 through 2026-06-30 Phase 10 Development files are not used because they are outside the common Phase 13 factor panel",
+    "2026-07-28 through 2026-08-28 prices, metadata contents, factors, signals, and outcomes are not read"
+  ],
+  "phase14_computation_input": "runtime/research/phase13/phase13-safe-factor-panel.jsonl.gz; source clips the primary panel at 2025-06-30",
+  "prospective_period_policy": "No PROSPECTIVE_UNREAD period is explicitly specified in the inspected Phase 10-13 policy artifacts.",
+  "schema_version": 1,
+  "strategy_families_examined": [
+    "Breakout",
+    "Pullback",
+    "Retest",
+    "Relative Strength Continuation",
+    "Mean Reversion",
+    "VWAP Reclaim",
+    "Opening Gap",
+    "Market Stress Rebound",
+    "Residual / Excess candidate family"
+  ],
+  "survivorship_limitations": {
+    "adjusted_price_revision_risk": "PRESENT; KIS adjusted history has no historical-vintage selector",
+    "point_in_time_price_history": "NOT_AVAILABLE",
+    "point_in_time_universe": "PARTIAL",
+    "survivorship_sensitivity": "NOT_TESTABLE"
+  }
+}
