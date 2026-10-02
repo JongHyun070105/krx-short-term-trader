@@ -1,0 +1,409 @@
+{
+  "canonicalization_version": 1,
+  "cohorts": {
+    "full_research_cohort": {
+      "cohort_sha256": "5bcad330613b94bda148401cddcba8e62262a96e3e38acd4b70e4ed013e78f95",
+      "expected_symbols": 100,
+      "path": "runtime/research/phase4/cohort-manifest.json",
+      "scope": "FROZEN_RESEARCH_COHORT"
+    },
+    "probe_cohort": {
+      "path": "runtime/research/phase15/pilot-request-manifest.json",
+      "scope": "DETERMINISTIC_6_SYMBOL_PROBE",
+      "symbols": {
+        "KOSDAQ": [
+          "086520",
+          "028300",
+          "293490"
+        ],
+        "KOSPI": [
+          "005930",
+          "000660",
+          "005380"
+        ]
+      }
+    }
+  },
+  "config_version": "phase16b-v3",
+  "effective_from": "2026-10-02",
+  "enabled_sources": [
+    "kis_current_listings",
+    "krx_market_flow_exact_day"
+  ],
+  "microstructure": {
+    "daily_size_budget_bytes": 0,
+    "enabled": false,
+    "max_symbols": 0,
+    "reason": "Optional source-specific capture, storage and retention budgets have not been established.",
+    "retention_days": 0,
+    "sampling_method": null,
+    "status": "DEFERRED"
+  },
+  "observation_schedule": {
+    "deferred_flow_slots_kst": [],
+    "enabled_jobs": [
+      {
+        "frequency": "daily",
+        "local_time": "20:15",
+        "name": "daily-current-listings",
+        "source": "kis_current_listings"
+      },
+      {
+        "frequency": "KRX-session-daily",
+        "local_time": "16:20",
+        "name": "phase16-flow-probe-close",
+        "source": "kis_per_stock_flow"
+      },
+      {
+        "frequency": "KRX-session-daily",
+        "local_time": "20:20",
+        "name": "phase16-flow-probe-evening",
+        "source": "kis_per_stock_flow"
+      },
+      {
+        "frequency": "KRX-session-daily",
+        "local_time": "20:30",
+        "name": "phase16-flow-full-evening",
+        "source": "active-flow-sources"
+      },
+      {
+        "frequency": "KRX-session-daily",
+        "local_time": "08:20",
+        "name": "phase16-flow-probe-morning",
+        "source": "kis_per_stock_flow"
+      }
+    ],
+    "flow_followup_slots": [
+      "T",
+      "T_PLUS_1_BUSINESS_DAY",
+      "T_PLUS_5_BUSINESS_DAYS"
+    ],
+    "flow_followups_enabled": false,
+    "flow_full_cohort_kst": "20:30",
+    "flow_jobs_enabled": true,
+    "missed_observation_policy": "record MISSED_OBSERVATION; never backdate or reconstruct an observation"
+  },
+  "parent_config_sha256": "6a14d4b79dd411120615806407a349aecff82a32561488b65d6c6a0233091e33",
+  "phase16b": {
+    "auto_activate_source_ids": [
+      "kis_per_stock_flow",
+      "kis_program_flow",
+      "krx_market_flow_exact_day"
+    ],
+    "auto_activation_enabled": true,
+    "config_version": "phase16b-v3",
+    "effective_from": "2026-10-02",
+    "market_exact_day_source": "krx_market_flow_exact_day",
+    "observation_policy": {
+      "duplicate_policy": "same source, anchor, slot and date is accidental unless intentional_reobservation=true",
+      "fixed_flow_probe_cohort": {
+        "frozen_before_revision_comparison": true,
+        "membership_sha256": "6aecac7a1b9a75c1f7fcb13e9aab8d7b0612d11a28cf72fa2d8ecc323e76915e",
+        "selection_rule": "first six symbols per market in frozen Phase4 cohort order, based on frozen current-listing market labels",
+        "source_cohort": "PHASE4_FROZEN_COHORT_100",
+        "symbols_by_market": {
+          "KOSDAQ": [
+            "199430",
+            "208860",
+            "457370",
+            "222080",
+            "101680",
+            "010240"
+          ],
+          "KOSPI": [
+            "001440",
+            "001450",
+            "003490",
+            "004020",
+            "005940",
+            "006360"
+          ]
+        }
+      },
+      "full_cohort_symbols": 100,
+      "full_cohort_time_kst": "20:30",
+      "intentional_reobservation_slots": [
+        "16:20",
+        "20:20",
+        "08:20"
+      ],
+      "probe_symbols": 6,
+      "probe_times_kst": [
+        "16:20",
+        "20:20",
+        "next KRX session 08:20"
+      ],
+      "shared_limiter_seconds": 4
+    },
+    "parent_config_sha256": "6a14d4b79dd411120615806407a349aecff82a32561488b65d6c6a0233091e33",
+    "probe_policy": {
+      "anchors": [
+        "2019-06-03",
+        "2022-06-02",
+        "2025-06-02"
+      ],
+      "evidence_class": "CONTRACT_VERIFICATION_PROBE",
+      "fixed_before_comparison": true,
+      "no_account_endpoints": true,
+      "symbols": [
+        {
+          "market": "KOSPI",
+          "symbol": "005930"
+        },
+        {
+          "market": "KOSPI",
+          "symbol": "000660"
+        },
+        {
+          "market": "KOSDAQ",
+          "symbol": "086520"
+        }
+      ],
+      "token_cache": "memory_only"
+    },
+    "prospective_era_start": "2026-10-01",
+    "response_contracts_path": "runtime/research/phase16b/phase16b-source-contracts.json",
+    "scheduler_preflight_required": true,
+    "session_calendar": {
+      "calendar_version": "KRX-STOCK-2026-POST-HOLDOUT-v1",
+      "coverage_end": "2026-12-30",
+      "coverage_start": "2026-07-01",
+      "official_closures": [
+        "2026-08-17",
+        "2026-09-24",
+        "2026-09-25",
+        "2026-10-05",
+        "2026-10-09",
+        "2026-12-25",
+        "2026-12-31"
+      ],
+      "source_note": "KRX weekdays exclude official holidays, Saturdays, Sundays and exchange closures. The KRX 2026 schedule establishes Liberation Day closure through 2026-08-17, Chuseok 2026-09-24..27, National Foundation Day bridge 2026-10-03..05, Hangul Day 2026-10-09..11, and the last 2026 session on 2026-12-30. The covered calendar includes 2026-07-01 through 2026-12-30 so the Oct 2026 response envelope can be checked across the protected window. Future requests beyond covered dates fail closed.",
+      "source_urls": [
+        "https://global.krx.co.kr/contents/GLB/06/0602/0602020204/GLB0602020204T1.jsp",
+        "https://kind.krx.co.kr/external/dst/notice/11637/"
+      ]
+    },
+    "source_contracts": {
+      "kis_market_flow": {
+        "anchor_included": true,
+        "confidence": "PARTIAL",
+        "contract_version": "kis-market-flow-v1",
+        "date_field": "stck_bsop_date",
+        "earliest_contract_probe": "2019-03-18",
+        "endpoint_id": "/uapi/domestic-stock/v1/quotations/inquire-investor-daily-by-market",
+        "future_rows_allowed": false,
+        "latest_contract_probe": "2019-06-03",
+        "maximum_rows": null,
+        "non_session_behavior": "DENY_UNVERIFIED",
+        "notes": "Retain deferred until a conservative finite span is established.",
+        "ordering": "ASCENDING",
+        "request_anchor_semantics": "DATE_UPPER_BOUND",
+        "response_direction": "BACKWARD",
+        "response_window_verified": false,
+        "session_only": true,
+        "source_id": "kis_market_flow",
+        "source_name": "KIS market investor daily flow",
+        "verification_method": "Phase 15 sampled 300-row window; no conservative finite cap established.",
+        "verification_observation_count": 1
+      },
+      "kis_per_stock_flow": {
+        "anchor_included": true,
+        "confidence": "EMPIRICALLY_VERIFIED",
+        "contract_version": "kis-per-stock-flow-v2",
+        "date_field": "stck_bsop_date",
+        "earliest_contract_probe": "2019-06-03",
+        "endpoint_id": "/uapi/domestic-stock/v1/quotations/investor-trade-by-stock-daily",
+        "future_rows_allowed": false,
+        "latest_contract_probe": "2025-06-02",
+        "maximum_rows": 31,
+        "non_session_behavior": "DENY_UNVERIFIED",
+        "notes": "Sampled maximum 31 dated rows in one page across 59 historical observations; anchor included, backward dates only, descending order. This is an empirical operational envelope, not an official forever-cap; collector limits to one page and enters contract review on drift. Non-session anchors remain denied.",
+        "ordering": "DESCENDING",
+        "request_anchor_semantics": "DATE_UPPER_BOUND",
+        "response_direction": "BACKWARD",
+        "response_window_verified": true,
+        "session_only": true,
+        "source_id": "kis_per_stock_flow",
+        "source_name": "KIS per-stock investor daily flow",
+        "verification_method": "Phase 15 historical sample plus fixed Phase 16B one-page historical probes; provider docs do not state a finite row cap.",
+        "verification_observation_count": 59
+      },
+      "kis_program_flow": {
+        "anchor_included": true,
+        "confidence": "EMPIRICALLY_VERIFIED",
+        "contract_version": "kis-program-flow-v2",
+        "date_field": "stck_bsop_date",
+        "earliest_contract_probe": "2019-06-03",
+        "endpoint_id": "/uapi/domestic-stock/v1/quotations/program-trade-by-stock-daily",
+        "future_rows_allowed": false,
+        "latest_contract_probe": "2025-06-02",
+        "maximum_rows": 30,
+        "non_session_behavior": "DENY_UNVERIFIED",
+        "notes": "Sampled maximum 30 dated rows in one page across 12 historical observations; anchor included, backward dates only, descending order. This is an empirical operational envelope, not an official forever-cap; collector limits to one page and enters contract review on drift. Non-session anchors remain denied.",
+        "ordering": "DESCENDING",
+        "request_anchor_semantics": "DATE_UPPER_BOUND",
+        "response_direction": "BACKWARD",
+        "response_window_verified": true,
+        "session_only": true,
+        "source_id": "kis_program_flow",
+        "source_name": "KIS per-stock program trading",
+        "verification_method": "Phase 15 historical sample plus fixed Phase 16B one-page historical probes; provider docs do not state a finite row cap.",
+        "verification_observation_count": 12
+      },
+      "krx_market_flow_exact_day": {
+        "anchor_included": true,
+        "confidence": "EMPIRICALLY_VERIFIED",
+        "contract_version": "krx-market-investor-exact-day-v1",
+        "date_field": "TRD_DD",
+        "earliest_contract_probe": "2025-06-02",
+        "endpoint_id": "MDCSTAT022 daily trend / MDCSTAT02202_OUT",
+        "future_rows_allowed": false,
+        "latest_contract_probe": "2025-06-02",
+        "maximum_rows": 1,
+        "non_session_behavior": "DENY_UNVERIFIED",
+        "notes": "Separate source; not a KIS substitute. Official page labels daily trend, market selection, trade volume/value, buy/sell/net and says final same-day detail is available after 20:00 KST. Individual response field/category and unit mapping remain unresolved.",
+        "ordering": "ASCENDING",
+        "request_anchor_semantics": "EXACT_DATE",
+        "response_direction": "EXACT",
+        "response_window_verified": true,
+        "session_only": true,
+        "source_id": "krx_market_flow_exact_day",
+        "source_name": "KRX official exact-day market investor statistics",
+        "verification_method": "Official KRX Data Marketplace one-session start=end query; KOSPI and KOSDAQ bounded probes verified separately without retaining values.",
+        "verification_observation_count": 2
+      }
+    },
+    "storage_projection": {
+      "estimate_basis": "conservative planning assumption, 60 KB stored per KIS response including raw and normalized payloads; 4 KB per KRX market response; validate using first production-safe response batches",
+      "estimated_bytes_per_active_day": 14168000,
+      "estimated_bytes_per_kis_response_raw_plus_normalized": 60000,
+      "estimated_bytes_per_krx_market_response": 4000,
+      "estimated_gb_per_365_day_year": 5.171,
+      "estimated_mb_per_30_day_month": 425.04,
+      "estimated_mb_per_active_day": 14.168,
+      "krx_exact_day_calls_per_active_day": 2,
+      "per_stock_full_calls_per_active_day": 100,
+      "per_stock_probe_calls_per_active_day": 36,
+      "program_full_calls_per_active_day": 100,
+      "retention_policy": "append-only; no deletion or compression is enabled",
+      "total_calls_per_active_day": 238
+    }
+  },
+  "protected_ranges": [
+    {
+      "end": "2026-04-16",
+      "label": "EXTERNAL_2026",
+      "start": "2026-01-05"
+    },
+    {
+      "end": "2026-08-28",
+      "label": "HOLDOUT_2026",
+      "start": "2026-07-28"
+    }
+  ],
+  "request_policy": {
+    "authenticated_kis_min_interval_seconds": 4,
+    "collector_lock_path": "runtime/research/phase16/locks/collector.lock",
+    "max_retries": 2,
+    "retry_transient_only": true,
+    "shared_limiter_path": "runtime/kis_rate_limit.json"
+  },
+  "research_boundaries": {
+    "alpha": "UNPROVEN",
+    "external_2026": "NOT_READ",
+    "factor_or_return_analysis": false,
+    "holdout_2026": "NOT_READ",
+    "live": "DISABLED",
+    "shadow_next_session": "NO"
+  },
+  "schema_version": 1,
+  "source_stability_gate": {
+    "gate_type": "DATA_QUALITY_ONLY",
+    "minimum_completed_sessions": 20,
+    "minimum_multi_vintage_sessions": 10
+  },
+  "sources": {
+    "kis_current_listings": {
+      "endpoint_id": "kis_current_listing_master_archive_v1",
+      "provider": "Korea Investment & Securities",
+      "range_contract_proven": true,
+      "range_evidence": "Repository current-master adapter downloads current KOSPI/KOSDAQ symbol archives; no historical date parameter or history is requested.",
+      "raw_archive_retention": false,
+      "request_semantics": "CURRENT_ONLY",
+      "scope": "FULL_CURRENT_LISTINGS",
+      "source_name": "KIS current KOSPI/KOSDAQ stock master",
+      "urls": {
+        "KOSDAQ": "https://new.real.download.dws.co.kr/common/master/kosdaq_code.mst.zip",
+        "KOSPI": "https://new.real.download.dws.co.kr/common/master/kospi_code.mst.zip"
+      }
+    },
+    "kis_market_flow": {
+      "deferred_reason": "Phase 15 observed up to 300 dated rows; response range is not proven exact-date and overlaps protected periods.",
+      "enabled": false,
+      "endpoint_id": "/uapi/domestic-stock/v1/quotations/inquire-investor-daily-by-market",
+      "exact_date_semantics_proven": false,
+      "observed_rows_per_request": 300,
+      "provider": "Korea Investment & Securities",
+      "range_contract_proven": false,
+      "request_semantics": "TRAILING_WINDOW",
+      "source_name": "KIS market investor daily flow"
+    },
+    "kis_per_stock_flow": {
+      "deferred_reason": "Phase 15 observed 31 dated rows ending on the requested date; lower range/cap and vintage semantics are not documented. The current response may include protected 2026 Jul-Aug rows.",
+      "enabled": false,
+      "endpoint_id": "/uapi/domestic-stock/v1/quotations/investor-trade-by-stock-daily",
+      "exact_date_semantics_proven": false,
+      "observed_rows_per_request": 31,
+      "provider": "Korea Investment & Securities",
+      "range_contract_proven": false,
+      "request_semantics": "TRAILING_WINDOW",
+      "source_name": "KIS per-stock investor daily flow"
+    },
+    "kis_program_flow": {
+      "deferred_reason": "Phase 15 observed up to 30 dated rows; response range is not proven exact-date and may overlap protected 2026 Jul-Aug rows.",
+      "enabled": false,
+      "endpoint_id": "/uapi/domestic-stock/v1/quotations/program-trade-by-stock-daily",
+      "exact_date_semantics_proven": false,
+      "observed_rows_per_request": 30,
+      "provider": "Korea Investment & Securities",
+      "range_contract_proven": false,
+      "request_semantics": "TRAILING_WINDOW",
+      "source_name": "KIS per-stock program trading"
+    },
+    "krx_market_flow": {
+      "deferred_reason": "No reproducible exact-day response contract or safe local adapter has been verified.",
+      "enabled": false,
+      "endpoint_id": "krx_market_investor_statistics_unverified",
+      "provider": "Korea Exchange",
+      "range_contract_proven": false,
+      "request_semantics": "UNKNOWN",
+      "source_name": "KRX official market investor statistics"
+    },
+    "krx_market_flow_exact_day": {
+      "date_parameter": "strtDd=endDd=YYYYMMDD",
+      "documentation_url": "https://data.krx.co.kr/contents/MDC/MDI/outerLoader/index.cmd?screenId=MDCSTAT022",
+      "enabled": true,
+      "endpoint_id": "MDCSTAT022 daily trend / MDCSTAT02202_OUT",
+      "exact_date_semantics_proven": true,
+      "market_codes": {
+        "KSQ": "KOSDAQ",
+        "STK": "KOSPI"
+      },
+      "measure": "daily net-purchase volume",
+      "policy_allowed": true,
+      "provider": "Korea Exchange",
+      "publication_timing": "KRX page states same-day final detail after 20:00 KST; conservative next-session use",
+      "range_contract_proven": true,
+      "request_semantics": "EXACT_DATE",
+      "source_name": "KRX official exact-day market investor statistics"
+    }
+  },
+  "storage": {
+    "critical_bytes": 10737418240,
+    "raw_flow_retention": "disabled until provider terms are confirmed",
+    "root": "runtime/research/phase16",
+    "warning_bytes": 5368709120
+  },
+  "storage_schema_version": 1,
+  "timezone": "Asia/Seoul"
+}

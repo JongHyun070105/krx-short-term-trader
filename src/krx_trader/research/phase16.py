@@ -30,7 +30,7 @@ from krx_trader.universe.master import MASTER_URLS, parse_master_archive
 
 KST = ZoneInfo("Asia/Seoul")
 REPO_ROOT = Path(__file__).resolve().parents[3]
-DEFAULT_CONFIG_PATH = REPO_ROOT / "config/phase16/phase16-collector-config.json"
+DEFAULT_CONFIG_PATH = REPO_ROOT / "config/phase16/phase16b-collector-config-phase16b-v4.json"
 DEFAULT_ROOT = REPO_ROOT / "runtime/research/phase16"
 CONFIG_VERSION_DIR = "config"
 SCHEMA_VERSION = 1
@@ -457,7 +457,10 @@ def _chain_records(root: Path) -> list[dict[str, Any]]:
 
 
 def _manifest_path(root: Path, snapshot_id: str, evidence_class: str) -> Path:
-    tree = "revision_probes" if evidence_class == "HISTORICAL_REVISION_PROBE" else "prospective"
+    tree = {
+        "HISTORICAL_REVISION_PROBE": "revision_probes",
+        "CONTRACT_VERIFICATION_PROBE": "contract_probes",
+    }.get(evidence_class, "prospective")
     return root / tree / "manifests/snapshots" / f"{snapshot_id}.json"
 
 
@@ -466,7 +469,7 @@ def _read_manifest(root: Path, snapshot_id: str, evidence_class: str | None = No
         path = _manifest_path(root, snapshot_id, evidence_class)
         if path.exists():
             return json.loads(path.read_text(encoding="utf-8"))
-    for tree in ("prospective", "revision_probes"):
+    for tree in ("prospective", "revision_probes", "contract_probes"):
         path = root / tree / "manifests" / f"{snapshot_id}.json"
         if path.exists():
             return json.loads(path.read_text(encoding="utf-8"))
@@ -529,7 +532,7 @@ def verify_store(root: Path = DEFAULT_ROOT) -> dict[str, Any]:
             snapshots.append(manifest)
         except (OSError, ValueError, KeyError, Phase16Error) as exc:
             errors.append(f"{snapshot_id}: manifest verification failed ({type(exc).__name__})")
-    for tree in ("prospective", "revision_probes"):
+    for tree in ("prospective", "revision_probes", "contract_probes"):
         manifests = root / tree / "manifests/snapshots"
         if manifests.exists():
             for path in manifests.glob("*.json"):
@@ -590,7 +593,7 @@ class EvidenceStore:
         metadata: dict[str, Any] | None = None,
         raw_representation_basis: str = "SANITIZED_DECODED_JSON",
     ) -> dict[str, Any]:
-        if evidence_class not in {"PROSPECTIVE_OBSERVED", "HISTORICAL_REVISION_PROBE"}:
+        if evidence_class not in {"PROSPECTIVE_OBSERVED", "HISTORICAL_REVISION_PROBE", "CONTRACT_VERIFICATION_PROBE"}:
             raise ValueError("invalid evidence_class")
         observed_utc, observed_kst = timezone_pair(observed_at)
         safe_payload, redact_flags = sanitize_payload(payload)
@@ -618,7 +621,10 @@ class EvidenceStore:
             canonical_sha256=canonical_hash,
             raw_sha256=raw_hash,
         )
-        tree = "revision_probes" if evidence_class == "HISTORICAL_REVISION_PROBE" else "prospective"
+        tree = {
+            "HISTORICAL_REVISION_PROBE": "revision_probes",
+            "CONTRACT_VERIFICATION_PROBE": "contract_probes",
+        }.get(evidence_class, "prospective")
         raw_path = self.root / tree / "raw" / f"{snapshot_id}.json" if persist_raw else None
         normalized_path = self.root / tree / "normalized" / f"{snapshot_id}.json"
         manifest_path = _manifest_path(self.root, snapshot_id, evidence_class)
@@ -938,7 +944,11 @@ def _revision_event_path(root: Path, revision_id: str) -> Path:
 
 
 def build_revision_records(root: Path = DEFAULT_ROOT) -> list[dict[str, Any]]:
-    manifests = EvidenceStore(root).manifests()
+    manifests = [
+        item
+        for item in EvidenceStore(root).manifests()
+        if item.get("evidence_class") != "CONTRACT_VERIFICATION_PROBE"
+    ]
     by_key: dict[str, list[dict[str, Any]]] = defaultdict(list)
     for item in manifests:
         by_key[item["logical_key"]].append(item)
@@ -1076,6 +1086,46 @@ def _read_cohort_symbols(path: Path, expected_sha: str) -> list[str]:
         if expected_sha != alternate:
             raise Phase16Error("configured frozen cohort hash does not match Phase 4 cohort")
     return values
+
+
+def _prior_listing_snapshot(root: Path) -> tuple[str | None, set[str]]:
+    manifests = [
+        item for item in EvidenceStore(root).manifests()
+        if item.get("source_name") == "KIS current listings"
+        and item.get("metadata", {}).get("universe_scope") == "FULL_CURRENT_LISTINGS"
+    ] if root.exists() else []
+    if not manifests:
+        return None, set()
+    manifests.sort(key=lambda item: item.get("observed_at_utc", ""))
+    latest = manifests[-1]
+    rows = json.loads((root / latest["normalized_payload_path"]).read_text(encoding="utf-8"))
+    return latest["snapshot_id"], {str(row["symbol"]) for row in rows if isinstance(row, dict) and row.get("symbol")}
+
+
+def _record_listing_state_change(
+    root: Path,
+    *,
+    previous_snapshot_id: str | None,
+    previous_symbols: set[str],
+    current_snapshot_id: str,
+    current_symbols: set[str],
+    observed_at: datetime,
+) -> dict[str, Any]:
+    removed = sorted(previous_symbols - current_symbols)
+    record = {
+        "schema_version": 1,
+        "state": "OBSERVED_LISTING_REMOVAL" if removed else "NO_OBSERVED_LISTING_REMOVAL",
+        "previous_universe_snapshot_id": previous_snapshot_id,
+        "current_universe_snapshot_id": current_snapshot_id,
+        "observed_at_utc": observed_at.astimezone(UTC).isoformat(),
+        "observed_at_kst": observed_at.astimezone(KST).isoformat(),
+        "removed_symbols": removed,
+        "legal_cause": "NOT_INFERRED",
+        "confirmation_status": "OBSERVED_ONLY",
+    }
+    target = root / "universe/listing-state-changes" / f"{current_snapshot_id}.json"
+    _atomic_create(target, _json_bytes(record, pretty=True))
+    return record
 
 
 def _listing_rows(archives: dict[str, bytes]) -> list[dict[str, Any]]:
@@ -1316,7 +1366,12 @@ def _refresh_indexes(root: Path, config: dict[str, Any], config_sha: str) -> dic
         {"snapshot_id": m["snapshot_id"], "scope": m["metadata"]["universe_scope"], "observed_at_utc": m["observed_at_utc"], "record_count": m["record_count"], "coverage": m["metadata"].get("coverage")}
         for m in universe
     ])
-    revisions = build_revision_records(root)
+    with _file_lock(root / "locks/revision-index.lock", blocking=False) as revision_locked:
+        if revision_locked:
+            revisions = build_revision_records(root)
+        else:
+            revision_index = root / "revision/revision-index.json"
+            revisions = json.loads(revision_index.read_text(encoding="utf-8")) if revision_index.is_file() else []
     _atomic_report(root, "revision/revision-index.json", revisions)
     core_source = "KIS per-stock investor daily flow"
     flow_manifests = [m for m in manifests if m.get("source_name") == core_source and m.get("evidence_class") == "PROSPECTIVE_OBSERVED"]
@@ -1568,6 +1623,9 @@ def collect_universe(
         observed_utc, _ = timezone_pair(observed_at)
         raw_combined = b"".join(market.encode() + b"\0" + archives[market] + b"\0" for market in sorted(archives))
         store = EvidenceStore(root)
+        prior_listing_snapshot_id, prior_listing_symbols = _prior_listing_snapshot(root)
+        current_listing_symbols = set(by_symbol)
+        removed_listing_symbols = sorted(prior_listing_symbols - current_listing_symbols)
         batch_id = _batch_id(observed_at)
         snapshot_metadata = {
             "universe_scope": "FULL_CURRENT_LISTINGS",
@@ -1589,6 +1647,12 @@ def collect_universe(
             },
             "lineage": "UNKNOWN unless an explicit provider mapping exists",
             "batch_id": batch_id,
+            "listing_state_change": {
+                "state": "OBSERVED_LISTING_REMOVAL" if removed_listing_symbols else "NO_OBSERVED_LISTING_REMOVAL",
+                "previous_universe_snapshot_id": prior_listing_snapshot_id,
+                "removed_symbol_count": len(removed_listing_symbols),
+                "legal_cause": "NOT_INFERRED",
+            },
         }
         full = store.create_snapshot(
             evidence_class="PROSPECTIVE_OBSERVED",
@@ -1609,6 +1673,14 @@ def collect_universe(
             availability_label=effective_availability,
             result_classification="HTTP_200",
             metadata=snapshot_metadata,
+        )
+        listing_state = _record_listing_state_change(
+            root,
+            previous_snapshot_id=prior_listing_snapshot_id,
+            previous_symbols=prior_listing_symbols,
+            current_snapshot_id=full["snapshot_id"],
+            current_symbols=current_listing_symbols,
+            observed_at=observed_at,
         )
         cohort_meta = {
             "universe_scope": "FROZEN_RESEARCH_COHORT",
@@ -1682,7 +1754,8 @@ def collect_universe(
         }
         _write_batch(root, batch)
         missing = _append_missed_events(root, observed_at)
-        revision_records = build_revision_records(root)
+        with _file_lock(root / "locks/revision-index.lock", blocking=False) as revision_locked:
+            revision_records = build_revision_records(root) if revision_locked else []
         integrity = verify_store(root)
         after = verify_previous_phase_snapshot(root)
         if after["status"] != "PASS":
@@ -1726,6 +1799,8 @@ def collect_universe(
             "missed_observations_recorded": missing,
             "previous_phase_artifact_immutability": after["status"],
             "revision_comparison_count": len(revision_records),
+            "listing_state_change": listing_state["state"],
+            "observed_listing_removal_count": len(listing_state["removed_symbols"]),
             "reason": "Only current-only listing archives passed the protected-response guard; dated flow endpoints remain deferred.",
         })
         report = _refresh_indexes(root, config, config_sha)
@@ -1794,6 +1869,10 @@ def make_status(root: Path = DEFAULT_ROOT, config_path: Path = DEFAULT_CONFIG_PA
     first = min((m["observed_at_utc"] for m in manifests), default=None)
     latest = max((m["observed_at_utc"] for m in manifests), default=None)
     full_cohort_sessions = {m.get("requested_session") for m in manifests if m.get("metadata", {}).get("universe_scope") == "FROZEN_RESEARCH_COHORT" and m.get("requested_session")}
+    current_listing_manifests = [m for m in manifests if m.get("source_name") == "KIS current listings" and m.get("metadata", {}).get("universe_scope") == "FULL_CURRENT_LISTINGS"]
+    current_listing_manifests.sort(key=lambda item: item.get("observed_at_utc", ""))
+    listing_state_dir = root / "universe/listing-state-changes"
+    listing_states = [json.loads(path.read_text(encoding="utf-8")) for path in sorted(listing_state_dir.glob("*.json"))] if listing_state_dir.exists() else []
     gate = config["source_stability_gate"]
     enough = len(sessions) >= gate["minimum_completed_sessions"] and len(multi) >= gate["minimum_multi_vintage_sessions"]
     report = {
@@ -1808,6 +1887,11 @@ def make_status(root: Path = DEFAULT_ROOT, config_path: Path = DEFAULT_CONFIG_PA
         "prospective_sessions": len(sessions),
         "multi_vintage_sessions": len(multi),
         "full_cohort_sessions": len(full_cohort_sessions),
+        "latest_universe_snapshot_id": current_listing_manifests[-1]["snapshot_id"] if current_listing_manifests else None,
+        "latest_universe_observed_at_utc": current_listing_manifests[-1].get("observed_at_utc") if current_listing_manifests else None,
+        "current_listing_count": current_listing_manifests[-1].get("record_count") if current_listing_manifests else 0,
+        "observed_listing_removals": sum(len(item.get("removed_symbols", [])) for item in listing_states),
+        "listing_state_change_count": len(listing_states),
         "revision_comparison_count": len(list((root / "revision/events").glob("*.json"))) if (root / "revision/events").exists() else 0,
         "revised_observations": sum(m.get("classification") not in {"IDENTICAL", "SEMANTICALLY_IDENTICAL"} for p in (root / "revision/events").glob("*.json") for m in [json.loads(p.read_text(encoding="utf-8"))]) if (root / "revision/events").exists() else 0,
         "coverage": [batch.get("coverage") for batch in batches],
@@ -1823,6 +1907,17 @@ def make_status(root: Path = DEFAULT_ROOT, config_path: Path = DEFAULT_CONFIG_PA
         "shadow_next_session": "NO",
         "live": "DISABLED",
     }
+    try:
+        from krx_trader.research.phase16b import flow_status
+
+        phase16b_status = flow_status(config, root)
+        report["phase16b"] = phase16b_status
+        report["source_states"].update({
+            row["source_id"]: row["collection_state"]
+            for row in phase16b_status.get("sources", [])
+        })
+    except (ImportError, KeyError, TypeError, ValueError):
+        report["phase16b"] = {"status": "UNAVAILABLE"}
     _write_operational_artifacts(root, config, config_sha, report)
     return report
 
@@ -1848,6 +1943,81 @@ def health_report(root: Path = DEFAULT_ROOT, config_path: Path = DEFAULT_CONFIG_
         warnings.append(f"STORAGE_{usage['status']}")
     if status["source_stability"] == "INSUFFICIENT_OBSERVATIONS":
         warnings.append("SOURCE_STABILITY_INSUFFICIENT")
+    phase16b_status = status.get("phase16b", {})
+    if phase16b_status.get("manifest_chain_valid") is False:
+        errors.append("PHASE16B_MANIFEST_CHAIN_INVALID")
+    for source in phase16b_status.get("sources", []):
+        first_safe = source.get("first_safe_anchor_session")
+        latest_session = source.get("latest_completed_krx_session")
+        if first_safe and latest_session and latest_session >= first_safe and source.get("collection_state") == "WAITING_FOR_SAFE_DATE":
+            warnings.append(f"SOURCE_STUCK_AFTER_FIRST_SAFE_DATE:{source.get('source_id')}")
+        if source.get("collection_state") == "ERROR":
+            errors.append(f"SOURCE_CONTRACT_REVIEW_REQUIRED:{source.get('source_id')}")
+    phase16b_batch_dir = root / "phase16b-flow-batches"
+    phase16b_batches = [json.loads(path.read_text(encoding="utf-8")) for path in sorted(phase16b_batch_dir.glob("*.json"))] if phase16b_batch_dir.exists() else []
+    consecutive_phase16b_errors = 0
+    for batch in reversed(phase16b_batches):
+        if batch.get("provider_errors", 0) or batch.get("transport_errors", 0) or batch.get("failure_count", 0):
+            consecutive_phase16b_errors += 1
+        else:
+            break
+    if consecutive_phase16b_errors >= 3:
+        warnings.append("PHASE16B_REPEATED_PROVIDER_ERRORS")
+    full_cohort_batches = [
+        batch for batch in phase16b_batches
+        if batch.get("source_id") == "kis_per_stock_flow"
+        and batch.get("collection_scope") == "FROZEN_RESEARCH_COHORT"
+    ]
+    if not full_cohort_batches:
+        warnings.append("PHASE16B_FULL_COHORT_COVERAGE_NOT_MEASURED")
+    elif phase16b_status.get("coverage_acceptable") is False:
+        coverages = [item.get("coverage") for item in full_cohort_batches if isinstance(item.get("coverage"), (int, float))]
+        if coverages and min(coverages) < 0.8:
+            warnings.append("PHASE16B_COVERAGE_POOR")
+        elif coverages and min(coverages) < 0.95:
+            warnings.append("PHASE16B_COVERAGE_DEGRADED")
+    try:
+        from krx_trader.research.phase16b import flow_launchd_status
+
+        flow_agents = flow_launchd_status(root)
+        phase16b_status["launch_agents"] = flow_agents
+        if flow_agents["status"] != "PASS":
+            warnings.append("PHASE16B_LAUNCHAGENTS_NOT_FULLY_ACTIVE")
+    except (ImportError, OSError, ValueError):
+        warnings.append("PHASE16B_LAUNCHAGENT_STATUS_UNAVAILABLE")
+    last_flow_run_path = root / "reports/phase16b-last-scheduled-invocation.json"
+    last_flow_run = None
+    if last_flow_run_path.is_file():
+        try:
+            last_flow_run = json.loads(last_flow_run_path.read_text(encoding="utf-8"))
+            last_run_at = parse_aware_datetime(last_flow_run["invoked_at_utc"]).astimezone(UTC)
+            last_flow_run["age_seconds"] = max(0.0, (datetime.now(UTC) - last_run_at).total_seconds())
+            if last_flow_run["age_seconds"] > 36 * 3600:
+                warnings.append("PHASE16B_SCHEDULED_JOB_STALE")
+        except (OSError, KeyError, ValueError, Phase16Error, json.JSONDecodeError):
+            warnings.append("PHASE16B_SCHEDULED_JOB_STATUS_INVALID")
+    else:
+        warnings.append("PHASE16B_SCHEDULED_JOB_NOT_RUN_YET")
+    phase16b_status["last_scheduled_invocation"] = last_flow_run
+    phase16b_status["clock_drift"] = {
+        "status": "NOT_MEASURED",
+        "reason": "health verifies the local Asia/Seoul timezone; no independent clock source is queried",
+    }
+    universe_label = "com.krxtrader.phase16.universe"
+    universe_plist = Path.home() / "Library/LaunchAgents" / f"{universe_label}.plist"
+    try:
+        universe_loaded = subprocess.run(
+            ["launchctl", "print", f"gui/{os.getuid()}/{universe_label}"],
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=False,
+        ).returncode == 0
+    except (OSError, subprocess.TimeoutExpired):
+        universe_loaded = False
+    if not universe_plist.is_file() or not universe_loaded:
+        warnings.append("UNIVERSE_LAUNCHAGENT_NOT_ACTIVE")
+    scheduler_status = {"universe": {"label": universe_label, "installed": universe_plist.is_file(), "loaded": universe_loaded}}
     batch_dir = root / "prospective/manifests/batches"
     batches = [json.loads(path.read_text(encoding="utf-8")) for path in sorted(batch_dir.glob("*.json"))] if batch_dir.exists() else []
     consecutive_errors = 0
@@ -1887,6 +2057,8 @@ def health_report(root: Path = DEFAULT_ROOT, config_path: Path = DEFAULT_CONFIG_
     return {
         "status": "FAIL" if errors else "PASS_WITH_WARNINGS" if warnings else "PASS",
         "collector_config_sha256": config_sha,
+        "phase16b": status.get("phase16b", {}),
+        "scheduler_status": scheduler_status,
         "manifest_chain": integrity,
         "previous_phase_artifact_immutability": previous,
         "warnings": warnings,
@@ -1953,6 +2125,7 @@ def _parser() -> argparse.ArgumentParser:
     subs = parser.add_subparsers(dest="command", required=True)
     subs.add_parser("collect-full", help="Preflight the full frozen cohort; unsafe flow sources remain network-disabled")
     subs.add_parser("collect-probe", help="Preflight the deterministic six-symbol flow probe cohort")
+    subs.add_parser("flow-preflight", help="Evaluate verified response envelopes and source activation without provider requests")
     universe = subs.add_parser("collect-universe", help="Collect current-only KIS listings and the frozen cohort intersection")
     universe.add_argument("--availability-label", choices=["MANUAL_BOOTSTRAP", "POST_20KST", "LATE_CATCHUP"], default="MANUAL_BOOTSTRAP")
     hist = subs.add_parser("historical-probe", help="Preflight a historical revision probe without making a request")
@@ -1963,19 +2136,46 @@ def _parser() -> argparse.ArgumentParser:
     subs.add_parser("status", help="Report source, vintage, coverage and storage status")
     export = subs.add_parser("export-evidence", help="Create a deterministic, content-addressed local evidence archive")
     export.add_argument("--output-dir", type=Path)
-    subs.add_parser("install-scheduler", help="Install the user-level daily current-listings LaunchAgent")
+    subs.add_parser("install-scheduler", help="Install the current-listings and guarded Phase 16B flow LaunchAgents")
     subs.add_parser("uninstall-scheduler", help="Remove only the Phase 16 LaunchAgent installed by this tool")
+    contract_probes = subs.add_parser("contract-probes", help="Run the fixed, guarded historical KIS response-contract probe set")
+    contract_probes.add_argument("--repeat", action="store_true", help="Explicitly repeat the fixed probe set as a new vintage")
+    flow = subs.add_parser("collect-active-flow", help="Preflight source contracts and collect eligible flow responses for a scheduled slot")
+    flow.add_argument("--slot", choices=("probe-close", "probe-evening", "full-evening", "probe-morning", "historical-weekly"), required=True)
+    flow.add_argument("--intentional-reobservation", action="store_true")
+    subs.add_parser("install-flow-scheduler", help="Install the five guarded Phase 16B flow LaunchAgents")
     return parser
 
 
 def _save_flow_preflight(args: argparse.Namespace, *, source_id: str, symbols: list[str], evidence_class: str = "PROSPECTIVE_OBSERVED") -> dict[str, Any]:
     config, config_sha, config_bytes = load_config(args.config)
     _runtime_config(args.root, config, config_sha, config_bytes)
-    session = datetime.now(KST).date()
-    result = collect_flow_preflight(source_id, symbols, config=config, session=session, evidence_class=evidence_class)
-    result.update({"source_id": source_id, "session": session.isoformat(), "collector_config_sha256": config_sha})
+    from krx_trader.research.phase16b import credentials_available, flow_preflight
+
+    now = datetime.now(KST)
+    preflight = flow_preflight(
+        config,
+        now=now,
+        credentials_available=credentials_available(),
+        collector_healthy=verify_store(args.root)["valid"],
+    )
+    source = next((item for item in preflight["sources"] if item["source_id"] == source_id), None)
+    result = {
+        **(source or {"source_id": source_id, "collection_state": "CONTRACT_UNKNOWN"}),
+        "status": "READY" if source and source["collection_state"] in {"READY", "ACTIVE"} else source.get("collection_state", "CONTRACT_UNKNOWN") if source else "CONTRACT_UNKNOWN",
+        "request_count": 0,
+        "network_accessed": False,
+        "target_symbols": list(symbols),
+        "successful_symbols": [],
+        "missing_symbols": [],
+        "failed_symbols": [],
+        "coverage": 0.0,
+        "generated_at_kst": now.isoformat(),
+        "collector_config_sha256": config_sha,
+        "preflight": preflight,
+    }
     _atomic_report(args.root, "reports/collection-decision.json", result)
-    _record_source_safety(args.root, config, datetime.now(KST))
+    _atomic_report(args.root, "reports/source-activation.json", preflight)
     _refresh_indexes(args.root, config, config_sha)
     _write_artifact_index(args.root)
     return result
@@ -2044,6 +2244,23 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "collect-universe":
             result = collect_universe(root=args.root, config_path=args.config, availability_label=args.availability_label)
+        elif args.command == "flow-preflight":
+            from krx_trader.research.phase16b import credentials_available, write_phase16b_artifacts
+            from krx_trader.research.phase16b import flow_preflight as run_phase16b_preflight
+
+            config, config_sha, config_bytes = load_config(args.config)
+            _runtime_config(args.root, config, config_sha, config_bytes)
+            result = run_phase16b_preflight(
+                config,
+                now=datetime.now(KST),
+                credentials_available=credentials_available(),
+                collector_healthy=verify_store(args.root)["valid"],
+                config_sha256=config_sha,
+            )
+            _atomic_report(args.root, "reports/source-activation.json", result)
+            write_phase16b_artifacts(config=config, config_sha256=config_sha, root=args.root, preflight=result)
+            _refresh_indexes(args.root, config, config_sha)
+            _write_artifact_index(args.root)
         elif args.command in {"collect-full", "collect-probe"}:
             config, _, _ = load_config(args.config)
             if args.command == "collect-probe":
@@ -2061,8 +2278,20 @@ def main(argv: list[str] | None = None) -> int:
             result.update({"network_accessed": False, "status": "PREFLIGHT_ONLY", "historical_evidence_class": "HISTORICAL_REVISION_PROBE", "note": "No live historical probe was issued by this Phase 16 bootstrap."})
             _atomic_report(args.root, "reports/historical-probe-decision.json", result)
         elif args.command == "revisions":
-            records = build_revision_records(args.root)
-            result = {"status": "PASS", "comparison_count": len(records), "summary": json.loads((args.root / "revision/revision-summary.json").read_text())}
+            with _file_lock(args.root / "locks/revision-index.lock", blocking=False) as locked:
+                if not locked:
+                    result = {"status": "ALREADY_RUNNING", "comparison_count": 0}
+                    print(json.dumps(result, indent=2, ensure_ascii=False))
+                    return 0
+                records = build_revision_records(args.root)
+            from krx_trader.research.phase16b import revision_summary
+
+            result = {
+                "status": "PASS",
+                "comparison_count": len(records),
+                "summary": json.loads((args.root / "revision/revision-summary.json").read_text()),
+                "phase16b": revision_summary(args.root),
+            }
             config, config_sha, _ = load_config(args.config)
             _refresh_indexes(args.root, config, config_sha)
             _write_artifact_index(args.root)
@@ -2080,10 +2309,86 @@ def main(argv: list[str] | None = None) -> int:
             result = export_evidence(args.root, args.output_dir)
         elif args.command == "install-scheduler":
             result = _install_scheduler(args.root)
+            from krx_trader.research.phase16b import install_flow_launchd
+
+            result["flow_agents"] = install_flow_launchd(args.root)
             _atomic_report(args.root, "reports/scheduler-status.json", result)
             config, config_sha, _ = load_config(args.config)
             _refresh_indexes(args.root, config, config_sha)
             _write_artifact_index(args.root)
+        elif args.command == "install-flow-scheduler":
+            from krx_trader.research.phase16b import install_flow_launchd
+
+            result = install_flow_launchd(args.root)
+            _atomic_report(args.root, "reports/phase16b-scheduler-status.json", result)
+            _write_artifact_index(args.root)
+        elif args.command == "contract-probes":
+            from krx_trader.research.phase16b import (
+                create_contract_config_revision,
+                live_kis_contract_probes,
+            )
+
+            config, config_sha, config_bytes = load_config(args.config)
+            _runtime_config(args.root, config, config_sha, config_bytes)
+            policy = config["phase16b"]["probe_policy"]
+            anchors = [date.fromisoformat(value) for value in policy["anchors"]]
+            result = live_kis_contract_probes(
+                root=args.root,
+                symbols=policy["symbols"],
+                anchors=anchors,
+                config=config,
+                config_sha256=config_sha,
+            )
+            if result.get("status") == "COMPLETE" and any(
+                config["phase16b"]["source_contracts"][source_id].get("confidence") != "EMPIRICALLY_VERIFIED"
+                or config["phase16b"]["source_contracts"][source_id].get("ordering") != result["contract_summary"][source_id].get("ordering")
+                for source_id in ("kis_per_stock_flow", "kis_program_flow")
+            ):
+                next_config_path, next_config, next_sha = create_contract_config_revision(
+                    current_config=config,
+                    current_config_path=args.config,
+                    audit_report=result,
+                )
+                result["new_config_revision"] = {
+                    "path": str(next_config_path),
+                    "config_version": next_config["config_version"],
+                    "parent_config_sha256": next_config["parent_config_sha256"],
+                    "config_sha256": next_sha,
+                }
+            elif result.get("network_accessed") and result.get("status") != "COMPLETE":
+                for source_id, summary in result.get("contract_summary", {}).items():
+                    if summary.get("all_valid") is not True:
+                        event = {
+                            "event_type": "SOURCE_CONTRACT_VIOLATION",
+                            "source_id": source_id,
+                            "event_at_utc": datetime.now(UTC).isoformat(),
+                            "probe_evidence_class": "CONTRACT_VERIFICATION_PROBE",
+                            "response_contract_probe_failure": True,
+                            "contract_review_required": True,
+                        }
+                        _atomic_report(args.root, f"contract-violations/{hashlib.sha256(_json_bytes(event)).hexdigest()}.json", event)
+        elif args.command == "collect-active-flow":
+            from krx_trader.research.phase16b import collect_active_flow_slot
+
+            config, config_sha, config_bytes = load_config(args.config)
+            _runtime_config(args.root, config, config_sha, config_bytes)
+            invoked_at = datetime.now(KST)
+            result = collect_active_flow_slot(
+                config=config,
+                config_sha256=config_sha,
+                root=args.root,
+                slot=args.slot,
+                now=invoked_at,
+                intentional_reobservation=args.intentional_reobservation,
+            )
+            _atomic_report(args.root, "reports/phase16b-last-scheduled-invocation.json", {
+                "slot": args.slot,
+                "invoked_at_utc": invoked_at.astimezone(UTC).isoformat(),
+                "invoked_at_kst": invoked_at.isoformat(),
+                "status": result.get("status"),
+                "network_accessed": result.get("network_accessed", False),
+                "request_count": result.get("request_count", sum(int(item.get("request_count", 0)) for item in result.get("sources", []))),
+            })
         elif args.command == "uninstall-scheduler":
             result = _uninstall_scheduler()
             _atomic_report(args.root, "reports/scheduler-status.json", result)
