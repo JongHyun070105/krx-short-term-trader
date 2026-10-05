@@ -2150,7 +2150,11 @@ def _parser() -> argparse.ArgumentParser:
 def _save_flow_preflight(args: argparse.Namespace, *, source_id: str, symbols: list[str], evidence_class: str = "PROSPECTIVE_OBSERVED") -> dict[str, Any]:
     config, config_sha, config_bytes = load_config(args.config)
     _runtime_config(args.root, config, config_sha, config_bytes)
-    from krx_trader.research.phase16b import credentials_available, flow_preflight
+    from krx_trader.research.phase16b import (
+        _contract_violation_sources,
+        credentials_available,
+        flow_preflight,
+    )
 
     now = datetime.now(KST)
     preflight = flow_preflight(
@@ -2158,6 +2162,7 @@ def _save_flow_preflight(args: argparse.Namespace, *, source_id: str, symbols: l
         now=now,
         credentials_available=credentials_available(),
         collector_healthy=verify_store(args.root)["valid"],
+        contract_violation_sources=_contract_violation_sources(args.root),
     )
     source = next((item for item in preflight["sources"] if item["source_id"] == source_id), None)
     result = {
@@ -2245,7 +2250,11 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "collect-universe":
             result = collect_universe(root=args.root, config_path=args.config, availability_label=args.availability_label)
         elif args.command == "flow-preflight":
-            from krx_trader.research.phase16b import credentials_available, write_phase16b_artifacts
+            from krx_trader.research.phase16b import (
+                _contract_violation_sources,
+                credentials_available,
+                write_phase16b_artifacts,
+            )
             from krx_trader.research.phase16b import flow_preflight as run_phase16b_preflight
 
             config, config_sha, config_bytes = load_config(args.config)
@@ -2255,6 +2264,7 @@ def main(argv: list[str] | None = None) -> int:
                 now=datetime.now(KST),
                 credentials_available=credentials_available(),
                 collector_healthy=verify_store(args.root)["valid"],
+                contract_violation_sources=_contract_violation_sources(args.root),
                 config_sha256=config_sha,
             )
             _atomic_report(args.root, "reports/source-activation.json", result)

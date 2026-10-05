@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-from krx_trader.research import phase16
+from krx_trader.research import phase16, phase16b
 from krx_trader.research.phase16 import (
     AppendOnlyError,
     EvidenceStore,
@@ -211,6 +211,31 @@ def test_current_only_listing_archive_passes_guard_but_is_not_a_flow_source():
     config, _, _ = load_config()
     assert request_range_guard("kis_current_listings", date(2026, 10, 1), config=config)["allowed"] is True
     assert collect_flow_preflight("kis_per_stock_flow", ["005930"], config=config, session=date(2026, 10, 1))["network_accessed"] is False
+
+
+def test_flow_preflight_cli_honors_persisted_contract_violation(tmp_path, monkeypatch, capsys):
+    root = tmp_path / "phase16"
+    violations = root / "contract-violations"
+    violations.mkdir(parents=True)
+    (violations / "violation.json").write_text(
+        json.dumps({
+            "event_type": "SOURCE_CONTRACT_VIOLATION",
+            "source_id": "kis_per_stock_flow",
+            "payload_persisted": False,
+        }),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(phase16b, "credentials_available", lambda: False)
+    monkeypatch.setattr(phase16b, "DEFAULT_PHASE16B_ROOT", tmp_path / "phase16b")
+
+    assert phase16.main(["--root", str(root), "flow-preflight"]) == 0
+    report = json.loads(capsys.readouterr().out)
+    per_stock = next(row for row in report["sources"] if row["source_id"] == "kis_per_stock_flow")
+
+    assert per_stock["collection_state"] == "ERROR"
+    assert per_stock["reason"] == "CONTRACT_REVIEW_REQUIRED"
+    assert per_stock["request_decision"] == "DENY_PROTECTED_RANGE"
+    assert report["network_accessed"] is False
 
 
 def test_append_only_store_rejects_snapshot_id_reuse(tmp_path):

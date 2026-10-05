@@ -628,6 +628,42 @@ def test_kis_pagination_contract_violation_disables_future_requests(tmp_path, mo
     assert json.loads(violation.read_text(encoding="utf-8"))["event_type"] == "SOURCE_CONTRACT_VIOLATION"
 
 
+def test_historical_probe_is_blocked_after_source_contract_violation(tmp_path, monkeypatch):
+    config = json.loads(phase16b.DEFAULT_PHASE16B_CONFIG.read_text(encoding="utf-8"))
+    monkeypatch.setattr(phase16b, "DEFAULT_PHASE16B_ROOT", tmp_path / "phase16b")
+    monkeypatch.setattr(phase16b, "credentials_available", lambda: True)
+    root = tmp_path / "phase16"
+    violations = root / "contract-violations"
+    violations.mkdir(parents=True)
+    (violations / "violation.json").write_text(
+        json.dumps({
+            "event_type": "SOURCE_CONTRACT_VIOLATION",
+            "source_id": "kis_per_stock_flow",
+            "payload_persisted": False,
+        }),
+        encoding="utf-8",
+    )
+    client_requests = []
+
+    def unexpected_kis_client(_config):
+        client_requests.append("created")
+        raise AssertionError("contract-violated source must not reach transport setup")
+
+    monkeypatch.setattr(phase16b, "_kis_client", unexpected_kis_client)
+    result = phase16b.collect_active_flow_slot(
+        config=config,
+        config_sha256=hashlib.sha256(phase16b.phase16._json_bytes(config)).hexdigest(),
+        root=root,
+        slot="historical-weekly",
+        now=datetime(2026, 10, 16, 20, 45, tzinfo=KST),
+    )
+
+    assert result["status"] == "CONTRACT_REVIEW_REQUIRED"
+    assert result["request_count"] == 0
+    assert result["network_accessed"] is False
+    assert client_requests == []
+
+
 def test_flow_launchd_templates_include_guarded_daily_slots_and_weekly_probe(tmp_path):
     plists = phase16b.build_flow_launchd_plists(root=tmp_path)
     by_label = {row["Label"]: row for row in plists}

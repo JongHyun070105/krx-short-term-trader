@@ -1611,12 +1611,13 @@ def collect_active_flow_slot(
     allowed_slots = {"probe-close", "probe-evening", "full-evening", "probe-morning", "historical-weekly"}
     if slot not in allowed_slots:
         raise ValueError(f"unsupported scheduled flow slot: {slot}")
+    contract_violations = _contract_violation_sources(root)
     preflight = flow_preflight(
         config,
         now=now,
         credentials_available=credentials_available(),
         collector_healthy=phase16.verify_store(root)["valid"],
-        contract_violation_sources=_contract_violation_sources(root),
+        contract_violation_sources=contract_violations,
         config_sha256=config_sha256,
     )
     activation_path = root / "reports/phase16b-source-activation.json"
@@ -1638,11 +1639,22 @@ def collect_active_flow_slot(
             write_phase16b_artifacts(config=config, config_sha256=config_sha256, root=root, preflight=preflight)
             return result
         policy = config.get("phase16b", {}).get("historical_revision_policy", {})
+        source_id = policy.get("source_id", "kis_per_stock_flow")
+        if source_id in contract_violations:
+            result = {
+                "status": "CONTRACT_REVIEW_REQUIRED",
+                "source_id": source_id,
+                "request_count": 0,
+                "network_accessed": False,
+                "reason": "historical probe is disabled after a source contract violation",
+            }
+            write_phase16b_artifacts(config=config, config_sha256=config_sha256, root=root, preflight=preflight)
+            return {"slot": slot, "network_accessed": False, "sources": [result], **result}
         result = collect_historical_revision_probe(
             config=config,
             config_sha256=config_sha256,
             root=root,
-            source_id=policy.get("source_id", "kis_per_stock_flow"),
+            source_id=source_id,
             symbol=policy.get("symbol", "005930"),
             market=policy.get("market", "KOSPI"),
             anchor=date.fromisoformat(policy.get("anchor", "2025-06-02")),
@@ -2653,6 +2665,7 @@ def main(argv: list[str] | None = None) -> int:
             now=datetime.now(KST),
             credentials_available=credentials_available(),
             collector_healthy=phase16.verify_store(args.root)["valid"],
+            contract_violation_sources=_contract_violation_sources(args.root),
             config_sha256=config_sha,
         )
         write_phase16b_artifacts(config=config, config_sha256=config_sha, root=args.root, preflight=result)
