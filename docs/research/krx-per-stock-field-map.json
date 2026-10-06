@@ -1,0 +1,314 @@
+{
+  "schema_version": 1,
+  "source_id": "krx_exact_day_per_stock_investor",
+  "screen_id": "MDCSTAT023",
+  "official_screen_title": "[12009] 투자자별 거래실적(개별종목)",
+  "official_source_url": "https://data.krx.co.kr/contents/MDC/STAT/standard/MDCSTAT023.jsp",
+  "retrieved_on": "2026-10-06",
+  "field_source": "Official screen HTML table bindings and selector labels; response payloads were not requested.",
+  "response_schema_status": "SCREEN_BINDINGS_OBSERVED_RESPONSE_UNVERIFIED",
+  "normalization_status": "QUARANTINED",
+  "sign_semantics_status": "LABEL_ONLY_POSITIVE_NEGATIVE_MAPPING_UNVERIFIED",
+  "fields": [
+    {
+      "data_service_id": "MDCSTAT02301",
+      "provider_field": "INVST_TP_NM",
+      "official_label_ko": "투자자구분",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "NOT_APPLICABLE_LABEL",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "LABEL_ONLY",
+      "notes": "Period-total table row label. Returned category values were not observed."
+    },
+    {
+      "data_service_id": "MDCSTAT02301",
+      "provider_field": "ASK_TRDVOL",
+      "official_label_ko": "매도 거래량",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Screen unit selector offers 주, 천주, 백만주; raw response scale was not observed."
+    },
+    {
+      "data_service_id": "MDCSTAT02301",
+      "provider_field": "BID_TRDVOL",
+      "official_label_ko": "매수 거래량",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Screen unit selector offers 주, 천주, 백만주; raw response scale was not observed."
+    },
+    {
+      "data_service_id": "MDCSTAT02301",
+      "provider_field": "NETBID_TRDVOL",
+      "official_label_ko": "순매수 거래량",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Screen unit selector offers 주, 천주, 백만주; numeric sign behavior was not observed."
+    },
+    {
+      "data_service_id": "MDCSTAT02301",
+      "provider_field": "ASK_TRDVAL",
+      "official_label_ko": "매도 거래대금",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Screen unit selector offers 원, 천원, 백만원, 십억원; raw response scale was not observed."
+    },
+    {
+      "data_service_id": "MDCSTAT02301",
+      "provider_field": "BID_TRDVAL",
+      "official_label_ko": "매수 거래대금",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Screen unit selector offers 원, 천원, 백만원, 십억원; raw response scale was not observed."
+    },
+    {
+      "data_service_id": "MDCSTAT02301",
+      "provider_field": "NETBID_TRDVAL",
+      "official_label_ko": "순매수 거래대금",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Screen unit selector offers 원, 천원, 백만원, 십억원; numeric sign behavior was not observed."
+    },
+    {
+      "data_service_id": "MDCSTAT02302",
+      "provider_field": "TRD_DD",
+      "official_label_ko": "일자",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "NOT_APPLICABLE_DATE",
+      "semantic_status": "SCREEN_BINDING_CONFIRMED",
+      "normalization_status": "DATE_PARSER_REQUIRED",
+      "notes": "Daily summary table date key."
+    },
+    {
+      "data_service_id": "MDCSTAT02302",
+      "provider_field": "TRDVAL1",
+      "official_label_ko": "기관 합계",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Daily series value depends on trdVolVal and askBid selectors."
+    },
+    {
+      "data_service_id": "MDCSTAT02302",
+      "provider_field": "TRDVAL2",
+      "official_label_ko": "기타법인",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Daily series value depends on trdVolVal and askBid selectors."
+    },
+    {
+      "data_service_id": "MDCSTAT02302",
+      "provider_field": "TRDVAL3",
+      "official_label_ko": "개인",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Daily series value depends on trdVolVal and askBid selectors."
+    },
+    {
+      "data_service_id": "MDCSTAT02302",
+      "provider_field": "TRDVAL4",
+      "official_label_ko": "외국인 합계",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Daily series value depends on trdVolVal and askBid selectors."
+    },
+    {
+      "data_service_id": "MDCSTAT02302",
+      "provider_field": "TRDVAL_TOT",
+      "official_label_ko": "전체",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Daily series value depends on trdVolVal and askBid selectors."
+    },
+    {
+      "data_service_id": "MDCSTAT02303",
+      "provider_field": "TRD_DD",
+      "official_label_ko": "일자",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "NOT_APPLICABLE_DATE",
+      "semantic_status": "SCREEN_BINDING_CONFIRMED",
+      "normalization_status": "DATE_PARSER_REQUIRED",
+      "notes": "Detailed daily series date key."
+    },
+    {
+      "data_service_id": "MDCSTAT02303",
+      "provider_field": "TRDVAL1",
+      "official_label_ko": "금융투자",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Daily series value depends on trdVolVal and askBid selectors."
+    },
+    {
+      "data_service_id": "MDCSTAT02303",
+      "provider_field": "TRDVAL2",
+      "official_label_ko": "보험",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Daily series value depends on trdVolVal and askBid selectors."
+    },
+    {
+      "data_service_id": "MDCSTAT02303",
+      "provider_field": "TRDVAL3",
+      "official_label_ko": "투신",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Daily series value depends on trdVolVal and askBid selectors."
+    },
+    {
+      "data_service_id": "MDCSTAT02303",
+      "provider_field": "TRDVAL4",
+      "official_label_ko": "사모",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Daily series value depends on trdVolVal and askBid selectors."
+    },
+    {
+      "data_service_id": "MDCSTAT02303",
+      "provider_field": "TRDVAL5",
+      "official_label_ko": "은행",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Daily series value depends on trdVolVal and askBid selectors."
+    },
+    {
+      "data_service_id": "MDCSTAT02303",
+      "provider_field": "TRDVAL6",
+      "official_label_ko": "기타금융",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Daily series value depends on trdVolVal and askBid selectors."
+    },
+    {
+      "data_service_id": "MDCSTAT02303",
+      "provider_field": "TRDVAL7",
+      "official_label_ko": "연기금 등",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Daily series value depends on trdVolVal and askBid selectors."
+    },
+    {
+      "data_service_id": "MDCSTAT02303",
+      "provider_field": "TRDVAL8",
+      "official_label_ko": "기타법인",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Daily series value depends on trdVolVal and askBid selectors."
+    },
+    {
+      "data_service_id": "MDCSTAT02303",
+      "provider_field": "TRDVAL9",
+      "official_label_ko": "개인",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Daily series value depends on trdVolVal and askBid selectors."
+    },
+    {
+      "data_service_id": "MDCSTAT02303",
+      "provider_field": "TRDVAL10",
+      "official_label_ko": "외국인",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Daily series value depends on trdVolVal and askBid selectors."
+    },
+    {
+      "data_service_id": "MDCSTAT02303",
+      "provider_field": "TRDVAL11",
+      "official_label_ko": "기타외국인",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Daily series value depends on trdVolVal and askBid selectors."
+    },
+    {
+      "data_service_id": "MDCSTAT02303",
+      "provider_field": "TRDVAL_TOT",
+      "official_label_ko": "전체",
+      "official_label_en": null,
+      "data_type": "UNKNOWN_UNTIL_RESPONSE",
+      "unit": "UNKNOWN_SCALE",
+      "semantic_status": "SCREEN_LABEL_CONFIRMED",
+      "normalization_status": "QUARANTINED_UNKNOWN_RESPONSE_SCALE",
+      "notes": "Daily series value depends on trdVolVal and askBid selectors."
+    }
+  ],
+  "category_labels": {
+    "summary": ["기관 합계", "기타법인", "개인", "외국인 합계", "전체"],
+    "detailed": ["금융투자", "보험", "투신", "사모", "은행", "기타금융", "연기금 등", "기타법인", "개인", "외국인", "기타외국인", "전체"]
+  },
+  "selector_mapping": {
+    "askBid": {"1": "매도", "2": "매수", "3": "순매수"},
+    "trdVolVal": {"1": "거래량", "2": "거래대금"},
+    "inqTpCd": {"1": "기간합계", "2": "일별추이"}
+  },
+  "unit_selectors": {
+    "share": {"1": "주", "2": "천주", "3": "백만주"},
+    "money": {"1": "원", "2": "천원", "3": "백만원", "4": "십억원"},
+    "response_unit_factor": "UNKNOWN"
+  }
+}

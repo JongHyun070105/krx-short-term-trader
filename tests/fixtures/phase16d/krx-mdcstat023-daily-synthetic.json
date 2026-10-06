@@ -1,0 +1,12 @@
+{
+  "fixture_kind": "SYNTHETIC_SCREEN_BINDING_FIXTURE_NOT_PROVIDER_PAYLOAD",
+  "source_screen": "MDCSTAT023",
+  "payload": {
+    "output": [
+      {
+        "TRD_DD": "2024/06/03",
+        "TRDVAL1": "SYNTHETIC_VALUE"
+      }
+    ]
+  }
+}
