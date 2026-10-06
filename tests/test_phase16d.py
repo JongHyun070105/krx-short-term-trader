@@ -122,6 +122,7 @@ def test_field_map_validates_and_keeps_unknown_units_quarantined():
     check = phase16d.validate_field_map(field_map)
     assert check["valid"] is True
     assert check["field_count"] == len(field_map["fields"])
+    assert len(check["unknown_unit_field_entries"]) == 23
     assert "NETBID_TRDVOL" in check["quarantined_fields"]
     assert "TRD_DD" not in check["quarantined_fields"]
 

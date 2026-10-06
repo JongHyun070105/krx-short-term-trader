@@ -322,6 +322,7 @@ def validate_field_map(field_map: Mapping[str, Any]) -> dict[str, Any]:
     }
     names: list[tuple[str, str]] = []
     unknown_units: list[str] = []
+    unknown_unit_entries: list[str] = []
     errors: list[str] = []
     for index, entry in enumerate(entries):
         if not isinstance(entry, dict) or not required.issubset(entry):
@@ -335,6 +336,7 @@ def validate_field_map(field_map: Mapping[str, Any]) -> dict[str, Any]:
         unit = entry["unit"]
         if not isinstance(unit, str) or unit.strip().upper() in {"", "UNKNOWN", "UNKNOWN_SCALE"}:
             unknown_units.append(name)
+            unknown_unit_entries.append(f"{entry['data_service_id']}:{name}")
     duplicates = sorted({key for key in names if names.count(key) > 1})
     if duplicates:
         errors.append(
@@ -344,6 +346,7 @@ def validate_field_map(field_map: Mapping[str, Any]) -> dict[str, Any]:
         "valid": not errors,
         "field_count": len(entries),
         "unknown_unit_fields": sorted(set(unknown_units)),
+        "unknown_unit_field_entries": sorted(unknown_unit_entries),
         "quarantined_fields": sorted(set(unknown_units)),
         "errors": errors,
     }
